@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>D-0507 Training Companion</title>
+<meta name="description" content="สื่อการสอนภาคทฤษฎีของ D-0507 Flight Training">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{
+  --bg:#eef1f5; --panel:#ffffff; --ink:#14202e; --muted:#5a6878; --line:#d6dde6;
+  --accent:#0f5fa8; --chip:#e4e9f0;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b121b; --panel:#121c28; --ink:#e7edf4; --muted:#93a3b5; --line:#24323f;
+  --accent:#5aa9ff; --chip:#1d2a38; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b121b; --panel:#121c28; --ink:#e7edf4; --muted:#93a3b5; --line:#24323f;
+  --accent:#5aa9ff; --chip:#1d2a38; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:40px 16px 56px}
+.k{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(34px,6vw,48px);line-height:1;margin:8px 0 10px;letter-spacing:.01em}
+.lead{color:var(--muted);max-width:60ch;margin:0 0 28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+a.card{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;transition:border-color .15s,transform .15s}
+a.card:hover{border-color:var(--accent);transform:translateY(-1px)}
+a.card:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.tag{align-self:flex-start;font-family:var(--f-mono);font-size:11.5px;background:var(--chip);color:var(--muted);border-radius:999px;padding:2px 9px}
+.t{font-family:var(--f-display);font-weight:600;font-size:23px;line-height:1.15}
+.d{color:var(--muted);font-size:14.5px}
+.go{margin-top:auto;padding-top:8px;color:var(--accent);font-weight:600;font-size:14px}
+footer{margin-top:36px;color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="k">D-0507 Flight Training · PPL Theory</div>
+  <h1>Training Companion</h1>
+  <p class="lead">สื่อการสอนภาคทฤษฎีสำหรับครูและนักเรียน เปิดได้ทั้งบนมือถือ แท็บเล็ต และคอมพิวเตอร์</p>
+
+  <div class="grid">
+    <a class="card" href="lecture/">
+      <span class="tag">ครูผู้สอน</span>
+      <span class="t">Lecture Companion</span>
+      <span class="d">คู่มือบรรยายทีละหน้าของ deck ภาคทฤษฎี PPL ทุกวิชา ใช้คู่กับสไลด์บนจอ</span>
+      <span class="go">เปิด →</span>
+    </a>
+    <a class="card" href="briefing/">
+      <span class="tag">Briefing</span>
+      <span class="t">PPL Briefing Plates</span>
+      <span class="d">แผ่นภาพประกอบการบรีฟ พร้อม walk-around แบบ 3 มิติ</span>
+      <span class="go">เปิด →</span>
+    </a>
+    <a class="card" href="wind-tunnel/">
+      <span class="tag">081 Principles of Flight</span>
+      <span class="t">อุโมงค์ลม Joukowski</span>
+      <span class="d">จำลองการไหลผ่านแพนอากาศ แฟลป สแลต slipstream และ P-factor</span>
+      <span class="go">เปิด →</span>
+    </a>
+    <a class="card" href="atmosphere/">
+      <span class="tag">050 Meteorology</span>
+      <span class="t">ห้องทดลองชั้นบรรยากาศ</span>
+      <span class="d">ลูกอากาศ เมฆ หมอก แนวปะทะ และระบบความกดอากาศ</span>
+      <span class="go">เปิด →</span>
+    </a>
+    <a class="card" href="engine/">
+      <span class="tag">021 AGK</span>
+      <span class="t">ระบบเครื่องยนต์ C172S / DA42</span>
+      <span class="d">เครื่องยนต์ 4 จังหวะ ระบบหล่อลื่น ระบายความร้อน เทอร์โบ และ EGT</span>
+      <span class="go">เปิด →</span>
+    </a>
+    <a class="card" href="cg/">
+      <span class="tag">031 Mass &amp; Balance</span>
+      <span class="t">CG Envelope Trainer</span>
+      <span class="d">จัดน้ำหนักเครื่องบินแล้วดูจุด CG เคลื่อนที่บนกราฟ envelope</span>
+      <span class="go">เปิด →</span>
+    </a>
+  </div>
+
+  <footer>สื่อเพื่อการเรียนการสอนเท่านั้น ใช้งานจริงให้ยึดตาม POH/AFM, AIP และ SOP ของหน่วยฝึก</footer>
+</main>
+</body>
+</html>

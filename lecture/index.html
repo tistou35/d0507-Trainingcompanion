@@ -1,0 +1,341 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>D-0507 Lecture Companion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one-hand cockpit companion — sticky top bar, scrolling page card, fixed thumb bar at the bottom; iPad landscape splits narration | notes. */
+:root{
+  --bg:#eef1f5; --panel:#ffffff; --panel-2:#f5f7fa; --ink:#14202e; --muted:#5a6878; --line:#d6dde6;
+  --accent:#0f5fa8; --accent-ink:#ffffff; --amber:#a35a00; --amber-bg:#fff3df; --amber-line:#f0c27a;
+  --key:#0b6b4f; --key-bg:#e5f5ee; --chip:#e4e9f0;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Thai","Noto Sans Thai","Sukhumvit Set","Thonburi",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --fs:19px; --gutter:16px; --bar-h:72px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0b121b; --panel:#121c28; --panel-2:#17222f; --ink:#e7edf4; --muted:#93a3b5; --line:#24323f;
+  --accent:#5aa9ff; --accent-ink:#06121f; --amber:#ffb547; --amber-bg:#2a1f0d; --amber-line:#6b4a14;
+  --key:#5fd3a6; --key-bg:#0f2a22; --chip:#1d2a38; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b121b; --panel:#121c28; --panel-2:#17222f; --ink:#e7edf4; --muted:#93a3b5; --line:#24323f;
+  --accent:#5aa9ff; --accent-ink:#06121f; --amber:#ffb547; --amber-bg:#2a1f0d; --amber-line:#6b4a14;
+  --key:#5fd3a6; --key-bg:#0f2a22; --chip:#1d2a38; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;-webkit-text-size-adjust:100%}
+button{font:inherit;color:inherit}
+*{box-sizing:border-box}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:var(--gutter)}
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:10px;min-height:56px}
+.iconbtn{min-width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--panel);display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 12px;cursor:pointer;font-weight:500;font-size:15px}
+.iconbtn:active{transform:scale(.97)}
+.iconbtn svg{width:20px;height:20px}
+.toptitle{flex:1;min-width:0}
+.toptitle .k{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.02em}
+.toptitle .t{font-family:var(--f-display);font-weight:600;font-size:20px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gbtn{margin-left:auto;text-decoration:none;color:var(--accent);font-weight:600;white-space:nowrap;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:6px 12px;font-size:14px;display:inline-flex;align-items:center}
+.tabs{align-items:center}
+.tab{white-space:nowrap}
+@media (max-width:480px){.tth{display:none}}
+.timer{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.timer.on{background:var(--key-bg);color:var(--key);border-color:var(--key)}
+/* library */
+.lib-head{padding-block:22px 6px}
+.brand{font-family:var(--f-display);font-weight:700;font-size:34px;letter-spacing:.01em;line-height:1}
+.brand small{display:block;font-family:var(--f-body);font-weight:400;font-size:15px;color:var(--muted);margin-top:6px;letter-spacing:0}
+.search{margin-block:14px 8px;display:flex}
+.search input{flex:1;min-width:0;height:48px;border-radius:14px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:0 16px;font:inherit;font-size:16px}
+.subjects{display:flex;gap:8px;overflow-x:auto;padding-block:6px 10px;scrollbar-width:none}
+.subjects::-webkit-scrollbar{display:none}
+.subj{flex:0 0 auto;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:8px 14px;cursor:pointer;display:flex;gap:8px;align-items:baseline}
+.subj b{font-family:var(--f-mono);font-size:13px}
+.subj span{font-size:14px;white-space:nowrap}
+.subj[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.group{margin-block:18px 6px;display:flex;align-items:baseline;gap:4px 10px;flex-wrap:wrap}
+.group h2{font-family:var(--f-display);font-weight:600;font-size:22px;margin:0}
+.group .th{color:var(--muted);font-size:14px}
+.group .th{flex:1 1 auto}
+.group .n{margin-left:auto;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.decks{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.deck{display:flex;gap:12px;align-items:flex-start;text-align:left;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:12px 14px;cursor:pointer;min-width:0}
+.deck:hover{border-color:var(--accent)}
+.deck .code{display:flex;flex-direction:column;align-items:center;min-width:46px;padding:2px 8px 4px;border-right:1px solid var(--line);margin-right:2px;font-variant-numeric:tabular-nums}
+.deck .code .c0{font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
+.deck .code .cn{font-family:var(--f-display);font-weight:700;font-size:24px;line-height:1.02;color:var(--ink)}
+.deck .code .cn.z{color:var(--muted);font-weight:500}
+.deck .nm{font-weight:500;line-height:1.35;min-width:0}
+.deck .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.pill{font-size:12px;border-radius:999px;padding:1px 8px;background:var(--chip);color:var(--muted);white-space:nowrap}
+.pill.rev0{background:var(--amber-bg);color:var(--amber)}
+.pill.resume{background:var(--key-bg);color:var(--key)}
+.dcont{display:block;margin-top:8px;border:1px dashed var(--line);border-radius:10px;padding:6px 9px;background:var(--panel-2);font-size:13px;line-height:1.35}
+.dcont .dh{display:block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.dcont .ci{display:flex;gap:8px;padding:2px 0}
+.dcont .ci+.ci{border-top:1px solid color-mix(in srgb,var(--line) 60%,transparent)}
+.dcont .cc{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);min-width:84px;white-space:nowrap;padding-top:1px}
+.dcont .cn2{min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dcont .ci.main .cn2{font-weight:600}
+.dcont .ci.sub .cn2{color:var(--muted)}
+.brief .dcont{font-size:15px;padding:10px 12px}
+.brief .dcont .cn2{-webkit-line-clamp:unset;display:block}
+.brief .dcont .cc{font-size:13px;min-width:100px}
+.foot{color:var(--muted);font-size:13px;padding-block:24px 40px}
+/* deck view */
+.tabs{display:flex;gap:6px;padding-block:10px 4px}
+.tab{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:6px 14px;cursor:pointer;font-weight:500}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.page{padding-block:8px calc(var(--bar-h) + 28px + env(safe-area-inset-bottom,0px))}
+.phead{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;padding-block:6px 10px}
+.pno{font-family:var(--f-display);font-weight:700;font-size:56px;line-height:.85;font-variant-numeric:tabular-nums}
+.pno small{font-size:24px;color:var(--muted);font-weight:500}
+.ptitle{flex:1;min-width:220px}
+.ptitle h1{font-family:var(--f-display);font-weight:600;font-size:28px;line-height:1.1;margin:0;text-wrap:balance}
+.ts{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.onscreen{font-size:14px;color:var(--muted);border-left:3px solid var(--line);padding:2px 0 2px 10px;margin-bottom:12px}
+.onscreen b{color:var(--ink);font-weight:600}
+.clamp{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;cursor:pointer}
+.cor .clamp{-webkit-line-clamp:3}
+.clamp.open{-webkit-line-clamp:unset;display:block}
+.more{font-size:12px;color:var(--muted);margin-top:4px}
+@media (max-width:640px){.pno{font-size:40px}.pno small{font-size:18px}.ptitle{min-width:0}.ptitle h1{font-size:23px}.phead{gap:10px;flex-wrap:nowrap;align-items:flex-start}.tab{padding:5px 12px;font-size:14px}.card{padding:14px 15px}}
+.grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media (min-width:900px){.grid{grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);align-items:start}.side{position:sticky;top:76px}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 18px;min-width:0}
+.lbl{font-family:var(--f-display);font-weight:600;font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:flex;gap:8px;align-items:center}
+.narr{font-size:var(--fs);line-height:1.62}
+.narr p{margin:0 0 .7em}
+.narr .th{font-size:calc(var(--fs) * 1.02)}
+.narr .sep{border-top:1px dashed var(--line);margin:14px 0}
+.narr .langtag{font-family:var(--f-mono);font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
+.written{font-size:12px;color:var(--amber);font-weight:500}
+.key{background:var(--key-bg);border-color:color-mix(in srgb,var(--key) 40%,transparent)}
+.key .lbl{color:var(--key)}
+.key .txt{font-size:calc(var(--fs) * .95);font-weight:500;line-height:1.45}
+.key .txt+.txt{margin-top:6px;font-weight:400}
+.corchip{display:inline-flex;align-items:center;gap:6px;margin-top:6px;border:1px solid var(--amber-line);background:var(--amber-bg);color:var(--amber);border-radius:999px;padding:3px 10px 3px 8px;font-size:13px;font-weight:600;cursor:pointer;line-height:1.3}
+.corchip .dot{width:7px;height:7px;border-radius:50%;background:var(--amber)}
+.corchip .chev{transition:transform .15s;font-size:11px}
+.corchip[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.cordetail{background:var(--amber-bg);border:1px solid var(--amber-line);border-radius:12px;padding:10px 14px;font-size:15px;margin-bottom:12px}
+.guide .txt{font-size:calc(var(--fs) * .88);line-height:1.5}
+.guide .txt+.txt{margin-top:8px;color:var(--muted)}
+.guide mark{background:none;color:var(--accent);font-weight:600}
+.empty{color:var(--muted);font-size:14px}
+/* brief */
+.brief .card{margin-bottom:12px}
+.brief ul{margin:0;padding-left:20px}
+.brief li{margin-bottom:6px}
+.tblwrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:8px 8px;text-align:left;vertical-align:top}
+th{font-family:var(--f-display);font-weight:600;letter-spacing:.05em;text-transform:uppercase;font-size:13px;color:var(--muted)}
+.links{display:flex;gap:8px;flex-wrap:wrap}
+.links a{color:var(--accent);text-decoration:none;border:1px solid var(--line);border-radius:10px;padding:6px 12px;background:var(--panel)}
+/* bottom bar */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--panel);border-top:1px solid var(--line);padding:10px var(--gutter) calc(10px + env(safe-area-inset-bottom,0px))}
+.bar .in{max-width:1180px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.nav{height:56px;border-radius:16px;border:none;cursor:pointer;font-weight:600;font-size:17px;display:flex;align-items:center;justify-content:center;gap:6px}
+.nav.prev{width:72px;background:var(--chip)}
+.nav.next{flex:1;background:var(--accent);color:var(--accent-ink)}
+.nav:disabled{opacity:.35}
+.nav svg{width:24px;height:24px}
+.jump{height:56px;min-width:84px;border-radius:16px;border:1px solid var(--line);background:var(--panel-2);font-family:var(--f-mono);font-variant-numeric:tabular-nums;cursor:pointer;font-size:16px}
+.progress{position:absolute;left:0;top:-3px;height:3px;background:var(--accent);transition:width .2s}
+/* sheets */
+.sheet{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center;background:rgba(5,10,16,.45)}
+.sheet .box{background:var(--panel);width:100%;max-width:720px;max-height:80%;overflow:auto;border-radius:20px 20px 0 0;padding:18px var(--gutter) calc(20px + env(safe-area-inset-bottom,0px))}
+.sheet h3{font-family:var(--f-display);font-weight:600;font-size:22px;margin:0 0 12px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+.pgrid button{height:52px;border-radius:12px;border:1px solid var(--line);background:var(--panel-2);font-family:var(--f-mono);cursor:pointer;position:relative}
+.pgrid button.cur{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.pgrid button.hc::after{content:"";position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--amber)}
+.plist{margin-top:14px;display:grid;gap:4px}
+.plist button{text-align:left;border:none;background:none;padding:8px 6px;border-radius:8px;cursor:pointer;display:flex;gap:10px}
+.plist button:hover{background:var(--panel-2)}
+.plist .n{font-family:var(--f-mono);color:var(--muted);min-width:28px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px;border-bottom:1px solid var(--line)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{border:none;background:var(--panel);padding:10px 14px;cursor:pointer;font-weight:500}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.loading{padding:40px 0;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="top"><div class="wrap" id="topbar"></div></header>
+<main class="wrap" id="app"><div class="loading">Loading library…</div></main>
+<div id="sheetRoot"></div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const app=$('#app'), topbar=$('#topbar'), sheetRoot=$('#sheetRoot');
+const LS={get(k,d){try{const v=localStorage.getItem('lc.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('lc.'+k,JSON.stringify(v))}catch(e){}}};
+const S={cat:null,deck:null,page:0,view:'teach',subj:LS.get('subj','all'),q:'',lang:LS.get('lang','th'),fs:LS.get('fs',19),theme:LS.get('theme','system'),timer:{on:false,start:0,acc:0},wake:null};
+const ICON={
+ back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>',
+ next:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>',
+ set:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>'};
+function esc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function md(s){let h=esc(s);h=h.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<i>$2</i>').replace(/`([^`]+)`/g,'<code>$1</code>');return h}
+function codeHTML(c){const p=String(c||'').trim().split(/\s+/);return p.map((x,i)=>i===0?`<span class="c0">${esc(x)}</span>`:`<span class="cn${x==='00'?' z':''}">${esc(x)}</span>`).join('')}
+function paras(s){return String(s||'').split(/\n\s*\n|\n/).filter(x=>x.trim()).map(x=>'<p>'+md(x)+'</p>').join('')}
+function applyPrefs(){document.documentElement.style.setProperty('--fs',S.fs+'px');if(S.theme==='system')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',S.theme)}
+applyPrefs();
+const cache={};
+async function getJSON(u){const r=await fetch(u);if(!r.ok)throw new Error(r.status);return r.json()}
+async function loadDeck(meta){
+  if(cache[meta.id])return cache[meta.id];
+  const k='deck.'+meta.id+'.'+meta.v; let d=null;
+  try{const raw=localStorage.getItem('lc.'+k);if(raw)d=JSON.parse(raw)}catch(e){}
+  if(!d){d=await getJSON('data/'+encodeURIComponent(meta.id)+'.json?v='+meta.v);try{localStorage.setItem('lc.'+k,JSON.stringify(d))}catch(e){}}
+  cache[meta.id]=d;return d}
+function findMeta(id){for(const s of S.cat.subjects)for(const d of s.decks)if(d.id===id)return{s,d};return null}
+function contentsHTML(doc,full){
+  if(!doc||!doc.length)return '';
+  const rows=[];
+  for(const g of doc){
+    const pm=(g.p||g.m)?` <span class="cc" style="min-width:0">${g.p?esc(g.p)+' p':''}${g.m?' · '+esc(g.m)+' min':''}${g.n>1?' · '+g.n+' links':''}</span>`:'';
+    rows.push(`<span class="ci main"><span class="cc">${esc(g.code||'—')}</span><span class="cn2">${esc(g.name)}${full?pm:''}</span></span>`);
+    for(const it of g.items)rows.push(`<span class="ci sub"><span class="cc">${esc(it[0]||'·')}</span><span class="cn2">${esc(it[1])}</span></span>`)}
+  return `<span class="dcont"><span class="dh">In this Gamma link · เนื้อหาในลิงค์นี้</span>${rows.join('')}</span>`}
+function docText(d){return (d.doc||[]).map(g=>g.code+' '+g.name+' '+g.items.map(i=>i.join(' ')).join(' ')).join(' ')}
+/* ---------- library ---------- */
+function renderTopLib(){topbar.innerHTML=`<div class="toptitle"><div class="k">D-0507 FLIGHT TRAINING · PPL THEORY</div></div><button class="iconbtn" id="setBtn" aria-label="Settings">${ICON.set}</button>`;$('#setBtn').onclick=openSettings}
+function renderLibrary(){
+  S.deck=null;renderTopLib();
+  const subs=S.cat.subjects, q=S.q.trim().toLowerCase();
+  const chips=[`<button class="subj" data-s="all" aria-pressed="${S.subj==='all'}"><span>All subjects</span></button>`].concat(subs.map(s=>`<button class="subj" data-s="${s.code}" aria-pressed="${S.subj===s.code}"><b>${s.code}</b><span>${esc(s.en)}</span></button>`)).join('');
+  let groups='';
+  for(const s of subs){
+    if(S.subj!=='all'&&S.subj!==s.code)continue;
+    const ds=s.decks.filter(d=>!q||(d.code+' '+d.title+' '+docText(d)).toLowerCase().includes(q));
+    if(!ds.length)continue;
+    groups+=`<div class="group"><h2>${s.code} ${esc(s.en)}</h2><span class="th">${esc(s.th)}</span><span class="n">${ds.length} decks</span></div><div class="decks">`+ds.map(d=>{
+      const last=LS.get('pos.'+d.id,null);const r0=/Rev 0/.test(d.rev);
+      return `<button class="deck" data-id="${esc(d.id)}"><span class="code" aria-label="${esc(d.code)}">${codeHTML(d.code)}</span><span style="min-width:0"><span class="nm">${esc(d.title)}</span><span class="meta"><span class="pill">${d.np} pages</span><span class="pill ${r0?'rev0':''}">${esc((d.rev||'').replace(/\s*\(.*\)/,'')||'Rev ?')}${r0?' · slides only':''}</span>${d.nc?`<span class="pill">${d.nc} corrections</span>`:''}${d.gamma?'<span class="pill">Gamma</span>':''}${last!=null&&last>0?`<span class="pill resume">resume p${last+1}</span>`:''}</span>${contentsHTML(d.doc,false)}</span></button>`}).join('')+`</div>`}
+  const total=subs.reduce((a,s)=>a+s.decks.length,0);
+  app.innerHTML=`<div class="lib-head"><div class="brand">Lecture Companion<small>Instructor narration guides for the D-0507 PPL theory decks · คู่มือบรรยายสำหรับครู</small></div></div>
+  <div class="search"><input id="q" type="search" placeholder="Search code or topic — e.g. 061 04, altimetry, VOR" value="${esc(S.q)}" aria-label="Search decks"></div>
+  <div class="subjects" role="group" aria-label="Subjects">${chips}</div>${groups||'<p class="empty">No deck matches that search.</p>'}
+  <p class="foot">${subs.length} subjects · ${total} decks · data updated ${esc(S.cat.updated||'')}. Open a deck, keep this screen in your hand and present the slides on the other screen. Arrow keys, Page Up/Down and presenter clickers turn pages.</p>`;
+  const qi=$('#q');qi.oninput=()=>{S.q=qi.value;const pos=qi.selectionStart;renderLibrary();const n=$('#q');n.focus();n.setSelectionRange(pos,pos)};
+  app.querySelectorAll('.subj').forEach(b=>b.onclick=()=>{S.subj=b.dataset.s;LS.set('subj',S.subj);renderLibrary()});
+  app.querySelectorAll('.deck').forEach(b=>b.onclick=()=>openDeck(b.dataset.id));
+  releaseWake();
+}
+/* ---------- deck ---------- */
+async function openDeck(id,page){
+  const m=findMeta(id);if(!m)return renderLibrary();
+  app.innerHTML='<div class="loading">Opening '+esc(m.d.code)+'…</div>';
+  try{S.deck=await loadDeck(m.d)}catch(e){app.innerHTML='<p class="loading">Could not load this deck. Check the connection and try again.</p>';return}
+  S.meta=m;S.page=page!=null?page:Math.min(LS.get('pos.'+id,0),S.deck.pages.length-1);S.view='teach';
+  try{history.replaceState(null,'','#'+id.replace(/[^A-Za-z0-9._~-]/g,'-'))}catch(e){}
+  renderDeck();requestWake();window.scrollTo(0,0)}
+function fmtTime(ms){const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function elapsed(){return S.timer.acc+(S.timer.on?Date.now()-S.timer.start:0)}
+function renderTopDeck(){
+  const d=S.deck;
+  topbar.innerHTML=`<button class="iconbtn" id="backBtn" aria-label="Back to library">${ICON.back}</button>
+  <div class="toptitle"><div class="k">${esc(d.code)} · ${esc(S.meta.s.en)}</div><div class="t">${esc(d.title)}</div></div>
+  <button class="iconbtn timer ${S.timer.on?'on':''}" id="tmr" aria-label="Lecture timer">${fmtTime(elapsed())}</button>
+  <button class="iconbtn" id="setBtn" aria-label="Settings">${ICON.set}</button>`;
+  $('#backBtn').onclick=()=>{try{history.replaceState(null,'',location.pathname)}catch(e){}renderLibrary();window.scrollTo(0,0)};
+  $('#setBtn').onclick=openSettings;
+  $('#tmr').onclick=toggleTimer}
+function toggleTimer(){const t=S.timer;if(t.on){t.acc+=Date.now()-t.start;t.on=false}else{t.start=Date.now();t.on=true}const b=$('#tmr');if(b){b.classList.toggle('on',t.on);b.textContent=fmtTime(elapsed())}}
+setInterval(()=>{const b=$('#tmr');if(b&&S.timer.on)b.textContent=fmtTime(elapsed())},1000);
+function hiAsk(s){return md(s).replace(/(Check:|Ask:|Closing check:|คำถาม:|คำถามปิดบท:|ถามว่า)/g,'<mark>$1</mark>')}
+function narrBlock(p){
+  const en=p.en?paras(p.en):'', th=p.th?paras(p.th):'';
+  const w=p.w?'<span class="written">written from the slide (no recorded narration)</span>':'';
+  if(S.lang==='th')return (th||en||'<p class="empty">—</p>')+w;
+  if(S.lang==='en')return (en||th||'<p class="empty">—</p>')+w;
+  return `<span class="langtag">EN</span>${en||'<p class="empty">—</p>'}<div class="sep"></div><span class="langtag">ไทย</span><div class="th">${th||'<p class="empty">—</p>'}</div>`+w}
+function pick(a,b){return S.lang==='en'?[a,b]:S.lang==='th'?[b,a]:[a,b]}
+function renderDeck(){
+  const d=S.deck, N=d.pages.length, p=d.pages[S.page];
+  renderTopDeck();
+  LS.set('pos.'+d.id,S.page);
+  const tabs=`<div class="tabs" role="tablist"><button class="tab" role="tab" aria-selected="${S.view==='teach'}" data-v="teach">Teach<span class="tth"> · สอน</span></button><button class="tab" role="tab" aria-selected="${S.view==='brief'}" data-v="brief">Brief<span class="tth"> · เตรียมสอน</span></button>${S.meta.d.gamma?`<a class="gbtn" href="${esc(S.meta.d.gamma)}" target="_blank" rel="noopener">Open Gamma ↗</a>`:''}</div>`;
+  let body='';
+  if(S.view==='teach'){
+    const [k1,k2]=pick(p.kEn,p.kTh), [g1,g2]=pick(p.gEn,p.gTh);
+    const key=(k1||k2)?`<div class="card key"><div class="lbl">Key message · สาระที่ต้องครบ</div>${k1?`<div class="txt">${md(k1)}</div>`:''}${k2?`<div class="txt">${md(k2)}</div>`:''}</div>`:'';
+    const cor='';
+    const gd=(g1||g2)?`<div class="card guide"><div class="lbl">Classroom guidance · แนวทางครู</div>${g1?`<div class="txt">${hiAsk(g1)}</div>`:''}${g2?`<div class="txt">${hiAsk(g2)}</div>`:''}</div>`:'';
+    body=`<section class="page"><div class="phead"><div class="pno">${p.n}<small> / ${N}</small></div><div class="ptitle"><h1>${md(p.t)}</h1>${p.ts?`<div class="ts">Recording ${esc(p.ts)}</div>`:''}${p.cor?`<button class="corchip" id="corBtn" aria-expanded="false" aria-controls="corDet"><span class="dot"></span>Correction · แก้ไข <span class="chev">▾</span></button>`:''}</div></div>
+    ${p.cor?`<div class="cordetail" id="corDet" hidden>${md(p.cor)}</div>`:''}
+    ${p.on?`<div class="onscreen clamp" data-x="1"><b>On screen</b> · ${md(p.on)}</div>`:''}
+    <div class="grid"><div style="display:grid;gap:12px;min-width:0">${cor}<div class="card"><div class="lbl">Narration · บทบรรยาย</div><div class="narr">${narrBlock(p)}</div></div></div>
+    <div class="side" style="display:grid;gap:12px;min-width:0">${key}${gd}${(!key&&!gd)?'<div class="card"><p class="empty">No extra notes for this page.</p></div>':''}</div></div></section>`;
+  }else{
+    const intro=(S.lang==='en'?d.intro.en:S.lang==='th'?(d.intro.th||d.intro.en):[d.intro.en,d.intro.th].filter(Boolean).join('\n\n'));
+    const nums=d.numbers.length?`<div class="card"><div class="lbl">Every instructor uses · ตัวเลขที่ต้องพูดตรงกัน</div><ul>${d.numbers.map(x=>'<li>'+md(x)+'</li>').join('')}</ul></div>`:'';
+    const ch=d.corr.length?(d.corr[0].length>=4?['Page','Type','Issue','Fix']:['Page','Correction']):[];
+    const corr=d.corr.length?`<div class="card"><div class="lbl">Slide and recording corrections · รายการแก้ไข</div><div class="tblwrap"><table><thead><tr>${ch.map(h=>'<th>'+h+'</th>').join('')}</tr></thead><tbody>${d.corr.map(r=>'<tr>'+r.map(c=>'<td>'+md(c)+'</td>').join('')+'</tr>').join('')}</tbody></table></div></div>`:'';
+    const links=[S.meta.d.gamma?`<a href="${esc(S.meta.d.gamma)}" target="_blank" rel="noopener">Open Gamma presentation</a>`:'',d.canva?`<a href="https://www.canva.com/design/${esc(d.canva)}/view" target="_blank" rel="noopener">Open Canva deck</a>`:'',d.yt?`<a href="https://www.youtube.com/watch?v=${esc(d.yt)}" target="_blank" rel="noopener">Open recording on YouTube</a>`:''].join('');
+    body=`<section class="page brief"><div class="phead"><div class="ptitle"><h1>${esc(d.code)} ${esc(d.title)}</h1><div class="ts">${esc(d.rev)} · ${N} pages</div></div></div>
+    ${links?`<div class="links" style="margin-bottom:12px">${links}</div>`:''}
+    ${(S.meta.d.doc&&S.meta.d.doc.length)?`<div class="card">${contentsHTML(S.meta.d.doc,true).replace('class="dcont"','class="dcont" style="margin-top:0;border:none;padding:0;background:none"')}</div>`:''}
+    ${intro?`<div class="card"><div class="lbl">Read before teaching · อ่านก่อนสอน</div><div class="narr" style="font-size:16px">${paras(intro)}</div></div>`:''}
+    ${nums}${corr}${d.verify?`<div class="card"><div class="lbl">Still to verify (SME)</div><p>${md(d.verify)}</p></div>`:''}</section>`;
+  }
+  app.innerHTML=tabs+body+`<nav class="bar" aria-label="Page navigation"><div class="progress" style="width:${((S.page+1)/N*100).toFixed(1)}%"></div><div class="in">
+   <button class="nav prev" id="prev" aria-label="Previous page" ${S.page===0?'disabled':''}>${ICON.back}</button>
+   <button class="jump" id="jump" aria-label="Go to page">${S.page+1} / ${N}</button>
+   <button class="nav next" id="next" aria-label="Next page" ${S.page===N-1?'disabled':''}>${S.page===N-1?'Last page':'Next'} ${ICON.next}</button></div></nav>`;
+  app.querySelectorAll('[data-x]').forEach(el=>el.onclick=()=>el.classList.toggle('open'));
+  const cb=$('#corBtn');if(cb)cb.onclick=()=>{const d=$('#corDet');const o=d.hidden;d.hidden=!o;cb.setAttribute('aria-expanded',String(o))};
+  app.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{S.view=b.dataset.v;renderDeck();window.scrollTo(0,0)});
+  $('#prev').onclick=()=>go(-1);$('#next').onclick=()=>go(1);$('#jump').onclick=openJump;
+}
+function go(dir){if(!S.deck)return;const N=S.deck.pages.length;const n=Math.max(0,Math.min(N-1,S.page+dir));if(n===S.page)return;S.page=n;if(S.view!=='teach')S.view='teach';renderDeck();window.scrollTo(0,0)}
+function gotoPage(i){S.page=i;S.view='teach';closeSheet();renderDeck();window.scrollTo(0,0)}
+/* ---------- sheets ---------- */
+function closeSheet(){sheetRoot.innerHTML=''}
+function sheet(html){sheetRoot.innerHTML=`<div class="sheet" id="sh"><div class="box" role="dialog" aria-modal="true">${html}</div></div>`;$('#sh').onclick=e=>{if(e.target.id==='sh')closeSheet()}}
+function openJump(){
+  const d=S.deck;
+  sheet(`<h3>Go to page</h3><div class="pgrid">${d.pages.map((p,i)=>`<button data-i="${i}" class="${i===S.page?'cur':''} ${p.cor?'hc':''}" aria-label="Page ${p.n}">${p.n}</button>`).join('')}</div>
+  <div class="plist">${d.pages.map((p,i)=>`<button data-i="${i}"><span class="n">${p.n}</span><span>${md(p.t)}</span></button>`).join('')}</div>
+  <p class="empty" style="margin-top:10px">Amber dot = page has a correction.</p>`);
+  sheetRoot.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>gotoPage(+b.dataset.i))}
+function openSettings(){
+  const segL=[['th','ไทย'],['en','EN'],['both','EN + ไทย']].map(([k,l])=>`<button data-lang="${k}" aria-pressed="${S.lang===k}">${l}</button>`).join('');
+  const segT=[['system','Auto'],['light','Light'],['dark','Dark']].map(([k,l])=>`<button data-theme="${k}" aria-pressed="${S.theme===k}">${l}</button>`).join('');
+  sheet(`<h3>Display</h3>
+  <div class="row"><span>Narration language</span><span class="seg">${segL}</span></div>
+  <div class="row"><span>Text size</span><span class="seg"><button id="fsm" aria-label="Smaller text">A−</button><button aria-pressed="false" disabled style="min-width:56px;font-family:var(--f-mono)">${S.fs}</button><button id="fsp" aria-label="Larger text">A+</button></span></div>
+  <div class="row"><span>Theme</span><span class="seg">${segT}</span></div>
+  <div class="row"><span>Lecture timer</span><span class="seg"><button id="tr">Reset to 00:00</button></span></div>
+  <p class="empty" style="margin-top:12px">${S.wake?'Screen stays awake while a deck is open.':'Keep-awake is not available here — turn off auto-lock on the device if the screen dims.'}</p>`);
+  sheetRoot.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>{S.lang=b.dataset.lang;LS.set('lang',S.lang);rerender();openSettings()});
+  sheetRoot.querySelectorAll('[data-theme]').forEach(b=>b.onclick=()=>{S.theme=b.dataset.theme;LS.set('theme',S.theme);applyPrefs();openSettings()});
+  $('#fsm').onclick=()=>{S.fs=Math.max(15,S.fs-1);LS.set('fs',S.fs);applyPrefs();openSettings()};
+  $('#fsp').onclick=()=>{S.fs=Math.min(30,S.fs+1);LS.set('fs',S.fs);applyPrefs();openSettings()};
+  $('#tr').onclick=()=>{S.timer={on:false,start:0,acc:0};const b=$('#tmr');if(b){b.classList.remove('on');b.textContent='00:00'}closeSheet()}}
+function rerender(){if(S.deck)renderDeck();else renderLibrary()}
+/* ---------- input ---------- */
+document.addEventListener('keydown',e=>{
+  if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;
+  if(e.key==='Escape'){closeSheet();return}
+  if(!S.deck||sheetRoot.innerHTML)return;
+  if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(1)}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(-1)}
+});
+let tx=null,ty=null,tt=0;
+document.addEventListener('touchstart',e=>{if(!S.deck||sheetRoot.innerHTML||e.touches.length!==1)return;tx=e.touches[0].clientX;ty=e.touches[0].clientY;tt=Date.now()},{passive:true});
+document.addEventListener('touchend',e=>{if(tx==null)return;const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;tx=null;if(Date.now()-tt<600&&Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.6&&!e.target.closest('.tblwrap,.subjects'))go(dx<0?1:-1)},{passive:true});
+/* ---------- wake lock ---------- */
+async function requestWake(){try{if('wakeLock' in navigator&&!S.wake){S.wake=await navigator.wakeLock.request('screen');S.wake.addEventListener('release',()=>{S.wake=null})}}catch(e){S.wake=null}}
+function releaseWake(){try{S.wake&&S.wake.release()}catch(e){}S.wake=null}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&S.deck)requestWake()});
+/* ---------- boot ---------- */
+getJSON('data/catalog.json').then(c=>{S.cat=c;const h=(location.hash||'').slice(1);let id=null;if(h)for(const s of c.subjects)for(const d of s.decks)if(d.id.replace(/[^A-Za-z0-9._~-]/g,'-')===h)id=d.id;if(id)openDeck(id);else renderLibrary()}).catch(()=>{app.innerHTML='<p class="loading">Could not load the library. Check the connection and reload.</p>'});
+})();
+</script>
+
+</body></html>

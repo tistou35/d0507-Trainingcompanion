@@ -1,0 +1,3313 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>ห้องทดลองชั้นบรรยากาศ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+
+:root{
+  --f-display:"Bai Jamjuree","IBM Plex Sans Thai",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Thai",system-ui,-apple-system,"Helvetica Neue",sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,SFMono-Regular,monospace;
+
+  --ground:#E7EDF2;
+  --surface:#FFFFFF;
+  --surface-2:#F0F4F8;
+  --line:#C9D5DE;
+  --line-soft:#DCE4EA;
+  --ink:#0F1A24;
+  --ink-2:#53646F;
+  --ink-3:#7E8D98;
+
+  --hot:#D9541F;
+  --hot-soft:#F2C3A8;
+  --cold:#2E7FB8;
+  --cold-soft:#AFD2E9;
+  --dew:#0E8C74;
+
+  --sky-low:#BFDAEE;
+  --sky-high:#2C5A88;
+  --cloud:#FFFFFF;
+  --cloud-edge:#D8E2EC;
+
+  --good:#227A54;
+  --warn:#A8720B;
+  --crit:#B23A2A;
+  --chip-bg:#F0F4F8;
+
+  --shadow:0 1px 2px rgba(15,26,36,.06), 0 8px 24px -14px rgba(15,26,36,.28);
+}
+
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#090F16;
+    --surface:#111A23;
+    --surface-2:#16212C;
+    --line:#26343F;
+    --line-soft:#1D2933;
+    --ink:#E4ECF3;
+    --ink-2:#9EAFBD;
+    --ink-3:#73858F;
+
+    --hot:#F1793F;
+    --hot-soft:#5B3524;
+    --cold:#5FADE0;
+    --cold-soft:#1F3D53;
+    --dew:#3DC2A3;
+
+    --sky-low:#1E3A55;
+    --sky-high:#060D16;
+    --cloud:#C9D6E4;
+    --cloud-edge:#8FA3B6;
+
+    --good:#4FBB86;
+    --warn:#DFA92C;
+    --crit:#E5705C;
+    --chip-bg:#16212C;
+
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -16px rgba(0,0,0,.8);
+  }
+}
+
+:root[data-theme="dark"]{
+  --ground:#090F16;
+  --surface:#111A23;
+  --surface-2:#16212C;
+  --line:#26343F;
+  --line-soft:#1D2933;
+  --ink:#E4ECF3;
+  --ink-2:#9EAFBD;
+  --ink-3:#73858F;
+
+  --hot:#F1793F;
+  --hot-soft:#5B3524;
+  --cold:#5FADE0;
+  --cold-soft:#1F3D53;
+  --dew:#3DC2A3;
+
+  --sky-low:#1E3A55;
+  --sky-high:#060D16;
+  --cloud:#C9D6E4;
+  --cloud-edge:#8FA3B6;
+
+  --good:#4FBB86;
+  --warn:#DFA92C;
+  --crit:#E5705C;
+  --chip-bg:#16212C;
+
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px -16px rgba(0,0,0,.8);
+}
+
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--f-body);
+  font-size:16px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+
+.wrap{max-width:1120px;margin:0 auto;padding:40px 20px 72px;display:flex;flex-direction:column;gap:34px}
+
+/* ---------- header ---------- */
+.eyebrow{
+  font-family:var(--f-data);
+  font-size:11.5px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+  margin:0 0 10px;
+}
+h1{
+  font-family:var(--f-display);
+  font-weight:700;
+  font-size:clamp(30px,4.6vw,46px);
+  line-height:1.18;
+  letter-spacing:-.01em;
+  margin:0 0 12px;
+  text-wrap:balance;
+}
+h1 em{font-style:normal;color:var(--hot)}
+.lead{margin:0;max-width:62ch;color:var(--ink-2);font-size:17px}
+
+/* ---------- scenario chips ---------- */
+.presets{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.presets .plabel{font-family:var(--f-data);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-right:4px}
+button.chip{
+  font-family:var(--f-body);font-size:14px;font-weight:500;
+  color:var(--ink);background:var(--surface);
+  border:1px solid var(--line);border-radius:999px;
+  padding:6px 14px;cursor:pointer;
+  transition:border-color .15s, background .15s, transform .1s;
+}
+button.chip:hover{border-color:var(--hot);background:var(--surface-2)}
+button.chip:active{transform:translateY(1px)}
+
+/* ---------- lab ---------- */
+.lab{display:grid;grid-template-columns:minmax(0,1fr) 296px;gap:24px;align-items:start}
+@media (max-width:1060px){.lab{grid-template-columns:minmax(0,1fr)}}
+
+.stage{
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);overflow:hidden;
+}
+.stage .scroller{overflow-x:auto}
+.stage svg{display:block;width:100%;min-width:620px;height:auto}
+
+.parcelbar{
+  border-top:1px solid var(--line-soft);
+  padding:14px 18px 16px;
+  display:flex;flex-wrap:wrap;gap:14px;align-items:center;
+}
+.parcelbar .pb-label{
+  font-family:var(--f-data);font-size:11.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);white-space:nowrap;
+}
+.parcelbar input[type=range]{flex:1 1 200px;min-width:140px}
+.parcelbar .alt-read{font-family:var(--f-data);font-size:14px;font-variant-numeric:tabular-nums;min-width:76px;text-align:right}
+
+button.go{
+  font-family:var(--f-display);font-size:14.5px;font-weight:600;
+  color:var(--surface);background:var(--hot);
+  border:1px solid var(--hot);border-radius:8px;
+  padding:8px 16px;cursor:pointer;white-space:nowrap;
+  transition:filter .15s, transform .1s;
+}
+button.go:hover{filter:brightness(1.08)}
+button.go:active{transform:translateY(1px)}
+button.ghost{
+  font-family:var(--f-display);font-size:14.5px;font-weight:600;
+  color:var(--ink-2);background:transparent;
+  border:1px solid var(--line);border-radius:8px;
+  padding:8px 14px;cursor:pointer;white-space:nowrap;
+}
+button.ghost:hover{border-color:var(--ink-3);color:var(--ink)}
+
+/* ---------- controls ---------- */
+.panel{
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);padding:18px;
+}
+.panel h2{
+  font-family:var(--f-display);font-size:13px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);
+  margin:0 0 16px;
+}
+.ctrl{display:flex;flex-direction:column;gap:5px;margin-bottom:18px}
+.ctrl:last-of-type{margin-bottom:6px}
+.ctrl .row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ctrl .name{font-size:14.5px;font-weight:500}
+.ctrl .val{font-family:var(--f-data);font-size:14px;font-variant-numeric:tabular-nums;color:var(--hot)}
+.ctrl .hint{font-size:12.5px;color:var(--ink-3);line-height:1.45}
+
+input[type=range]{
+  -webkit-appearance:none;appearance:none;
+  width:100%;height:22px;background:transparent;cursor:pointer;margin:0;
+}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:3px;background:var(--line)}
+input[type=range]::-moz-range-track{height:4px;border-radius:3px;background:var(--line)}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--hot);border:2px solid var(--surface);margin-top:-6px;
+  box-shadow:0 1px 3px rgba(0,0,0,.3);
+}
+input[type=range]::-moz-range-thumb{
+  width:16px;height:16px;border-radius:50%;background:var(--hot);
+  border:2px solid var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.3);
+}
+:focus-visible{outline:2px solid var(--hot);outline-offset:2px;border-radius:4px}
+
+/* ---------- verdict ---------- */
+.verdict{
+  margin-top:16px;padding:14px;border-radius:10px;
+  background:var(--surface-2);border:1px solid var(--line-soft);
+  border-left:3px solid var(--ink-3);
+}
+.verdict.rise{border-left-color:var(--hot)}
+.verdict.sink{border-left-color:var(--cold)}
+.verdict.neutral{border-left-color:var(--ink-3)}
+.verdict .vhead{font-family:var(--f-display);font-weight:600;font-size:16px;margin-bottom:4px}
+.verdict .vbody{font-size:13.5px;color:var(--ink-2);line-height:1.55}
+.verdict .vbody b{color:var(--ink);font-weight:600}
+
+/* ---------- stat strip ---------- */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:12px}
+.stat{
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:14px 16px;display:flex;flex-direction:column;gap:2px;
+}
+.stat .k{font-family:var(--f-data);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.stat .v{font-family:var(--f-data);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.stat .s{font-size:12.5px;color:var(--ink-2)}
+.stat .v .u{font-size:13px;color:var(--ink-3);margin-left:2px}
+
+.pill{
+  display:inline-block;font-family:var(--f-data);font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;padding:2px 8px;border-radius:999px;
+  background:var(--chip-bg);border:1px solid var(--line);
+}
+.pill.good{color:var(--good);border-color:var(--good)}
+.pill.warn{color:var(--warn);border-color:var(--warn)}
+.pill.crit{color:var(--crit);border-color:var(--crit)}
+
+/* ---------- section headings ---------- */
+.sec-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sec-head h2{
+  font-family:var(--f-display);font-size:22px;font-weight:600;margin:0;letter-spacing:-.005em;
+  text-transform:none;letter-spacing:0;color:var(--ink);
+}
+.sec-head p{margin:0;color:var(--ink-3);font-size:14px}
+
+/* ---------- rule cards ---------- */
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.rule{
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:18px;display:flex;flex-direction:column;gap:8px;
+}
+.rule h3{font-family:var(--f-display);font-size:17px;font-weight:600;margin:0;line-height:1.4}
+.rule p{margin:0;font-size:14px;color:var(--ink-2);line-height:1.6}
+.rule .live{
+  margin-top:auto;padding-top:10px;border-top:1px dashed var(--line);
+  font-family:var(--f-data);font-size:13px;font-variant-numeric:tabular-nums;color:var(--ink);
+}
+.rule .live span{color:var(--hot)}
+.rule .live span.c{color:var(--cold)}
+.rule .live span.d{color:var(--dew)}
+
+.key{
+  background:var(--surface);border:1px solid var(--hot);border-radius:12px;
+  padding:20px 22px;display:flex;flex-direction:column;gap:8px;
+}
+.key .tag{font-family:var(--f-data);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--hot)}
+.key h3{font-family:var(--f-display);font-size:19px;font-weight:600;margin:0;text-wrap:balance}
+.key p{margin:0;font-size:14.5px;color:var(--ink-2);max-width:78ch}
+.key b{color:var(--ink)}
+
+/* ---------- circulation ---------- */
+.circ{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+.circ .scroller{overflow-x:auto}
+.circ svg{display:block;width:100%;min-width:560px;height:auto}
+.flowline{stroke-dasharray:7 9;animation:flow 1.6s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-32}}
+@media (prefers-reduced-motion: reduce){
+  .flowline{animation:none}
+}
+
+/* ---------- legend + footer ---------- */
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--ink-2);padding:0 18px 16px}
+.legend i{display:inline-block;width:18px;height:0;border-top-width:3px;border-top-style:solid;vertical-align:middle;margin-right:6px}
+
+footer{border-top:1px solid var(--line);padding-top:20px;color:var(--ink-3);font-size:13px;line-height:1.7}
+footer b{color:var(--ink-2);font-weight:600}
+footer code{font-family:var(--f-data);font-size:12.5px;color:var(--ink-2)}
+/* ---------- แท็บหลัก / เมนูย่อย ---------- */
+.tabs{display:flex;flex-wrap:wrap;gap:2px;border-bottom:1px solid var(--line)}
+.tabs button{
+  font-family:var(--f-display);font-size:15.5px;font-weight:600;color:var(--ink-3);
+  background:none;border:none;border-bottom:2px solid transparent;
+  padding:10px 18px;margin-bottom:-1px;cursor:pointer;transition:color .15s;
+}
+.tabs button:hover{color:var(--ink)}
+.tabs button[aria-selected="true"]{color:var(--hot);border-bottom-color:var(--hot)}
+
+.view{display:flex;flex-direction:column;gap:34px}
+.view[hidden]{display:none}
+
+.subtabs{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.subtabs .slabel{font-family:var(--f-data);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin-right:4px}
+.subtabs button{
+  font-family:var(--f-body);font-size:14px;font-weight:500;color:var(--ink);
+  background:var(--surface);border:1px solid var(--line);border-radius:999px;
+  padding:6px 14px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;
+}
+.subtabs button:hover{border-color:var(--hot)}
+.subtabs button[aria-selected="true"]{background:var(--hot);border-color:var(--hot);color:#fff}
+
+.fogpanel{display:flex;flex-direction:column;gap:24px}
+.fogpanel[hidden]{display:none}
+
+.fogcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.fogintro{display:flex;flex-direction:column;gap:9px}
+.fogintro .frow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.fogintro h3{font-family:var(--f-display);font-size:23px;font-weight:600;margin:0;letter-spacing:-.005em}
+.fogintro h3 small{font-family:var(--f-data);font-size:12.5px;color:var(--ink-3);font-weight:400;margin-left:10px;letter-spacing:.04em}
+.fogintro .flead{margin:0;color:var(--ink-2);font-size:15px;max-width:76ch;line-height:1.65}
+.vhead{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.segs{display:flex;gap:8px;margin-top:4px}
+button.seg{
+  flex:1 1 0;font-family:var(--f-display);font-size:14px;font-weight:600;
+  color:var(--ink);background:var(--surface-2);border:1px solid var(--line);
+  border-radius:8px;padding:9px 8px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;
+}
+button.seg:hover{border-color:var(--hot)}
+button.seg[aria-selected="true"]{background:var(--hot);border-color:var(--hot);color:#fff}
+#pmap{display:block;width:100%;aspect-ratio:760/470;min-width:620px;cursor:crosshair}
+.parcelbar .hint{font-size:12.5px;color:var(--ink-3);line-height:1.45}
+.fogcard .scroller{overflow-x:auto}
+.fogcard svg{display:block;width:100%;min-width:560px;height:auto}
+
+.foggrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));border-top:1px solid var(--line-soft)}
+.foggrid > div{padding:16px 22px 18px;border-left:1px solid var(--line-soft)}
+.foggrid > div:first-child{border-left:none}
+.foggrid h4{font-family:var(--f-data);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 10px}
+.foggrid ul{margin:0;padding-left:17px;display:flex;flex-direction:column;gap:7px}
+.foggrid li{font-size:14px;color:var(--ink-2);line-height:1.55}
+.foggrid li b{color:var(--ink);font-weight:600}
+
+.minima{display:flex;flex-direction:column;gap:10px}
+.minima .mrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:14.5px}
+.minima .mrow .mname{flex:1 1 auto;min-width:180px}
+.minima .mrow .mval{font-family:var(--f-data);font-size:13.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+
+.sumwrap{background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow-x:auto}
+table.sum{width:100%;min-width:680px;border-collapse:collapse;font-size:14px}
+table.sum th,table.sum td{text-align:left;padding:13px 16px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+table.sum thead th{
+  font-family:var(--f-data);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:400;background:var(--surface-2);
+}
+table.sum tbody th{font-family:var(--f-display);font-weight:600;font-size:14.5px;color:var(--ink);white-space:nowrap}
+table.sum td{color:var(--ink-2);line-height:1.55}
+table.sum tr:last-child th,table.sum tr:last-child td{border-bottom:none}
+</style>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">D-0507 · Meteorology</p>
+    <h1>ชั้นบรรยากาศทำงานยังไง — <em>ลองขยับดู</em></h1>
+    <p class="lead">
+      ปรับอุณหภูมิพื้น ความชื้น และอัตราการลดของอุณหภูมิ แล้วปล่อย “ลูกอากาศ” ขึ้นไป
+      ทุกอย่างที่เห็น — ลอยขึ้น จมลง ความดันตก ความหนาแน่นเบาลง จนถึงเมฆที่ก่อตัว —
+      คำนวณสดจากกฎ thermodynamics ไม่กี่ข้อที่อยู่ในการ์ดด้านล่าง — แท็บที่สองเป็นเรื่องหมอก ฟ้าหลัว และทัศนวิสัยที่หัวรันเวย์
+    </p>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button id="tab-atmos" role="tab" aria-selected="true" aria-controls="view-atmos">ชั้นบรรยากาศ</button>
+    <button id="tab-fog" role="tab" aria-selected="false" aria-controls="view-fog">หมอก · Mist / Fog / Haze</button>
+    <button id="tab-cloud" role="tab" aria-selected="false" aria-controls="view-cloud">เมฆ · ฝน · หิมะ</button>
+    <button id="tab-front" role="tab" aria-selected="false" aria-controls="view-front">แนวปะทะอากาศ</button>
+    <button id="tab-press" role="tab" aria-selected="false" aria-controls="view-press">ความกดอากาศ H / L</button>
+  </nav>
+
+  <div id="view-atmos" class="view" role="tabpanel" aria-labelledby="tab-atmos">
+
+  <div class="presets">
+    <span class="plabel">สถานการณ์</span>
+    <button class="chip" data-preset="morning">เช้าฟ้าใส</button>
+    <button class="chip" data-preset="afternoon">บ่ายร้อนชื้น</button>
+    <button class="chip" data-preset="storm">ก่อนพายุฟ้าคะนอง</button>
+    <button class="chip" data-preset="cold">มวลอากาศเย็น</button>
+    <button class="chip" data-preset="desert">อากาศแห้งจัด</button>
+    <button class="chip" data-preset="inversion">อากาศนิ่ง เสถียรมาก</button>
+  </div>
+
+  <section class="lab">
+
+    <div class="stage">
+      <div class="scroller">
+        <svg id="sky" viewBox="0 0 700 560" role="img"
+             aria-label="ภาพจำลองชั้นบรรยากาศ แสดงลูกอากาศ เมฆ และกราฟอุณหภูมิเทียบความสูง"></svg>
+      </div>
+      <div class="legend">
+        <span><i style="border-top-color:var(--hot)"></i>อุณหภูมิอากาศรอบข้าง</span>
+        <span><i style="border-top-color:var(--hot);border-top-style:dashed"></i>ลูกอากาศ</span>
+        <span><i style="border-top-color:var(--dew);border-top-style:dashed"></i>จุดน้ำค้างของลูกอากาศ</span>
+        <span><i style="border-top-color:var(--cold)"></i>ฐานเมฆ (RH 100%)</span>
+      </div>
+      <div class="parcelbar">
+        <span class="pb-label">ยกลูกอากาศ</span>
+        <input type="range" id="alt" min="0" max="18000" step="100" value="0" aria-label="ความสูงของลูกอากาศ (ฟุต)">
+        <span class="alt-read" id="altRead">0 ft</span>
+        <button class="go" id="release">ปล่อยให้ลอยอิสระ</button>
+        <button class="ghost" id="reset">กลับพื้น</button>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <h2>ตั้งค่าบรรยากาศ</h2>
+
+      <div class="ctrl">
+        <div class="row"><span class="name">อุณหภูมิที่ผิวพื้น</span><span class="val" id="vT0">32 °C</span></div>
+        <input type="range" id="T0" min="-10" max="45" step="1" value="32">
+      </div>
+
+      <div class="ctrl">
+        <div class="row"><span class="name">ความชื้นสัมพัทธ์ที่พื้น</span><span class="val" id="vRH">60 %</span></div>
+        <input type="range" id="RH" min="5" max="100" step="1" value="60">
+        <span class="hint">ยิ่งชื้น จุดน้ำค้างยิ่งใกล้อุณหภูมิ → เมฆก่อตัวที่ระดับต่ำลง</span>
+      </div>
+
+      <div class="ctrl">
+        <div class="row"><span class="name">อุณหภูมิลดต่อ 1,000 ft</span><span class="val" id="vELR">2.0 °C</span></div>
+        <input type="range" id="ELR" min="0" max="4" step="0.1" value="2">
+        <span class="hint">ค่ามาตรฐาน ISA ≈ 2 °C ต่อ 1,000 ft (1.98 พอดี)</span>
+      </div>
+
+      <div class="ctrl">
+        <div class="row"><span class="name">ความร้อนจากพื้นดิน</span><span class="val" id="vDT">+2.5 °C</span></div>
+        <input type="range" id="DT" min="-4" max="8" step="0.5" value="2.5">
+        <span class="hint">พื้นดินโดนแดดเผา ทำให้อากาศติดพื้นร้อนกว่ารอบข้าง — นี่คือแรงที่ทำให้มันลอยขึ้น (อุ่นขึ้นแต่ไอน้ำเท่าเดิม จุดน้ำค้างจึงไม่เปลี่ยน)</span>
+      </div>
+
+      <div class="verdict" id="verdict">
+        <div class="vhead" id="vHead">—</div>
+        <div class="vbody" id="vBody">—</div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="stats">
+    <div class="stat">
+      <span class="k">ความดัน ณ ระดับลูกอากาศ</span>
+      <span class="v" id="sP">1013<span class="u">hPa</span></span>
+      <span class="s" id="sPs">—</span>
+    </div>
+    <div class="stat">
+      <span class="k">ความหนาแน่นอากาศ</span>
+      <span class="v" id="sRho">1.16<span class="u">kg/m³</span></span>
+      <span class="s" id="sRhos">—</span>
+    </div>
+    <div class="stat">
+      <span class="k">จุดน้ำค้างที่พื้น</span>
+      <span class="v" id="sTd">22.9<span class="u">°C</span></span>
+      <span class="s" id="sTds">—</span>
+    </div>
+    <div class="stat">
+      <span class="k">ฐานเมฆ (LCL)</span>
+      <span class="v" id="sLCL">3600<span class="u">ft</span></span>
+      <span class="s" id="sLCLs">—</span>
+    </div>
+    <div class="stat">
+      <span class="k">ความเสถียรของบรรยากาศ</span>
+      <span class="v" style="font-size:15px;padding-top:5px"><span class="pill" id="sStabPill">—</span></span>
+      <span class="s" id="sStabs">—</span>
+    </div>
+  </section>
+
+  <div class="key">
+    <span class="tag">กุญแจสำคัญ</span>
+    <h3>ลูกอากาศเย็นตัวเร็วกว่าอากาศรอบข้าง — นี่คือที่มาของทุกอย่าง</h3>
+    <p>
+      ลูกอากาศที่ลอยขึ้นไปเจอความดันต่ำลง มันจะขยายตัวและเย็นลงเอง <b>3 °C ต่อ 1,000 ft</b> (dry adiabatic)
+      ขณะที่อากาศรอบข้างเย็นลงแค่ <b>ประมาณ 2 °C ต่อ 1,000 ft</b> (ELR)
+      ลูกอากาศจึงไล่ตามอากาศรอบข้างทัน แล้วหมดแรงลอยที่ระดับหนึ่ง — เว้นแต่ว่ามันจะ <b>ควบแน่นเสียก่อน</b>
+      เพราะการควบแน่นคายความร้อนออกมา ทำให้เย็นช้าลงเหลือราว <b>1.2–1.5 °C ต่อ 1,000 ft</b> แล้วลอยต่อได้อีกไกล — เมฆก้อนใหญ่เกิดแบบนี้
+    </p>
+  </div>
+
+  <section style="display:flex;flex-direction:column;gap:14px">
+    <div class="sec-head">
+      <h2>กฎ 5 ข้อที่กำลังทำงานอยู่ในภาพ</h2>
+      <p>ตัวเลขในกล่องอัปเดตตามค่าที่ตั้งไว้จริง</p>
+    </div>
+    <div class="rules">
+      <div class="rule">
+        <h3>อากาศร้อนลอยขึ้น อากาศเย็นจมลง</h3>
+        <p>อากาศร้อนขยายตัว → เบากว่าอากาศรอบข้าง → ถูกดันให้ลอยขึ้น (แรงลอยตัว) พอเย็นกว่ารอบข้างเมื่อไหร่ ก็จมลงกลับ</p>
+        <div class="live" id="r1">—</div>
+      </div>
+      <div class="rule">
+        <h3>สูงขึ้นทุก 1,000&nbsp;ft อุณหภูมิลดราว 2&nbsp;°C</h3>
+        <p>ในโทรโพสเฟียร์ อากาศไม่ได้ร้อนจากดวงอาทิตย์โดยตรง แต่ร้อนจากพื้นโลกที่คายความร้อนขึ้นมา ยิ่งไกลพื้นยิ่งเย็น</p>
+        <div class="live" id="r2">—</div>
+      </div>
+      <div class="rule">
+        <h3>ยิ่งสูง ความดันยิ่งต่ำ</h3>
+        <p>ความดัน คือ น้ำหนักของอากาศที่กองทับอยู่ข้างบน ยิ่งขึ้นสูง อากาศที่ทับอยู่ยิ่งน้อย ความดันจึงลด (~1 hPa ต่อ 30 ft ใกล้พื้น)</p>
+        <div class="live" id="r3">—</div>
+      </div>
+      <div class="rule">
+        <h3>ความหนาแน่นสูงไหลไปหาความหนาแน่นต่ำ</h3>
+        <p>อากาศเย็น–หนาแน่นจะไหลลงและแทรกใต้อากาศร้อน–เบาบาง ดันให้อากาศร้อนลอยขึ้น การไหลนี้แหละคือ “ลม”</p>
+        <div class="live" id="r4">—</div>
+      </div>
+      <div class="rule">
+        <h3>RH ถึง 100% เมื่อไหร่ ควบแน่นเมื่อนั้น</h3>
+        <p>ไอน้ำในลูกอากาศเท่าเดิม แต่อากาศเย็นลงเก็บไอน้ำได้น้อยลง พอ RH แตะ 100% (T = จุดน้ำค้าง) ไอน้ำกลั่นตัวเป็นหยดน้ำ = ฐานเมฆ</p>
+        <div class="live" id="r5">—</div>
+      </div>
+      <div class="rule">
+        <h3>ระยะห่าง T กับ Td บอกฐานเมฆได้ทันที</h3>
+        <p>สูตรลัดที่นักบินใช้: เอา (อุณหภูมิ − จุดน้ำค้าง) หารด้วย 2.5 แล้วคูณ 1,000 ได้ความสูงฐานเมฆเป็นฟุต เพราะทั้งสองค่าไล่เข้าหากันในอัตรา 3 − 0.5 = 2.5 °C ต่อ 1,000 ft</p>
+        <div class="live" id="r6">—</div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:14px">
+    <div class="sec-head">
+      <h2>ผลรวมของทุกกฎ: วงจรการหมุนเวียนของอากาศ</h2>
+      <p>ตัวอย่างลมบก–ลมทะเล</p>
+    </div>
+    <div class="circ">
+      <div class="scroller">
+        <svg id="circ" viewBox="0 0 700 260" role="img"
+             aria-label="แผนภาพวงจรลมบกลมทะเล อากาศร้อนเหนือแผ่นดินลอยขึ้น อากาศเย็นเหนือทะเลจมลงและไหลเข้าหาฝั่ง"></svg>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      <b>สมมติฐานที่ใช้คำนวณ</b> — อัตราการเย็นตัวแบบแห้ง (DALR) 3 °C/1,000 ft · แบบอิ่มตัว (SALR) คิดตามอุณหภูมิจริง ~1.2 °C/1,000 ft ตอนอุ่น ถึง ~2.9 ตอนเย็นจัด ·
+      จุดน้ำค้างของลูกอากาศที่ยังไม่อิ่มตัวลด 0.5 °C/1,000 ft · ความดันใช้สูตรบรรยากาศมาตรฐาน ISA
+      <code>p = 1013.25 (1 − 6.8754×10⁻⁶ h)^5.2559</code> · ความหนาแน่นจาก <code>ρ = p / (R·T)</code>, R = 287 J/kg·K
+    </p>
+    <p>
+      ค่าเหล่านี้เป็น <b>rules of thumb</b> สำหรับการเรียนการสอน — เป็นแบบจำลองลูกอากาศก้อนเดียว ไม่คิดการผสมกับอากาศรอบข้าง (entrainment)
+      ชั้นผกผัน (inversion) หรือความชื้นที่เปลี่ยนตามความสูง ของจริงยอดเมฆจึงมักต่ำกว่าที่โมเดลนี้ทำนาย
+    </p>
+  </footer>
+  </div>
+
+  <div id="view-fog" class="view" role="tabpanel" aria-labelledby="tab-fog" hidden>
+
+    <nav class="subtabs" id="fogNav">
+      <span class="slabel">หัวข้อย่อย</span>
+      <button data-fog="tell" aria-selected="true">แยกให้ออก: Haze · Mist · Fog</button>
+      <button data-fog="rad" aria-selected="false">หมอกแผ่รังสี</button>
+      <button data-fog="adv" aria-selected="false">หมอกพัดพา</button>
+      <button data-fog="steam" aria-selected="false">หมอกไอน้ำ</button>
+      <button data-fog="up" aria-selected="false">หมอกลาดเขา</button>
+      <button data-fog="rain" aria-selected="false">หมอกจากฝน</button>
+      <button data-fog="sum" aria-selected="false">ตารางสรุป</button>
+    </nav>
+
+    <section class="fogpanel" data-panel="tell">
+      <div class="lab">
+        <div class="stage">
+          <div class="scroller">
+            <svg id="vis" viewBox="0 0 700 330" role="img"
+                 aria-label="ภาพจำลองทัศนวิสัยเมื่อมองจากหัวรันเวย์ ผ่านฟ้าหลัว หมอกบาง และหมอก"></svg>
+          </div>
+          <div class="parcelbar">
+            <span class="pb-label">มองจากหัวรันเวย์</span>
+            <span class="alt-read" id="visRead" style="min-width:130px;text-align:left">—</span>
+            <button class="go" id="sunset">จำลองพระอาทิตย์ตก</button>
+            <button class="ghost" id="fogReset">รีเซ็ต</button>
+          </div>
+        </div>
+
+        <aside class="panel">
+          <h2>ตั้งค่าอากาศผิวพื้น</h2>
+
+          <div class="ctrl">
+            <div class="row"><span class="name">อุณหภูมิอากาศ</span><span class="val" id="vFT">17 °C</span></div>
+            <input type="range" id="FT" min="-5" max="40" step="0.5" value="17">
+          </div>
+
+          <div class="ctrl">
+            <div class="row"><span class="name">จุดน้ำค้าง</span><span class="val" id="vFTd">15 °C</span></div>
+            <input type="range" id="FTd" min="-10" max="40" step="0.5" value="15">
+            <span class="hint">ยิ่งสองค่านี้ชิดกัน อากาศยิ่งใกล้อิ่มตัว — ห่างกันไม่เกิน 2 °C เมื่อไหร่ ให้ระวังหมอก</span>
+          </div>
+
+          <div class="ctrl">
+            <div class="row"><span class="name">ฝุ่นละออง / ควัน</span><span class="val" id="vFPM">40</span></div>
+            <input type="range" id="FPM" min="0" max="100" step="1" value="40">
+            <span class="hint">อนุภาคแห้งทำให้เกิดฟ้าหลัว และยังเป็นแกนให้ไอน้ำเกาะ — อากาศสกปรกจึงเกิดหมอกง่ายกว่า</span>
+          </div>
+
+          <div class="verdict" id="fVerdict">
+            <div class="vhead" id="fHead">—</div>
+            <div class="vbody" id="fBody">—</div>
+          </div>
+        </aside>
+      </div>
+
+      <section class="stats">
+        <div class="stat">
+          <span class="k">ทัศนวิสัย</span>
+          <span class="v" id="fVis">—</span>
+          <span class="s" id="fVisS">—</span>
+        </div>
+        <div class="stat">
+          <span class="k">ความชื้นสัมพัทธ์</span>
+          <span class="v" id="fRH">—</span>
+          <span class="s" id="fRHs">—</span>
+        </div>
+        <div class="stat">
+          <span class="k">ระยะห่าง T − Td</span>
+          <span class="v" id="fSp">—</span>
+          <span class="s" id="fSps">—</span>
+        </div>
+        <div class="stat">
+          <span class="k">รหัสที่จะขึ้นใน METAR</span>
+          <span class="v" style="font-size:15px;padding-top:5px"><span class="pill" id="fCode">—</span></span>
+          <span class="s" id="fCodes">—</span>
+        </div>
+      </section>
+
+      <div class="rules">
+        <div class="rule">
+          <h3>ฟ้าหลัว · Haze · HZ</h3>
+          <p>อนุภาค <b>แห้ง</b> — ฝุ่น ควันไฟป่า เกลือทะเล PM2.5 ลอยอยู่ในอากาศที่ยังไม่ชื้นมาก (RH ต่ำกว่า ~80%) ไม่ใช่หยดน้ำ จึงไม่หายไปเมื่อแดดออก</p>
+          <div class="live">มองย้อนแสงจะแย่กว่ามองตามแสงมาก · ลงสนามช่วงเช้า–เย็นระวังเป็นพิเศษ</div>
+        </div>
+        <div class="rule">
+          <h3>หมอกบาง · Mist · BR</h3>
+          <p>เป็น <b>หยดน้ำ</b> แล้ว แต่ยังจาง อากาศชื้นเกิน ~90% ทัศนวิสัยอยู่ระหว่าง 1,000–5,000 เมตร มักเป็นช่วงหัวเลี้ยวก่อนกลายเป็นหมอกเต็มตัว</p>
+          <div class="live">เห็น BR ใน METAR = สนามกำลังจะแย่ลง ถ้าอุณหภูมิยังลดต่อ</div>
+        </div>
+        <div class="rule">
+          <h3>หมอก · Fog · FG</h3>
+          <p>หยดน้ำหนาแน่น อากาศอิ่มตัวเต็มที่ (T = Td) ทัศนวิสัยต่ำกว่า <b>1,000 เมตร</b> — ในทางฟิสิกส์มันคือ <b>เมฆ stratus ที่ฐานลงมาแตะพื้น</b> ไม่ต่างจากเมฆในแท็บแรกเลย</p>
+          <div class="live">ต่ำกว่า 200 m เรียก dense fog · สนามบินหลายแห่งปิดรับเครื่องบินทันที</div>
+        </div>
+      </div>
+
+      <div class="key">
+        <span class="tag">เทียบกับ minima</span>
+        <h3>ทัศนวิสัยเท่านี้ ทำอะไรได้บ้าง</h3>
+        <div class="minima" id="minima"></div>
+        <p style="font-size:13px;color:var(--ink-3)">ตัวเลขข้างบนเป็นเกณฑ์อ้างอิงคร่าว ๆ เพื่อให้เห็นภาพ — ของจริงต้องยึดตาม AIP, approach chart ของสนามนั้น และ SOP ของหน่วยฝึก</p>
+      </div>
+    </section>
+
+    <section class="fogpanel" data-panel="rad" hidden></section>
+    <section class="fogpanel" data-panel="adv" hidden></section>
+    <section class="fogpanel" data-panel="steam" hidden></section>
+    <section class="fogpanel" data-panel="up" hidden></section>
+    <section class="fogpanel" data-panel="rain" hidden></section>
+
+    <section class="fogpanel" data-panel="sum" hidden>
+      <div class="sec-head">
+        <h2>ตารางสรุปหมอกทั้ง 5 แบบ</h2>
+        <p>ดูสองคอลัมน์สุดท้ายเวลาวางแผนบิน</p>
+      </div>
+      <div class="sumwrap"><table class="sum" id="sumTable"></table></div>
+    </section>
+
+    <footer>
+      <p>
+        <b>เกณฑ์ทัศนวิสัยที่ใช้</b> — FG ต่ำกว่า 1,000 m · BR 1,000–5,000 m ที่ความชื้นสูง · HZ ทัศนวิสัยลดโดยความชื้นยังไม่สูง ·
+        แบบจำลองใช้กฎของ Koschmieder <code>C = e^(−3d/V)</code> คิดความจางของภาพตามระยะทาง
+        และให้ความชื้นกับปริมาณอนุภาคเป็นตัวกำหนดค่า V
+      </p>
+      <p>
+        เป็นแบบจำลองเพื่อการเรียนการสอน ไม่ใช่เครื่องมือพยากรณ์ — ทัศนวิสัยจริงขึ้นกับชนิดและขนาดของอนุภาค
+        ความลึกของชั้นหมอก และมุมของแสงด้วย
+      </p>
+    </footer>
+
+  </div>
+
+  <div id="view-cloud" class="view" role="tabpanel" aria-labelledby="tab-cloud" hidden>
+
+    <nav class="subtabs" id="cloudNav">
+      <span class="slabel">หัวข้อย่อย</span>
+      <button data-cloud="cldtype" aria-selected="true">ชนิดของเมฆ</button>
+      <button data-cloud="cldrain" aria-selected="false">การเกิดเมฆฝน</button>
+      <button data-cloud="precip" aria-selected="false">ฝน / หิมะตก</button>
+    </nav>
+
+    <section class="fogpanel" data-cpanel="cldtype"></section>
+    <section class="fogpanel" data-cpanel="cldrain" hidden></section>
+    <section class="fogpanel" data-cpanel="precip" hidden></section>
+
+    <footer>
+      <p>
+        <b>สิ่งที่แบบจำลองนี้ทำ</b> — ฐานเมฆคำนวณจากสูตรเดียวกับแท็บแรก (T − Td) ÷ 2.5 × 1,000 ฟุต ·
+        ชนิดของเมฆตัดสินจากความเสถียร (เสถียร → เมฆแผ่น, ไม่เสถียร → เมฆก้อน) และแรงยกตัว ·
+        ชนิดของหยาดน้ำฟ้าตัดสินจากโปรไฟล์อุณหภูมิระหว่างเมฆถึงพื้น ตามหลักเดียวกับที่ใช้อ่าน sounding จริง
+      </p>
+      <p>
+        ความสูงและตัวเลขต่าง ๆ เป็นค่าโดยประมาณเพื่อการเรียนการสอน ของจริงยังขึ้นกับความชื้นแต่ละชั้น
+        ความแรงของแนวปะทะ และภูมิประเทศ
+      </p>
+    </footer>
+
+  </div>
+
+  <div id="view-front" class="view" role="tabpanel" aria-labelledby="tab-front" hidden>
+
+    <nav class="subtabs" id="frontNav">
+      <span class="slabel">หัวข้อย่อย</span>
+      <button data-front="map" aria-selected="true">อ่านแผนที่ · สัญลักษณ์</button>
+      <button data-front="warm" aria-selected="false">แนวปะทะอากาศอุ่น</button>
+      <button data-front="cold" aria-selected="false">แนวปะทะอากาศเย็น</button>
+      <button data-front="stat" aria-selected="false">แนวปะทะคงที่</button>
+      <button data-front="occl" aria-selected="false">แนวปะทะปิด</button>
+    </nav>
+
+    <section class="fogpanel" data-fpanel="map">
+      <div class="fogintro">
+        <div class="frow"><h3>แนวปะทะอากาศคืออะไร<small>Air Masses &amp; Fronts</small></h3><span class="pill">พื้นฐาน</span></div>
+        <p class="flead">
+          มวลอากาศคืออากาศก้อนใหญ่ที่มีอุณหภูมิและความชื้นใกล้เคียงกันทั้งก้อน เพราะนอนแช่อยู่เหนือพื้นที่แบบเดียวกันนาน ๆ
+          พอสองก้อนที่ต่างกันมาเจอกัน มันจะ <b>ไม่ผสมกัน</b> แต่จะเกิดรอยต่อชัดเจนขึ้นมาแทน — รอยต่อนั้นคือแนวปะทะอากาศ
+          และเกือบทุกสภาพอากาศเลวร้ายที่นักบินเจอ ก็เกิดขึ้นตรงรอยต่อนี้
+        </p>
+      </div>
+
+      <div class="fogcard">
+        <div class="scroller">
+          <svg id="frontMap" viewBox="0 0 700 360" role="img"
+               aria-label="แผนที่พายุหมุนละติจูดกลาง แสดงแนวปะทะอากาศเย็น อุ่น และแนวปิด รอบศูนย์กลางความกดอากาศต่ำ"></svg>
+        </div>
+        <div class="foggrid">
+          <div><h4>อ่านสัญลักษณ์</h4><ul>
+            <li><b>สามเหลี่ยม</b> = อากาศเย็น · <b>ครึ่งวงกลม</b> = อากาศอุ่น</li>
+            <li>สัญลักษณ์ชี้ไป <b>ทางที่แนวกำลังเคลื่อนไป</b></li>
+            <li>อยู่คนละข้างสลับกัน = แนวคงที่ (ไม่ขยับ)</li>
+            <li>สีม่วงและอยู่ข้างเดียวกัน = แนวปิด</li>
+          </ul></div>
+          <div><h4>ทำไมต้องสนใจ</h4><ul>
+            <li>แนวปะทะคือที่ที่อากาศถูก <b>บังคับให้ยกตัว</b> — จึงเกิดเมฆและฝนตรงนี้เสมอ</li>
+            <li>ลมเปลี่ยนทิศทุกครั้งที่แนวผ่าน — สำคัญมากตอนวางแผน takeoff/landing</li>
+            <li>ความกดอากาศเปลี่ยน ต้องตั้ง QNH ใหม่</li>
+            <li>อุณหภูมิและจุดน้ำค้างเปลี่ยนทั้งชุด ฐานเมฆจึงเปลี่ยนตาม</li>
+          </ul></div>
+          <div><h4>สัญญาณว่าแนวกำลังผ่าน</h4><ul>
+            <li><b>ลมเปลี่ยนทิศ</b> (ซีกโลกเหนือมักหมุนตามเข็มนาฬิกา)</li>
+            <li><b>อุณหภูมิเปลี่ยนกะทันหัน</b></li>
+            <li><b>ความกดอากาศ</b> ที่ลดมาตลอดเริ่มนิ่งหรือเด้งขึ้น</li>
+            <li>ชนิดของเมฆและฝนเปลี่ยนไป</li>
+          </ul></div>
+        </div>
+      </div>
+
+      <div class="sec-head">
+        <h2>เทียบแนวปะทะทั้ง 4 แบบ</h2>
+        <p>จำสองคอลัมน์สุดท้ายไว้ให้ขึ้นใจ</p>
+      </div>
+      <div class="sumwrap"><table class="sum" id="frontTable"></table></div>
+    </section>
+
+    <section class="fogpanel" data-fpanel="warm" hidden></section>
+    <section class="fogpanel" data-fpanel="cold" hidden></section>
+    <section class="fogpanel" data-fpanel="stat" hidden></section>
+    <section class="fogpanel" data-fpanel="occl" hidden></section>
+
+    <footer>
+      <p>
+        <b>มุมมองในภาพจำลอง</b> — เป็นภาพตัดขวางแนวดิ่ง มองจากด้านข้าง แกนนอนคือระยะทาง (หลายร้อยไมล์)
+        แกนตั้งคือความสูง · ความชันของแนวปะทะในภาพถูก <b>ขยายให้เห็นชัด</b> ของจริงแบนกว่านี้มาก
+        (1:200 แปลว่าไปข้างหน้า 200 ไมล์ ถึงจะสูงขึ้น 1 ไมล์)
+      </p>
+      <p>
+        ทิศลมที่ระบุใช้แบบซีกโลกเหนือ · ลำดับเมฆและสภาพอากาศเป็นแบบฉบับทั่วไป ของจริงขึ้นกับความชื้นและความแรงของแต่ละแนว
+      </p>
+    </footer>
+
+  </div>
+
+  <div id="view-press" class="view" role="tabpanel" aria-labelledby="tab-press" hidden>
+
+    <div class="fogintro">
+      <div class="frow"><h3>ห้องทดลองความกดอากาศ<small>Pressure Systems Lab</small></h3><span class="pill">จิ้มบนแผนที่ได้เลย</span></div>
+      <p class="flead">
+        แผนที่นี้มีทะเลอยู่ทางซ้าย ที่ราบชื้นถัดมา แนวเขาพาดกลาง และที่ราบสูงแห้งด้านหลังเขา (เงาฝน)
+        <b>คลิกลงไปตรงไหนก็ได้เพื่อวางศูนย์กลางความกดอากาศ</b> แล้วกด ▶ เพื่อเดินเวลา —
+        ลม เส้นความกดอากาศ เมฆและฝน คำนวณสดจากสนามความกดที่คุณสร้างขึ้นเอง
+        วางสองจุดเป็น H กับ L เพื่อดูว่าตรงช่องระหว่างสองระบบลมแรงแค่ไหน
+      </p>
+    </div>
+
+    <div class="lab">
+      <div class="stage">
+        <div class="scroller"><canvas id="pmap" width="1520" height="940" role="img"
+             aria-label="แผนที่จำลองความกดอากาศ วางศูนย์กลาง H และ L ได้เอง"></canvas></div>
+        <div class="parcelbar">
+          <button class="go" id="play-press" data-play="press">▶ เล่นภาพ</button>
+          <span id="bar-press"></span>
+          <span style="flex:1 1 auto"></span>
+          <span class="hint" style="max-width:44ch">คลิกบนแผนที่เพื่อวางระบบ · ยิ่งเส้นความกดชิดกัน ลมยิ่งแรง</span>
+        </div>
+      </div>
+
+      <aside class="panel">
+        <h2>ลองขยับดู</h2>
+
+        <div class="ctrl">
+          <div class="row"><span class="name">ชนิดที่จะวาง</span></div>
+          <div class="segs">
+            <button class="seg" data-pmode="H" aria-selected="false">H · ความกดสูง</button>
+            <button class="seg" data-pmode="L" aria-selected="true">L · ความกดต่ำ</button>
+          </div>
+        </div>
+
+        <div class="ctrl">
+          <div class="row"><span class="name">ความแรงของระบบ</span><span class="val" id="v-press-amp">16 hPa</span></div>
+          <input type="range" id="c-press-amp" data-t="press" data-k="amp" min="4" max="30" step="1" value="16" aria-label="ความแรงของระบบ">
+          <span class="hint">ต่างจากความกดปกติ 1013 hPa มากเท่าไหร่</span>
+        </div>
+
+        <div class="ctrl">
+          <div class="row"><span class="name">ขนาดของระบบ</span><span class="val" id="v-press-radkm">460 กม.</span></div>
+          <input type="range" id="c-press-radkm" data-t="press" data-k="radkm" min="200" max="900" step="20" value="460" aria-label="ขนาดของระบบ">
+          <span class="hint">ระบบเล็กแต่แรง = เส้นความกดชิด = ลมแรง</span>
+        </div>
+
+        <div class="ctrl">
+          <div class="row"><span class="name">ความเร็วที่ระบบเคลื่อนที่</span><span class="val" id="v-press-speed">20 kt</span></div>
+          <input type="range" id="c-press-speed" data-t="press" data-k="speed" min="0" max="40" step="1" value="20" aria-label="ความเร็วที่ระบบเคลื่อนที่">
+          <span class="hint">ระบบความกดอากาศมักเคลื่อนจากตะวันตกไปตะวันออก</span>
+        </div>
+
+        <div class="segs" style="margin-bottom:6px">
+          <button class="seg" id="pdemo">ตั้งตัวอย่าง H + L</button>
+          <button class="seg" id="pclear">ล้างแผนที่</button>
+        </div>
+
+        <div class="verdict" id="vd-press">
+          <div class="vhead" id="vh-press">—</div>
+          <div class="vbody" id="vb-press">—</div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="fogcard">
+      <div class="foggrid">
+        <div><h4>ความกดอากาศสูง · H</h4><ul>
+          <li>อากาศชั้นบน <b>จมลง</b> มาแทนที่ อากาศที่จมลงจะอุ่นและแห้ง</li>
+          <li>ลมหมุน <b>ตามเข็มนาฬิกา</b> และกระจายออกจากศูนย์กลาง (ซีกโลกเหนือ)</li>
+          <li>ฟ้าโปร่ง ลมเบา — แต่ถ้าค้างนานจะสะสมฝุ่นจนทัศนวิสัยแย่</li>
+          <li>กลางคืนที่ฟ้าใสและลมสงบแบบนี้คือเงื่อนไขของ <b>หมอกแผ่รังสี</b></li>
+        </ul></div>
+        <div><h4>ความกดอากาศต่ำ · L</h4><ul>
+          <li>ลมเบนเข้าหาศูนย์กลาง อากาศมารวมกันแล้ว <b>ถูกดันขึ้น</b></li>
+          <li>ลมหมุน <b>ทวนเข็มนาฬิกา</b> (ซีกโลกเหนือ)</li>
+          <li>อากาศที่ยกตัวเย็นลงจนควบแน่น → เมฆหนา ฝน ลมแรง</li>
+          <li>มักมีแนวปะทะอากาศพาดออกมาจากศูนย์กลาง แล้วค่อย ๆ กลายเป็นแนวปิดตอนแก่ตัว</li>
+        </ul></div>
+        <div><h4>ความชันความกดอากาศ</h4><ul>
+          <li>คือความกดที่เปลี่ยนไปต่อระยะทาง — บนแผนที่ดูจาก <b>ความชิดของเส้นความกด</b></li>
+          <li>เส้นชิด = ความชันสูง = <b>ลมแรง</b> · เส้นห่าง = ลมเบา</li>
+          <li>ลมไม่ได้พัดตรงจากสูงไปต่ำ แต่ถูกแรงคอริออลิสบิดจนพัดเกือบขนานเส้นความกด</li>
+          <li>แรงเสียดทานที่ผิวพื้นบิดกลับอีกราว 25–30° ทำให้ลมเบนเข้าหาความกดต่ำ</li>
+        </ul></div>
+      </div>
+    </div>
+
+    <footer>
+      <p>
+        <b>แบบจำลองนี้คำนวณอะไรบ้าง</b> — สนามความกดจากผลรวมของทุกระบบที่วางไว้ (รูประฆังคว่ำ) ·
+        ลมจากสมดุลจีโอสโทรฟิกบวกมุมเบนเข้าหาความกดต่ำ 25° · เมฆและฝนจากการลู่เข้าของลม (convergence)
+        บวกการยกตัวตามลาดเขา คูณด้วยความชื้นที่ลมพัดพามาจากทะเลหรือที่ราบชื้น
+      </p>
+      <p>
+        ใช้ค่าของซีกโลกเหนือ · 1 พิกเซลบนแผนที่ ≈ 1.6 กม. · 1 เฟรม ≈ 20 นาที ·
+        เป็นแบบจำลองเชิงการสอน ไม่ใช่แบบจำลองพยากรณ์อากาศจริง
+      </p>
+    </footer>
+
+  </div>
+
+</div>
+
+<script>
+(() => {
+"use strict";
+
+/* ============ ค่าคงที่เชิงฟิสิกส์ (rules of thumb การบิน) ============ */
+const FT_MAX = 18000;
+const DALR   = 3.0;   // °C ต่อ 1,000 ft  อากาศแห้ง
+const SALR   = 1.5;   // °C ต่อ 1,000 ft  อากาศอิ่มตัว
+const DEWLR  = 0.5;   // °C ต่อ 1,000 ft  จุดน้ำค้าง
+const CONV   = DALR - DEWLR; // 2.5
+
+const S = { T0:32, RH:60, ELR:2.0, DT:2.5, alt:0 };
+
+/* ============ ฟิสิกส์ ============ */
+const esat = T => 6.112 * Math.exp(17.62*T/(243.12+T));
+const dewFromRH = (T,rh) => { const g = Math.log(Math.max(rh,1)/100) + 17.62*T/(243.12+T); return 243.12*g/(17.62-g); };
+const rhOf = (T,Td) => Math.min(100, 100*esat(Math.min(Td,T))/esat(T));
+const pressAt = h => 1013.25 * Math.pow(Math.max(1 - 6.87535e-6*h, 0.02), 5.2559);
+const rhoOf = (T,p) => p*100 / (287.05*(T+273.15));
+/* อัตราเย็นตัวของอากาศอิ่มตัว ~1.2 °C/1,000 ft ตอนอุ่น ถึง ~2.9 ตอนเย็นจัด */
+const SALRof = T => 3.0 - 1.9/(1 + Math.exp(-(T+5)/12));
+
+function derive(){
+  const Td0 = dewFromRH(S.T0, S.RH);
+  const Tp0 = S.T0 + S.DT;
+  const lcl = Math.max(0, (Tp0 - Td0) / CONV * 1000);
+
+  const envT = h => S.T0 - S.ELR*h/1000;
+
+  /* ไต่ลูกอากาศขึ้นทีละ 50 ft — อากาศแห้งเย็นตัว 3°/1,000 ft
+     พออิ่มตัวแล้วเย็นช้าลงตามอุณหภูมิขณะนั้น (ยิ่งอุ่นยิ่งช้า) */
+  const STEP = 50, N = FT_MAX/STEP + 1;
+  const prof = new Float64Array(N);
+  let T = Tp0; prof[0] = T;
+  for (let i=1;i<N;i++){
+    const rate = (i-1)*STEP < lcl ? DALR : SALRof(T);
+    T -= rate*STEP/1000;
+    prof[i] = T;
+  }
+  const parT = h => {
+    const x = Math.max(0, Math.min(FT_MAX, h))/STEP, i = Math.floor(x), f = x-i;
+    return i >= N-1 ? prof[N-1] : prof[i]*(1-f) + prof[i+1]*f;
+  };
+  const Tlcl = parT(lcl);
+  const parTd = h => h <= lcl ? Td0 - DEWLR*h/1000 : parT(h);
+
+  // ระดับสมดุล: ลอยขึ้นจนอุณหภูมิเท่าอากาศรอบข้าง
+  let el = 0;
+  if (S.DT > 0){
+    el = FT_MAX;
+    for (let h = STEP; h <= FT_MAX; h += STEP){
+      if (parT(h) <= envT(h)){ el = h; break; }
+    }
+  }
+  const cloudTop = Math.min(FT_MAX, Math.max(el, S.alt));
+  const hasCloud = lcl < FT_MAX && cloudTop > lcl + 60;
+  const towering = hasCloud && cloudTop >= FT_MAX - 100;
+
+  let stab, stabCls, stabNote;
+  if (S.ELR > DALR){ stab='ไม่เสถียรสัมบูรณ์'; stabCls='crit'; stabNote='อากาศรอบข้างเย็นเร็วกว่าลูกอากาศ — ลอยขึ้นเองได้ตลอด อากาศปั่นป่วน'; }
+  else if (S.ELR < SALR){ stab='เสถียรสัมบูรณ์'; stabCls='good'; stabNote='อะไรลอยขึ้นก็จมกลับ อากาศนิ่ง ทัศนวิสัยมักแย่เพราะฝุ่นสะสม'; }
+  else { stab='ไม่เสถียรมีเงื่อนไข'; stabCls='warn'; stabNote='อากาศแห้งจะเสถียร แต่ถ้าอิ่มตัวเมื่อไหร่จะลอยต่อได้ไกล — เมฆก่อตัวสูง'; }
+
+  return { Td0, Tp0, lcl, Tlcl, envT, parT, parTd, el, cloudTop, hasCloud, towering, stab, stabCls, stabNote };
+}
+
+/* ============ เครื่องมือสี ============ */
+const root = document.documentElement;
+let TOK = {};
+function readTokens(){
+  const cs = getComputedStyle(root);
+  ['--hot','--hot-soft','--cold','--cold-soft','--dew','--ink','--ink-2','--ink-3','--line','--line-soft',
+   '--sky-low','--sky-high','--cloud','--cloud-edge','--surface','--surface-2','--good','--warn','--crit']
+   .forEach(k => TOK[k] = cs.getPropertyValue(k).trim());
+}
+const hex2rgb = h => { h=h.replace('#',''); if(h.length===3) h=h.split('').map(c=>c+c).join('');
+  return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; };
+const rgb2hex = c => '#'+c.map(v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0')).join('');
+const mix = (a,b,t) => { const A=hex2rgb(a),B=hex2rgb(b); return rgb2hex(A.map((v,i)=>v+(B[i]-v)*t)); };
+const tempColor = T => {
+  const t = Math.max(0, Math.min(1, (T + 30) / 75));           // -30 → +45
+  return t < .5 ? mix(TOK['--cold'], mix(TOK['--cold'],TOK['--hot'],.5), t*2)
+                : mix(mix(TOK['--cold'],TOK['--hot'],.5), TOK['--hot'], (t-.5)*2);
+};
+
+/* ============ เรขาคณิตของภาพ ============ */
+const VW=700, VH=560, PT=44, PB=506;
+const SKX=64, SKW=232, GRX=372, GRW=248;
+const yOf = h => PB - (h/FT_MAX)*(PB-PT);
+const fmt = (n,d=0) => n.toLocaleString('en-US',{minimumFractionDigits:d, maximumFractionDigits:d});
+
+let X0=-20, X1=45;
+const xOf = T => GRX + (T-X0)/(X1-X0)*GRW;
+
+/* PRNG แบบกำหนดค่าคงที่ เพื่อให้จุดความหนาแน่นไม่กระพริบ */
+function prng(seed){ let s = seed; return () => (s = (s*1103515245 + 12345) & 0x7fffffff) / 0x7fffffff; }
+
+const svg = document.getElementById('sky');
+
+function renderStatic(){
+  const D = derive();
+
+  // ขอบเขตแกนอุณหภูมิ
+  const vals = [D.Td0, D.Tp0, S.T0, D.envT(FT_MAX), D.parT(FT_MAX), D.parTd(FT_MAX)];
+  X0 = Math.floor((Math.min(...vals)-4)/10)*10;
+  X1 = Math.ceil((Math.max(...vals)+4)/10)*10;
+
+  const warmth = Math.max(0, Math.min(1, (S.T0-8)/34));
+  const skyLow = mix(TOK['--sky-low'], TOK['--hot'], warmth*0.30);
+
+  let s = '';
+
+  /* --- defs --- */
+  s += `<defs>
+    <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${TOK['--sky-high']}"/>
+      <stop offset="0.62" stop-color="${mix(TOK['--sky-high'],skyLow,.72)}"/>
+      <stop offset="1" stop-color="${skyLow}"/>
+    </linearGradient>
+    <filter id="soft" x="-25%" y="-40%" width="150%" height="180%">
+      <feGaussianBlur stdDeviation="3.2"/>
+    </filter>
+    <clipPath id="skyClip"><rect x="${SKX}" y="${PT}" width="${SKW}" height="${PB-PT}"/></clipPath>
+    <marker id="ar" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="${TOK['--ink-3']}"/>
+    </marker>
+  </defs>`;
+
+  /* --- หัวแผง --- */
+  s += `<text x="${SKX}" y="26" font-family="Bai Jamjuree,sans-serif" font-size="13" font-weight="600" fill="${TOK['--ink']}">ท้องฟ้าจำลอง</text>`;
+  s += `<text x="${SKX+SKW}" y="26" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="10.5" letter-spacing="1.2" fill="${TOK['--ink-3']}">DENSITY</text>`;
+  s += `<text x="${GRX}" y="26" font-family="Bai Jamjuree,sans-serif" font-size="13" font-weight="600" fill="${TOK['--ink']}">อุณหภูมิ เทียบ ความสูง</text>`;
+  s += `<text x="${GRX+GRW+8}" y="26" font-family="IBM Plex Mono,monospace" font-size="10.5" letter-spacing="1.2" fill="${TOK['--ink-3']}">hPa</text>`;
+
+  /* --- ท้องฟ้า --- */
+  s += `<rect x="${SKX}" y="${PT}" width="${SKW}" height="${PB-PT}" fill="url(#sg)"/>`;
+
+  /* --- จุดแทนความหนาแน่นของโมเลกุลอากาศ --- */
+  const rnd = prng(20250823);
+  let dots = '';
+  for (let i=0;i<420;i++){
+    const h = rnd()*FT_MAX;
+    if (rnd() > pressAt(h)/1013.25) continue;         // สุ่มแบบถ่วงน้ำหนักด้วยความดัน
+    const x = SKX + 6 + rnd()*(SKW-12);
+    dots += `<circle cx="${x.toFixed(1)}" cy="${yOf(h).toFixed(1)}" r="1.5" fill="${TOK['--cloud']}" opacity="0.34"/>`;
+  }
+  s += `<g clip-path="url(#skyClip)">${dots}</g>`;
+
+  /* --- เส้นระดับความสูง + ป้ายกำกับ --- */
+  for (let h=0; h<=FT_MAX; h+=1000){
+    const y = yOf(h), major = h % 2000 === 0;
+    s += `<line x1="${SKX}" y1="${y}" x2="${SKX+SKW}" y2="${y}" stroke="${TOK['--cloud']}" stroke-width="${major?0.7:0.4}" opacity="${major?0.22:0.11}"/>`;
+    s += `<line x1="${GRX}" y1="${y}" x2="${GRX+GRW}" y2="${y}" stroke="${TOK['--line']}" stroke-width="${major?0.9:0.6}" opacity="${major?1:0.5}"/>`;
+    if (major){
+      s += `<text x="54" y="${y+4}" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="11" fill="${TOK['--ink-3']}">${fmt(h)}</text>`;
+      s += `<text x="${GRX+GRW+8}" y="${y+4}" font-family="IBM Plex Mono,monospace" font-size="11" fill="${TOK['--ink-3']}">${fmt(pressAt(h))}</text>`;
+    }
+  }
+  s += `<text x="54" y="${PT-14}" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="10.5" letter-spacing="1.2" fill="${TOK['--ink-3']}">FT</text>`;
+
+  /* --- แกนอุณหภูมิ --- */
+  s += `<line x1="${GRX}" y1="${PB}" x2="${GRX+GRW}" y2="${PB}" stroke="${TOK['--line']}" stroke-width="1"/>`;
+  for (let T=X0; T<=X1; T+=10){
+    const x = xOf(T);
+    s += `<line x1="${x}" y1="${PT}" x2="${x}" y2="${PB}" stroke="${TOK['--line']}" stroke-width="0.6" opacity="0.55"/>`;
+    s += `<text x="${x}" y="${PB+18}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="${TOK['--ink-3']}">${T}°</text>`;
+  }
+
+  /* --- พื้นดิน --- */
+  s += `<rect x="${SKX}" y="${PB}" width="${SKW}" height="16" fill="${mix(TOK['--ink-3'],TOK['--hot'],.35)}"/>`;
+  s += `<rect x="${SKX+30}" y="${PB+6}" width="${SKW-60}" height="3" fill="${TOK['--cloud']}" opacity="0.55"/>`;
+  s += `<text x="${SKX+SKW/2}" y="${PB+33}" text-anchor="middle" font-family="IBM Plex Sans Thai,sans-serif" font-size="11.5" fill="${TOK['--ink-3']}">พื้นดินรับแดด → อุ่นอากาศที่ติดพื้น</text>`;
+
+  /* --- แถบแรงลอยตัวบนกราฟ --- */
+  if (S.DT > 0 && D.el > 0){
+    let up = `M ${xOf(D.envT(0))} ${yOf(0)}`;
+    for (let h=0; h<=D.el; h+=100) up += ` L ${xOf(D.envT(h))} ${yOf(h)}`;
+    up += ` L ${xOf(D.envT(D.el))} ${yOf(D.el)}`;
+    for (let h=D.el; h>=0; h-=100) up += ` L ${xOf(D.parT(h))} ${yOf(h)}`;
+    up += ' Z';
+    s += `<path d="${up}" fill="${TOK['--hot']}" opacity="0.15"/>`;
+  }
+
+  /* --- เส้นบนกราฟ --- */
+  const line = (fn, from, to) => {
+    let d=''; for (let h=from; h<=to; h+=100) d += (d?' L ':'M ') + xOf(fn(h)) + ' ' + yOf(h);
+    return d + ` L ${xOf(fn(to))} ${yOf(to)}`;
+  };
+  s += `<path d="${line(D.envT,0,FT_MAX)}" fill="none" stroke="${TOK['--hot']}" stroke-width="2.2" stroke-linecap="round"/>`;
+  s += `<path d="${line(D.parTd,0,FT_MAX)}" fill="none" stroke="${TOK['--dew']}" stroke-width="1.8" stroke-dasharray="5 4" stroke-linecap="round"/>`;
+  s += `<path d="${line(D.parT,0,FT_MAX)}" fill="none" stroke="${TOK['--hot']}" stroke-width="1.8" stroke-dasharray="5 4" stroke-linecap="round"/>`;
+
+  /* --- ระดับฐานเมฆ --- */
+  if (D.lcl < FT_MAX){
+    const y = yOf(D.lcl);
+    s += `<line x1="${SKX}" y1="${y}" x2="${GRX+GRW}" y2="${y}" stroke="${TOK['--cold']}" stroke-width="1.2" stroke-dasharray="2 4"/>`;
+    s += `<text x="${GRX+GRW}" y="${y-7}" text-anchor="end" font-family="IBM Plex Sans Thai,sans-serif" font-size="11.5" font-weight="600" fill="${TOK['--cold']}">RH 100% · ฐานเมฆ ${fmt(Math.round(D.lcl/100)*100)} ft</text>`;
+  }
+
+  /* --- ระดับสมดุล --- */
+  if (S.DT > 0 && D.el > 0 && D.el < FT_MAX){
+    const y = yOf(D.el);
+    s += `<line x1="${GRX}" y1="${y}" x2="${GRX+GRW}" y2="${y}" stroke="${TOK['--ink-3']}" stroke-width="1" stroke-dasharray="1 3"/>`;
+    s += `<text x="${GRX+4}" y="${y-6}" font-family="IBM Plex Sans Thai,sans-serif" font-size="11" fill="${TOK['--ink-2']}">ระดับสมดุล ${fmt(Math.round(D.el/100)*100)} ft</text>`;
+  }
+
+  s += `<g id="dyn"></g>`;
+  svg.innerHTML = s;
+  renderDyn(D);
+}
+
+/* ============ ชั้นที่เปลี่ยนตามลูกอากาศ ============ */
+function renderDyn(D){
+  D = D || derive();
+  const g = document.getElementById('dyn');
+  if (!g) return;
+  let s = '';
+
+  /* --- เมฆ --- */
+  if (D.hasCloud){
+    const yb = yOf(D.lcl), yt = yOf(D.cloudTop), th = Math.max(10, yb-yt);
+    const rnd = prng(77);
+    let puffs = '';
+    const n = Math.max(6, Math.round(th/12));
+    for (let i=0;i<n;i++){
+      const cy = yb - rnd()*th;
+      const cx = SKX + 20 + rnd()*(SKW-40);
+      const r  = 14 + rnd()*22;
+      puffs += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" fill="${TOK['--cloud']}" opacity="0.55"/>`;
+    }
+    s += `<g clip-path="url(#skyClip)" filter="url(#soft)">
+            <rect x="${SKX+16}" y="${yb-9}" width="${SKW-32}" height="16" rx="8" fill="${TOK['--cloud']}" opacity="0.6"/>
+            ${puffs}
+          </g>`;
+    s += `<line x1="${SKX+16}" y1="${yb}" x2="${SKX+SKW-16}" y2="${yb}" stroke="${TOK['--cold']}" stroke-width="1.4" opacity="0.85"/>`;
+  }
+
+  /* --- ลูกอากาศในท้องฟ้า --- */
+  const h = S.alt, y = yOf(h), cx = SKX + SKW*0.5;
+  const Tp = D.parT(h), Te = D.envT(h), b = Tp - Te;
+  const col = tempColor(Tp);
+
+  if (Math.abs(b) > 0.2){
+    const dir = b > 0 ? -1 : 1;
+    const y1 = y + dir*22, y2 = y + dir*46;
+    s += `<line x1="${cx}" y1="${y1}" x2="${cx}" y2="${y2}" stroke="${b>0?TOK['--hot']:TOK['--cold']}" stroke-width="2.4" marker-end="url(#ar)" opacity="0.9"/>`;
+  }
+
+  s += `<circle cx="${cx}" cy="${y}" r="13" fill="${col}" stroke="${TOK['--surface']}" stroke-width="2"/>`;
+  if (h >= D.lcl - 1) s += `<circle cx="${cx}" cy="${y}" r="18" fill="none" stroke="${TOK['--cold']}" stroke-width="1.4" stroke-dasharray="3 3"/>`;
+  s += `<rect x="${cx+22}" y="${y-13}" width="66" height="26" rx="5" fill="${TOK['--surface']}" stroke="${TOK['--line']}"/>`;
+  s += `<text x="${cx+55}" y="${y+5}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="13" fill="${TOK['--ink']}">${Tp.toFixed(1)}°C</text>`;
+
+  /* --- ลูกอากาศบนกราฟ --- */
+  s += `<circle cx="${xOf(Tp)}" cy="${y}" r="5" fill="${col}" stroke="${TOK['--surface']}" stroke-width="1.6"/>`;
+  s += `<circle cx="${xOf(Te)}" cy="${y}" r="3.5" fill="none" stroke="${TOK['--hot']}" stroke-width="1.6"/>`;
+
+  g.innerHTML = s;
+  updateReadouts(D);
+}
+
+/* ============ ตัวเลขทั้งหมด ============ */
+const $ = id => document.getElementById(id);
+
+function updateReadouts(D){
+  const h = S.alt;
+  const Tp = D.parT(h), Te = D.envT(h), Tdp = D.parTd(h), b = Tp - Te;
+  const p = pressAt(h);
+  const rhoE = rhoOf(Te, p), rhoP = rhoOf(Tp, p), rho0 = rhoOf(S.T0, 1013.25);
+  const rhP = rhOf(Tp, Tdp);
+
+  $('altRead').textContent = fmt(Math.round(h/50)*50) + ' ft';
+  $('alt').value = Math.round(h);
+
+  $('vT0').textContent  = S.T0 + ' °C';
+  $('vRH').textContent  = S.RH + ' %';
+  $('vELR').textContent = S.ELR.toFixed(1) + ' °C';
+  $('vDT').textContent  = (S.DT>=0?'+':'') + S.DT.toFixed(1) + ' °C';
+
+  /* คำตัดสิน */
+  const V = $('verdict');
+  let cls, head, body;
+  if (b > 0.2){
+    cls='rise'; head='ลอยขึ้น ↑';
+    body = `ลูกอากาศอุ่นกว่าอากาศรอบข้าง <b>${b.toFixed(1)} °C</b> จึงเบากว่า <b>${((1-rhoP/rhoE)*100).toFixed(1)}%</b> — อากาศหนาแน่นรอบๆ ดันมันขึ้นไปต่อ`;
+  } else if (b < -0.2){
+    cls='sink'; head='จมลง ↓';
+    body = `ลูกอากาศเย็นกว่าอากาศรอบข้าง <b>${Math.abs(b).toFixed(1)} °C</b> จึงหนักกว่า <b>${((rhoP/rhoE-1)*100).toFixed(1)}%</b> — มันจะจมกลับลงไป`;
+  } else {
+    cls='neutral'; head='สมดุล — ลอยนิ่ง';
+    body = `อุณหภูมิลูกอากาศเท่ากับอากาศรอบข้าง (<b>${Tp.toFixed(1)} °C</b>) ความหนาแน่นเท่ากัน ไม่มีแรงพาขึ้นหรือลง`;
+  }
+  if (h >= D.lcl - 1 && D.lcl < FT_MAX) body += ` · <b>อิ่มตัวแล้ว</b> อยู่ในเมฆ เย็นลงช้าเหลือ ${SALRof(Tp).toFixed(1)} °C/1,000 ft`;
+  if (S.DT <= 0 && h === 0) body += ` · พื้นไม่ได้อุ่นกว่าอากาศ ลูกอากาศจึงไม่ลอยเอง ต้องมีภูเขาหรือแนวปะทะยกให้`;
+  V.className = 'verdict ' + cls;
+  $('vHead').textContent = head;
+  $('vBody').innerHTML = body;
+
+  /* แถบสถิติ */
+  $('sP').innerHTML  = fmt(p) + '<span class="u">hPa</span>';
+  $('sPs').textContent = `${(p/1013.25*100).toFixed(0)}% ของที่ระดับน้ำทะเล (1,013 hPa)`;
+  $('sRho').innerHTML = rhoE.toFixed(3) + '<span class="u">kg/m³</span>';
+  $('sRhos').textContent = `ที่พื้น ${rho0.toFixed(3)} — เบาลง ${((1-rhoE/rho0)*100).toFixed(0)}%`;
+  $('sTd').innerHTML = D.Td0.toFixed(1) + '<span class="u">°C</span>';
+  $('sTds').textContent = `ห่างจากอุณหภูมิ (spread) ${(D.Tp0-D.Td0).toFixed(1)} °C`;
+  if (D.lcl < FT_MAX){
+    $('sLCL').innerHTML = fmt(Math.round(D.lcl/100)*100) + '<span class="u">ft</span>';
+    $('sLCLs').textContent = D.towering ? `ยอดเมฆทะลุ 18,000 ft — เมฆฝนฟ้าคะนอง (CB)`
+      : D.hasCloud ? `เมฆหนา ${fmt(Math.round((D.cloudTop-D.lcl)/100)*100)} ft`
+      : 'ต้องมีแรงยกอากาศขึ้นไปถึงก่อน จึงจะเกิดเมฆ';
+  } else {
+    $('sLCL').innerHTML = '—';
+    $('sLCLs').textContent = 'แห้งเกินไป ไม่ควบแน่นในช่วง 18,000 ft';
+  }
+  $('sStabPill').className = 'pill ' + D.stabCls;
+  $('sStabPill').textContent = D.stab;
+  $('sStabs').textContent = D.stabNote;
+
+  /* การ์ดกฎ */
+  $('r1').innerHTML = `ลูกอากาศ <span>${Tp.toFixed(1)}°</span> · รอบข้าง <span class="c">${Te.toFixed(1)}°</span> → ${b>0.2?'เบากว่า ลอยขึ้น':b<-0.2?'หนักกว่า จมลง':'เท่ากัน นิ่ง'}`;
+  $('r2').innerHTML = `ที่ 10,000 ft : ${S.T0}° − <span>${S.ELR.toFixed(1)}</span>×10 = <span class="c">${D.envT(10000).toFixed(1)}°C</span>`;
+  $('r3').innerHTML = `ที่ <span>${fmt(Math.round(h/100)*100)} ft</span> : ${fmt(p)} hPa (${(p/1013.25*100).toFixed(0)}% ของที่พื้น)`;
+  $('r4').innerHTML = `พื้น <span>${rho0.toFixed(3)}</span> → ที่ ${fmt(Math.round(h/100)*100)} ft <span class="c">${rhoE.toFixed(3)}</span> kg/m³`;
+  $('r5').innerHTML = D.lcl < FT_MAX
+    ? `RH ของลูกอากาศตอนนี้ <span class="d">${rhP.toFixed(0)}%</span> · ครบ 100% ที่ <span class="c">${fmt(Math.round(D.lcl/100)*100)} ft</span>`
+    : `RH ของลูกอากาศตอนนี้ <span class="d">${rhP.toFixed(0)}%</span> · ไม่ถึง 100% ในช่วงที่แสดง`;
+  $('r6').innerHTML = `( <span>${D.Tp0.toFixed(1)}</span> − <span class="d">${D.Td0.toFixed(1)}</span> ) ÷ 2.5 × 1,000 = <span class="c">${D.lcl<FT_MAX?fmt(Math.round(D.lcl/100)*100)+' ft':'สูงมาก'}</span>`;
+}
+
+/* ============ การเคลื่อนที่แบบอิสระ ============ */
+let raf = null;
+const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+
+function stopAnim(){ if (raf){ cancelAnimationFrame(raf); raf = null; } }
+
+function release(){
+  stopAnim();
+  const D = derive();
+  if (reduced.matches){
+    S.alt = (S.DT > 0) ? D.el : 0;
+    renderDyn(D); return;
+  }
+  let last = performance.now();
+  const step = now => {
+    const dt = Math.min(0.05, (now-last)/1000); last = now;
+    const b = D.parT(S.alt) - D.envT(S.alt);
+    const v = Math.max(-4000, Math.min(4000, b*1100));       // ft ต่อวินาที
+    S.alt = Math.max(0, Math.min(FT_MAX, S.alt + v*dt));
+    renderDyn(D);
+    if (Math.abs(b) < 0.04 || (S.alt <= 0 && b < 0) || S.alt >= FT_MAX){ raf = null; return; }
+    raf = requestAnimationFrame(step);
+  };
+  raf = requestAnimationFrame(step);
+}
+
+/* ============ ตัวควบคุม ============ */
+function bind(id, key, transform){
+  const inp = $(id);
+  inp.addEventListener('input', () => {
+    stopAnim();
+    S[key] = transform(inp.value);
+    renderStatic();
+  });
+}
+bind('T0','T0',Number); bind('RH','RH',Number); bind('ELR','ELR',Number); bind('DT','DT',Number);
+
+$('alt').addEventListener('input', e => { stopAnim(); S.alt = Number(e.target.value); renderDyn(); });
+$('release').addEventListener('click', release);
+$('reset').addEventListener('click', () => { stopAnim(); S.alt = 0; renderDyn(); });
+
+const PRESETS = {
+  morning:   {T0:24, RH:70, ELR:1.8, DT:1.0},
+  afternoon: {T0:34, RH:70, ELR:2.4, DT:3.0},
+  storm:     {T0:33, RH:85, ELR:2.9, DT:5.0},
+  cold:      {T0:12, RH:60, ELR:2.2, DT:1.0},
+  desert:    {T0:42, RH:12, ELR:2.6, DT:4.0},
+  inversion: {T0:22, RH:55, ELR:0.6, DT:1.0}
+};
+document.querySelectorAll('.chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    stopAnim();
+    Object.assign(S, PRESETS[btn.dataset.preset], {alt:0});
+    ['T0','RH','ELR','DT'].forEach(k => $(k).value = S[k]);
+    renderStatic();
+  });
+});
+
+/* ============ แผนภาพวงจรลมบก–ลมทะเล ============ */
+function renderCirc(){
+  const c = document.getElementById('circ');
+  const sea = TOK['--cold'], land = TOK['--hot'], ink = TOK['--ink'], ink2 = TOK['--ink-2'], ink3 = TOK['--ink-3'];
+  let s = `<defs>
+    <marker id="ac" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="13" markerHeight="13" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="${ink2}"/>
+    </marker>
+  </defs>`;
+
+  s += `<rect x="30" y="205" width="300" height="30" fill="${sea}" opacity="0.45"/>`;
+  s += `<path d="M330,235 L330,205 Q430,196 500,182 Q580,168 670,178 L670,235 Z" fill="${land}" opacity="0.35"/>`;
+  s += `<text x="180" y="226" text-anchor="middle" font-family="Bai Jamjuree,sans-serif" font-size="13" font-weight="600" fill="${ink}">ทะเล · เย็นกว่า</text>`;
+  s += `<text x="520" y="226" text-anchor="middle" font-family="Bai Jamjuree,sans-serif" font-size="13" font-weight="600" fill="${ink}">แผ่นดิน · ร้อนกว่า</text>`;
+  s += `<text x="180" y="252" text-anchor="middle" font-family="IBM Plex Sans Thai,sans-serif" font-size="12" fill="${ink3}">อากาศหนาแน่น → ความกดอากาศสูง</text>`;
+  s += `<text x="520" y="252" text-anchor="middle" font-family="IBM Plex Sans Thai,sans-serif" font-size="12" fill="${ink3}">อากาศเบาบาง → ความกดอากาศต่ำ</text>`;
+
+  s += `<path class="flowline" d="M300,190 L410,190" fill="none" stroke="${sea}" stroke-width="3" marker-end="url(#ac)"/>`;
+  s += `<text x="352" y="180" text-anchor="middle" font-family="IBM Plex Sans Thai,sans-serif" font-size="12" font-weight="600" fill="${sea}">ลมพัดเข้าฝั่ง</text>`;
+
+  s += `<path class="flowline" d="M520,178 L520,114" fill="none" stroke="${land}" stroke-width="3" marker-end="url(#ac)"/>`;
+  s += `<text x="536" y="152" font-family="IBM Plex Sans Thai,sans-serif" font-size="12" font-weight="600" fill="${land}">อากาศร้อนลอยขึ้น</text>`;
+
+  s += `<path class="flowline" d="M470,58 L230,58" fill="none" stroke="${ink3}" stroke-width="3" marker-end="url(#ac)"/>`;
+  s += `<text x="350" y="48" text-anchor="middle" font-family="IBM Plex Sans Thai,sans-serif" font-size="12" fill="${ink2}">ไหลย้อนกลับด้านบน</text>`;
+
+  s += `<path class="flowline" d="M180,74 L180,178" fill="none" stroke="${sea}" stroke-width="3" marker-end="url(#ac)"/>`;
+  s += `<text x="164" y="132" text-anchor="end" font-family="IBM Plex Sans Thai,sans-serif" font-size="12" font-weight="600" fill="${sea}">อากาศเย็นจมลง</text>`;
+
+  const cf = mix(TOK['--cloud'], TOK['--ink-3'], 0.42);
+  s += `<g>
+    <circle cx="500" cy="82" r="17" fill="${cf}"/>
+    <circle cx="524" cy="74" r="22" fill="${cf}"/>
+    <circle cx="551" cy="84" r="15" fill="${cf}"/>
+    <rect x="483" y="82" width="83" height="13" rx="6.5" fill="${cf}"/>
+  </g>`;
+  s += `<text x="576" y="90" font-family="IBM Plex Sans Thai,sans-serif" font-size="12" fill="${ink2}">ควบแน่นเป็นเมฆ</text>`;
+
+  c.innerHTML = s;
+}
+
+
+/* ============ แท็บหลัก + เมนูย่อย ============ */
+const VIEWS = {atmos: $('view-atmos'), fog: $('view-fog'), cloud: $('view-cloud'), front: $('view-front'), press: $('view-press')};
+document.querySelectorAll('.tabs button').forEach(b => {
+  b.addEventListener('click', () => {
+    const key = b.id.replace('tab-','');
+    stopPlay();
+    document.querySelectorAll('.tabs button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    Object.keys(VIEWS).forEach(k => VIEWS[k].hidden = (k !== key));
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+document.querySelectorAll('#fogNav button').forEach(b => {
+  b.addEventListener('click', () => {
+    stopPlay();
+    document.querySelectorAll('#fogNav button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    document.querySelectorAll('#view-fog .fogpanel').forEach(pn => pn.hidden = pn.dataset.panel !== b.dataset.fog);
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+document.querySelectorAll('#frontNav button').forEach(b => {
+  b.addEventListener('click', () => {
+    stopPlay();
+    document.querySelectorAll('#frontNav button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    document.querySelectorAll('#view-front .fogpanel').forEach(pn => pn.hidden = pn.dataset.fpanel !== b.dataset.front);
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+document.querySelectorAll('#cloudNav button').forEach(b => {
+  b.addEventListener('click', () => {
+    stopPlay();
+    document.querySelectorAll('#cloudNav button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+    document.querySelectorAll('#view-cloud .fogpanel').forEach(pn => pn.hidden = pn.dataset.cpanel !== b.dataset.cloud);
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+
+/* ============ หมอก: ฟิสิกส์ทัศนวิสัย ============ */
+const F = {T:17, Td:15, pm:40, night:0};
+
+function fogCalc(){
+  const rh = rhOf(F.T, F.Td);
+  const spread = F.T - F.Td;
+  const base = 30000/(1 + F.pm/100*9);                 // ทัศนวิสัยถ้าอากาศแห้ง
+  const hf = rh <= 70 ? 1 : Math.max(0.011, Math.pow((100.6-rh)/30.6, 1.6));
+  const vis = Math.max(60, Math.min(30000, base*hf));
+  const hazeFrac = Math.max(0, Math.min(1, 1-(rh-70)/30));
+  let code, name, cls, note;
+  if (vis < 1000){
+    code='FG'; name='หมอก (Fog)'; cls='crit';
+    note = vis < 200 ? 'หมอกหนาจัด — dense fog' : 'อากาศอิ่มตัว หยดน้ำเต็มไปหมด';
+  } else if (vis < 5000 && rh >= 82){
+    code='BR'; name='หมอกบาง (Mist)'; cls='warn'; note='หยดน้ำจาง ๆ อีกนิดเดียวจะกลายเป็นหมอก';
+  } else if (vis < 5000){
+    code='HZ'; name='ฟ้าหลัว (Haze)'; cls='warn'; note='อนุภาคแห้งบังสายตา ความชื้นยังไม่ถึงขั้นควบแน่น';
+  } else if (vis < 9500){
+    code = F.pm > 30 ? 'HZ' : '—'; name = F.pm > 30 ? 'ฟ้าหลัวจาง' : 'ทัศนวิสัยดี'; cls='good'; note='ยังบิน VFR ได้สบาย';
+  } else {
+    code='CAVOK'; name='ทัศนวิสัยดีมาก'; cls='good'; note='มองได้ไกล 10 กิโลเมตรขึ้นไป';
+  }
+  return {rh, spread, vis, hazeFrac, code, name, cls, note};
+}
+
+/* ============ ฉากมองจากหัวรันเวย์ ============ */
+const HOR = 120, GND = 330, CX = 350;
+const yD = d => HOR + 21000/Math.max(d,100);
+const wD = d => 230*100/Math.max(d,100);
+const visKm = v => v >= 9500 ? '10+ km' : v >= 1000 ? (v/1000).toFixed(1) + ' km' : Math.round(v/10)*10 + ' m';
+
+function renderVis(){
+  const C = fogCalc();
+  const night = F.night;
+  const skyTop = mix(TOK['--sky-high'], '#04080F', night);
+  const skyBot = mix(TOK['--sky-low'],  '#0E1826', night);
+  const grass  = mix(mix(TOK['--ink-3'], TOK['--hot'], .22), '#0A1018', night*.75);
+  const asphalt= mix(mix('#2C333C', TOK['--ink-3'], .22), '#080D14', night*.6);
+  const fogC   = mix(TOK['--cloud'], '#FFFFFF', .3);
+  const hazeC  = mix('#C7B489', TOK['--surface'], .12);
+  const veil   = mix(fogC, hazeC, C.hazeFrac);
+  const opAt   = d => Math.min(0.965, 1 - Math.exp(-3*Math.max(d,0)/C.vis));
+
+  let s = `<defs>
+    <linearGradient id="vsky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="${skyTop}"/><stop offset="1" stop-color="${skyBot}"/>
+    </linearGradient>`;
+
+  let stops = `<stop offset="0" stop-color="${veil}" stop-opacity="${opAt(12000).toFixed(3)}"/>`
+            + `<stop offset="${((HOR-1)/GND).toFixed(3)}" stop-color="${veil}" stop-opacity="${opAt(12000).toFixed(3)}"/>`;
+  for (let y = HOR+2; y <= GND; y += 11){
+    stops += `<stop offset="${(y/GND).toFixed(3)}" stop-color="${veil}" stop-opacity="${opAt(21000/(y-HOR)).toFixed(3)}"/>`;
+  }
+  s += `<linearGradient id="veil" x1="0" y1="0" x2="0" y2="1" gradientUnits="objectBoundingBox">${stops}</linearGradient></defs>`;
+
+  s += `<rect x="0" y="0" width="700" height="${HOR}" fill="url(#vsky)"/>`;
+  if (night > .35){
+    const rnd = prng(4242);
+    for (let i=0;i<40;i++){
+      s += `<circle cx="${(rnd()*700).toFixed(1)}" cy="${(rnd()*HOR*.85).toFixed(1)}" r="${(0.6+rnd()).toFixed(1)}" fill="#fff" opacity="${(0.25+rnd()*0.5)*night}"/>`;
+    }
+  }
+  s += `<rect x="0" y="${HOR}" width="700" height="${GND-HOR}" fill="${grass}"/>`;
+
+  /* รันเวย์ */
+  s += `<path d="M${CX-wD(100)},${GND} L${CX-wD(6000)},${yD(6000)} L${CX+wD(6000)},${yD(6000)} L${CX+wD(100)},${GND} Z" fill="${asphalt}"/>`;
+  [150,230,350,520,780,1200,1900,3000].forEach(d => {
+    const y1 = yD(d), y2 = yD(d*1.28), w = Math.max(0.8, wD(d)*0.035);
+    s += `<rect x="${CX-w}" y="${y2}" width="${w*2}" height="${Math.max(1,y1-y2)}" fill="${TOK['--cloud']}" opacity="0.75"/>`;
+  });
+  /* ไฟขอบรันเวย์ */
+  [130,190,280,420,640,980,1500,2300,3600].forEach(d => {
+    const y = yD(d), w = wD(d), r = Math.max(1.1, w*0.022);
+    ['-','+'].forEach(sg => {
+      const x = sg === '-' ? CX-w : CX+w;
+      s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" fill="#F5C26B" opacity="${(0.55+0.45*night).toFixed(2)}"/>`;
+    });
+  });
+  /* หอบังคับการบิน */
+  const dT = 1400, yT = yD(dT), sT = wD(dT)/23;
+  s += `<g opacity="0.95"><rect x="${CX-wD(dT)*3.1}" y="${yT-46*sT}" width="${13*sT}" height="${46*sT}" fill="${mix(asphalt,'#000',.15)}"/>
+        <rect x="${CX-wD(dT)*3.1-4*sT}" y="${yT-58*sT}" width="${21*sT}" height="${14*sT}" rx="${2*sT}" fill="${mix(asphalt,TOK['--cloud'],.35)}"/></g>`;
+
+  /* ม่านหมอก/ฟ้าหลัว */
+  s += `<rect x="0" y="0" width="700" height="${GND}" fill="url(#veil)"/>`;
+
+  /* หลักบอกระยะ อยู่เหนือม่าน แต่จางตามระยะจริง */
+  [200,400,800,1600,3200].forEach(d => {
+    const y = yD(d), w = wD(d), op = Math.max(0.16, Math.exp(-3*d/C.vis));
+    const x = CX + w + Math.max(9, w*0.22);
+    s += `<g opacity="${op.toFixed(3)}">
+      <line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x.toFixed(1)}" y2="${(y-Math.max(9,w*0.15)).toFixed(1)}" stroke="${TOK['--cloud']}" stroke-width="1.6"/>
+      <text x="${(x+6).toFixed(1)}" y="${(y+1).toFixed(1)}" font-family="IBM Plex Mono,monospace" font-size="${Math.max(9, Math.min(13, w*0.09)).toFixed(1)}" fill="${TOK['--cloud']}">${fmt(d)} m</text>
+    </g>`;
+  });
+
+  /* เส้นบอกระยะที่มองเห็นได้ไกลสุด */
+  if (C.vis >= 220 && C.vis < 6000){
+    const y = yD(C.vis), w = wD(C.vis);
+    s += `<line x1="${CX-w-34}" y1="${y}" x2="${CX+w+34}" y2="${y}" stroke="${TOK['--hot']}" stroke-width="1.6" stroke-dasharray="5 4"/>`;
+    s += tag(CX, y-9, `เห็นได้ไกลสุด ${visKm(C.vis)}`, TOK['--hot'], 'middle');
+  }
+  s += `<g><rect x="14" y="12" width="228" height="26" rx="6" fill="${TOK['--surface']}" opacity="0.9"/>
+    <text x="26" y="29" font-family="IBM Plex Sans Thai,sans-serif" font-size="12.5" fill="${TOK['--ink-2']}">RWY 27 · มองจากจุดเริ่มวิ่งขึ้น</text></g>`;
+
+  $('vis').innerHTML = s;
+  updateFogReadouts(C);
+}
+
+const MINIMA = [
+  {n:'บิน VFR ในเขตควบคุม', need:5000, txt:'ต้องเห็นอย่างน้อย 5 km'},
+  {n:'Non-precision approach', need:1600, txt:'ราว 1,600 m ขึ้นไป'},
+  {n:'ILS CAT I', need:550, txt:'RVR 550 m ขึ้นไป'}
+];
+
+function updateFogReadouts(C){
+  $('vFT').textContent  = F.T.toFixed(1) + ' °C';
+  $('vFTd').textContent = F.Td.toFixed(1) + ' °C';
+  $('vFPM').textContent = F.pm;
+  $('FT').value = F.T; $('FTd').value = F.Td; $('FPM').value = F.pm;
+
+  $('visRead').textContent = 'เห็นไกล ~' + visKm(C.vis);
+  $('fVis').innerHTML = C.vis >= 1000
+    ? (C.vis/1000).toFixed(1) + '<span class="u">km</span>'
+    : Math.round(C.vis/10)*10 + '<span class="u">m</span>';
+  $('fVisS').textContent = C.note;
+  $('fRH').innerHTML = C.rh.toFixed(0) + '<span class="u">%</span>';
+  $('fRHs').textContent = C.rh >= 99 ? 'อิ่มตัวเต็มที่ — ไอน้ำเกินกลั่นตัวเป็นหยดน้ำ' : C.rh >= 90 ? 'สูงมาก อนุภาคเริ่มดูดน้ำจนบวม' : 'ยังไม่ถึงจุดควบแน่น';
+  $('fSp').innerHTML = C.spread.toFixed(1) + '<span class="u">°C</span>';
+  $('fSps').textContent = C.spread <= 1 ? 'ชิดมาก — เสี่ยงเกิดหมอกสูง' : C.spread <= 3 ? 'เริ่มชิด เฝ้าดูให้ดี' : 'ห่างพอสมควร';
+  $('fCode').className = 'pill ' + C.cls;
+  $('fCode').textContent = C.code;
+  $('fCodes').textContent = C.name;
+
+  const V = $('fVerdict');
+  V.className = 'verdict ' + (C.cls === 'crit' ? 'sink' : C.cls === 'warn' ? 'neutral' : 'rise');
+  $('fHead').textContent = C.name;
+  let body;
+  if (C.code === 'FG') body = `อุณหภูมิลงมาเท่าจุดน้ำค้างแล้ว (ห่างกัน <b>${C.spread.toFixed(1)} °C</b>) ไอน้ำจึงกลั่นตัวเกาะอนุภาคฝุ่นเป็นหยดน้ำเต็มอากาศ เหลือมองเห็นแค่ <b>${visKm(C.vis)}</b>`;
+  else if (C.code === 'BR') body = `ความชื้น <b>${C.rh.toFixed(0)}%</b> เริ่มมีหยดน้ำแล้วแต่ยังจาง ถ้าอุณหภูมิลดอีก <b>${C.spread.toFixed(1)} °C</b> จะกลายเป็นหมอกเต็มตัว`;
+  else if (C.code === 'HZ') body = `ความชื้นแค่ <b>${C.rh.toFixed(0)}%</b> ยังไม่ควบแน่น สิ่งที่บังสายตาคืออนุภาคแห้ง — ลดฝุ่นถึงจะดีขึ้น รอแดดออกก็ไม่หาย`;
+  else body = `อากาศค่อนข้างใส มองเห็นได้ <b>${visKm(C.vis)}</b> — ${C.note}`;
+  $('fBody').innerHTML = body;
+
+  $('minima').innerHTML = MINIMA.map(m => {
+    const ok = C.vis >= m.need;
+    return `<div class="mrow">
+      <span class="mname">${m.n}</span>
+      <span class="mval">${m.txt}</span>
+      <span class="pill ${ok?'good':'crit'}">${ok?'ผ่าน':'ไม่ผ่าน'}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ============ ชนิดของหมอก: ฉากที่ขยับได้ ============ */
+const SW = 700, SH = 250, GY = 214;
+
+function scene(night, key){
+  const top = night ? '#0A1524' : TOK['--sky-high'];
+  const bot = night ? '#152338' : TOK['--sky-low'];
+  return `<defs>
+      <linearGradient id="dg_${key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${bot}"/>
+      </linearGradient>
+      <filter id="bl_${key}" x="-30%" y="-70%" width="160%" height="240%"><feGaussianBlur stdDeviation="4"/></filter>
+      <marker id="hot_${key}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M0,1 L9,5 L0,9 z" fill="${TOK['--hot']}"/></marker>
+      <marker id="cold_${key}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M0,1 L9,5 L0,9 z" fill="${TOK['--cold']}"/></marker>
+      <marker id="cl_${key}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M0,1 L9,5 L0,9 z" fill="${TOK['--cloud']}"/></marker>
+    </defs>
+    <rect x="0" y="0" width="${SW}" height="${SH}" fill="url(#dg_${key})"/>`;
+}
+const lbl = (x,y,t,c,anchor,size) => `<text x="${x}" y="${y}" text-anchor="${anchor||'start'}" font-family="IBM Plex Sans Thai,sans-serif" font-size="${size||12.5}" font-weight="600" fill="${c}">${t}</text>`;
+const tag = (x,y,t,c,anchor) => {
+  const w = t.length*6.9 + 20, h = 25;
+  const x0 = anchor === 'end' ? x-w : anchor === 'middle' ? x-w/2 : x;
+  return `<g><rect x="${x0.toFixed(1)}" y="${(y-17).toFixed(1)}" width="${w.toFixed(1)}" height="${h}" rx="6" fill="${TOK['--surface']}" opacity="0.92"/>`
+       + `<text x="${(x0+w/2).toFixed(1)}" y="${y}" text-anchor="middle" font-family="IBM Plex Sans Thai,sans-serif" font-size="12.5" font-weight="600" fill="${c}">${t}</text></g>`;
+};
+const puff = (x,y,rx,ry,c,op) => `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${ry.toFixed(1)}" fill="${c}" opacity="${op||0.75}"/>`;
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+
+/* แถบลมพร้อมความยาวตามความเร็ว */
+function windArrow(x, y, kt, key, color, dir, off){
+  if (kt < 0.5) return lbl(x, y+4, 'ลมสงบ 0 kt', color, 'start', 12);
+  x = x + (off || 0);
+  const len = 34 + kt*9, d = dir === -1 ? -1 : 1;
+  const mk = color === TOK['--cold'] ? `cold_${key}` : color === TOK['--hot'] ? `hot_${key}` : `cl_${key}`;
+  return `<path d="M${x},${y} L${(x+len*d).toFixed(0)},${y}" stroke="${color}" stroke-width="2.6" stroke-dasharray="7 6" marker-end="url(#${mk})"/>`
+       + lbl(x + (d>0?len+10:-len-10), y+4, kt.toFixed(0)+' kt', color, d>0?'start':'end', 12);
+}
+/* ก้อนหมอกเรียงเป็นแถบ */
+function fogBand(x0, x1, yTop, yBot, key, op, seed){
+  const rnd = prng(Math.round(x0+yTop)+7+(seed||0)*29);
+  let s = `<g filter="url(#bl_${key})">`;
+  const h = Math.max(6, yBot-yTop), n = Math.max(3, Math.round((x1-x0)/70));
+  s += `<rect x="${x0}" y="${yTop}" width="${x1-x0}" height="${h}" rx="${Math.min(h/2,14)}" fill="${TOK['--cloud']}" opacity="${(op||0.8)*0.85}"/>`;
+  for (let i=0;i<n;i++){
+    const cx = x0 + (i+0.5)*(x1-x0)/n + (rnd()-0.5)*30;
+    s += puff(cx, yTop + h*0.35 + (rnd()-0.5)*h*0.4, (x1-x0)/n*0.75, Math.max(5,h*0.62), TOK['--cloud'], op||0.8);
+  }
+  return s + '</g>';
+}
+
+/* ============ ตัวเล่นภาพเคลื่อนไหว (เฟรมต่อเฟรม) ============ */
+const PLAY = {id:null, f:0, timer:null};
+function stopPlay(redraw){
+  if (PLAY.timer){ clearInterval(PLAY.timer); PLAY.timer = null; }
+  const old = PLAY.id;
+  PLAY.id = null; PLAY.f = 0;
+  if (old){
+    const b = $('play-'+old);
+    if (b) b.textContent = '▶ เล่นภาพ';
+    if (redraw !== false) drawType(old);
+  }
+}
+function togglePlay(id){
+  if (PLAY.id === id){ stopPlay(); return; }
+  stopPlay();
+  const frames = SIM[id].frames || 20;
+  PLAY.id = id; PLAY.f = 0;
+  const b = $('play-'+id); if (b) b.textContent = '■ หยุด';
+  drawType(id);
+  PLAY.timer = setInterval(() => {
+    PLAY.f = (PLAY.f + 1) % frames;
+    drawType(id);
+  }, 210);
+}
+
+/* ============ สถานะของทุกแบบจำลอง ============ */
+const FS = {
+  rad:   {wind:4,  spread:3,  cloud:0},
+  adv:   {td:20,   ts:15,     wind:9},
+  steam: {tw:22,   ta:8,      wind:6},
+  up:    {spread:4, peak:6000, wind:8},
+  rain:  {rain:60, spread:3,  wind:5},
+  cldtype:{rh:70,  elr:2.6,   lift:55},
+  cldrain:{rh:80,  elr:3.0,   shear:12},
+  precip:{ts:3,    warm:0,    water:60}
+};
+
+const SIM = {
+
+/* ---------- หมอกแผ่รังสี ---------- */
+rad: {
+  frames: 24,
+  controls:[
+    {k:'wind',   name:'ความเร็วลมผิวพื้น', min:0, max:20, step:1, u:' kt',
+     hint:'ตัวแปรที่สำคัญที่สุด — สงบเกินไปได้แค่น้ำค้าง แรงเกินไปกลายเป็นเมฆ'},
+    {k:'spread', name:'T − Td ตอนหัวค่ำ', min:0, max:12, step:0.5, u:' °C',
+     hint:'ยิ่งห่าง ยิ่งต้องเย็นลงมากกว่าจะถึงจุดน้ำค้าง'},
+    {k:'cloud',  name:'เมฆปกคลุม', min:0, max:100, step:5, u:' %',
+     hint:'เมฆทำตัวเหมือนผ้าห่ม สะท้อนความร้อนกลับลงพื้น'}
+  ],
+  play:'กด ▶ ดูตั้งแต่ 18:00 ถึงเช้า — หมอกจะค่อย ๆ ก่อตัวตามเวลาจริง',
+  calc(v){
+    if (v.cloud >= 50) return {fog:0, pill:'good', tag:'ไม่เกิด', head:'เมฆคลุมมากเกินไป',
+      body:`เมฆ <b>${v.cloud}%</b> สะท้อนความร้อนกลับลงพื้น พื้นดินจึงไม่เย็นลงพอที่จะดึงอุณหภูมิอากาศไปถึงจุดน้ำค้าง`, depth:0, hrs:99};
+    if (v.wind > 12) return {fog:0, pill:'good', tag:'ไม่เกิด', head:`ลม ${v.wind} kt แรงเกินไป`,
+      body:'ลมกวนอากาศแห้งจากข้างบนลงมาผสมตลอดเวลา ชั้นอากาศติดพื้นเลยไม่มีโอกาสเย็นจนอิ่มตัว', depth:0, hrs:99};
+    if (v.spread > 8) return {fog:0, pill:'good', tag:'ไม่เกิด', head:'อากาศแห้งเกินไป',
+      body:`ต้องเย็นลงถึง <b>${v.spread.toFixed(1)} °C</b> กว่าจะถึงจุดน้ำค้าง — คืนเดียวเย็นไม่ทัน สว่างเสียก่อน`, depth:0, hrs:99};
+    const hrs = Math.max(0.5, v.spread/1.4);
+    if (v.wind <= 2){
+      const d = Math.round(20 + (8-v.spread)*6);
+      return {fog:1, kind:'ground', depth:d, hrs, pill:'warn', tag:'หมอกติดพื้น',
+        head:'หมอกบาง ๆ ติดพื้น + น้ำค้าง',
+        body:`ลมเกือบนิ่ง อากาศชั้นที่เย็นมีแค่ไม่กี่ฟุตติดพื้น ได้หมอกตื้นราว <b>${d} ฟุต</b> มองจากในเครื่องอาจเห็นรันเวย์ แต่พอ flare แล้วมองไม่เห็น · ก่อตัวราว <b>${hrs.toFixed(1)} ชม.</b> หลังพระอาทิตย์ตก`};
+    }
+    if (v.wind <= 7){
+      const d = Math.round((150 + (v.wind-2)*90) * clamp(1-v.spread/12, .25, 1));
+      return {fog:1, kind:'full', depth:d, hrs, pill:'crit', tag:'หมอกเต็มรูปแบบ',
+        head:`ลม ${v.wind} kt คือช่วงที่แย่ที่สุด`,
+        body:`ลมอ่อน ๆ กวนให้ชั้นอากาศเย็นหนาขึ้นแต่ไม่แรงพอจะสลาย ได้หมอกหนา <b>~${d} ฟุต</b> คลุมทั้งสนาม · ก่อตัวราว <b>${hrs.toFixed(1)} ชม.</b> หลังพระอาทิตย์ตก และมักสลาย 1–3 ชม. หลังพระอาทิตย์ขึ้น`};
+    }
+    const base = Math.round((v.wind-7)*130 + 120);
+    return {fog:2, kind:'stratus', depth:base, hrs, pill:'warn', tag:'กลายเป็นเมฆ',
+      head:`ลม ${v.wind} kt ยกหมอกขึ้นเป็นเมฆ`,
+      body:`ลมแรงพอจะผสมอากาศให้ชั้นอิ่มตัวลอยสูงขึ้น ไม่ได้หมอกแต่ได้ <b>เมฆ stratus ฐาน ~${base} ฟุต</b> แทน — ทัศนวิสัยดีขึ้นแต่เพดานต่ำ`};
+  },
+  draw(v, r, f){
+    const key='rad', c=TOK['--cloud'], on = f !== null;
+    const hour = 18 + (on ? f : 0)*0.5;
+    let grow = 1;
+    if (on && r.fog){
+      grow = clamp((f*0.5 - r.hrs)/2.5, 0, 1);
+    }
+    let s = scene(true, key);
+    const rnd = prng(9), starOp = 1 - v.cloud/100;
+    for (let i=0;i<28;i++){
+      const tw = on ? 0.55 + 0.45*Math.abs(Math.sin(i*1.7 + f*0.8)) : 1;
+      s += `<circle cx="${(rnd()*SW).toFixed(0)}" cy="${(rnd()*120).toFixed(0)}" r="${(0.7+rnd()).toFixed(1)}" fill="#fff" opacity="${((0.3+rnd()*0.5)*starOp*tw).toFixed(2)}"/>`;
+    }
+    if (v.cloud > 4){
+      const op = v.cloud/100*0.9, dx = on ? (f*7)%80 - 40 : 0;
+      s += `<g filter="url(#bl_${key})">${puff(160+dx,44,180,26,c,op)}${puff(430+dx,36,190,24,c,op)}${puff(640+dx,48,150,22,c,op)}</g>`;
+    }
+    s += `<path d="M0,${SH} L0,${GY-16} Q150,${GY-32} 250,${GY-4} Q360,${GY+22} 470,${GY-6} Q590,${GY-34} ${SW},${GY-18} L${SW},${SH} Z" fill="${mix('#141A22',TOK['--hot'],.2)}"/>`;
+    [120,300,470,620].forEach(x => {
+      if (v.cloud >= 50){
+        s += `<path d="M${x},${GY-24} L${x},${102}" stroke="${TOK['--hot']}" stroke-width="2" stroke-dasharray="4 5" opacity="0.55"/>`;
+        s += `<path d="M${x+16},${92} L${x+16},${GY-30}" stroke="${TOK['--hot']}" stroke-width="2" stroke-dasharray="4 5" marker-end="url(#hot_${key})" opacity="0.9"/>`;
+      } else {
+        s += `<path d="M${x},${GY-24} L${x},${86}" stroke="${TOK['--hot']}" stroke-width="2" stroke-dasharray="4 5" marker-end="url(#hot_${key})" opacity="0.9"/>`;
+      }
+    });
+    s += windArrow(40, 150, v.wind, key, TOK['--cloud'], 1, on ? (f*5)%13 : 0);
+    const dNow = Math.round(r.depth * grow);
+    if (r.fog === 1 && dNow > 3){
+      const h = clamp(dNow/1000*150, 4, 120);
+      s += fogBand(20, SW-20, GY-6-h, GY-2, key, 0.86, on ? f : 0);
+      s += tag(SW-24, GY-16-h, `หนาราว ${dNow} ฟุต`, TOK['--cold'], 'end');
+    } else if (r.fog === 2 && grow > 0.05){
+      const yb = GY - clamp(r.depth/1000*150, 20, 130);
+      s += fogBand(0, SW, yb-34*grow-4, yb, key, 0.85, on ? f : 0);
+      s += tag(SW-24, yb-48, `ฐานเมฆ ~${r.depth} ฟุต`, TOK['--cold'], 'end');
+    }
+    s += lbl(20, 34, v.cloud >= 50 ? 'เมฆคลุม — ความร้อนสะท้อนกลับลงพื้น' : 'ฟ้าใส — พื้นดินคายความร้อนหนีขึ้นฟ้า', c);
+    if (on){
+      const hh = String(Math.floor(hour)%24).padStart(2,'0');
+      s += tag(SW-24, 36, `${hh}:${hour%1 ? '30' : '00'} น.`, TOK['--ink'], 'end');
+    }
+    return s;
+  }
+},
+
+/* ---------- หมอกพัดพา ---------- */
+adv: {
+  frames: 20,
+  controls:[
+    {k:'td',   name:'จุดน้ำค้างของอากาศที่พัดมา', min:0, max:32, step:0.5, u:' °C',
+     hint:'อากาศจากทะเลอุ่นมักมีจุดน้ำค้างสูง'},
+    {k:'ts',   name:'อุณหภูมิผิวปลายทาง', min:-5, max:32, step:0.5, u:' °C',
+     hint:'ถ้าผิวเย็นกว่าจุดน้ำค้างเมื่อไหร่ อากาศที่แตะผิวจะควบแน่นทันที'},
+    {k:'wind', name:'ความเร็วลม', min:0, max:25, step:1, u:' kt',
+     hint:'ต่างจากหมอกแผ่รังสี — ชนิดนี้ต้องมีลมพัดอากาศชุดใหม่มาเรื่อย ๆ'}
+  ],
+  play:'กด ▶ ดูหมอกเคลื่อนเข้าฝั่ง — ยิ่งลมแรงยิ่งลามเข้าแผ่นดินเร็ว',
+  calc(v){
+    const diff = v.td - v.ts;
+    if (diff <= 0) return {fog:0, pill:'good', tag:'ไม่เกิด', head:'ผิวยังอุ่นกว่าจุดน้ำค้าง',
+      body:`ผิวปลายทาง <b>${v.ts.toFixed(1)} °C</b> ยังสูงกว่าจุดน้ำค้างของอากาศ <b>${v.td.toFixed(1)} °C</b> อากาศที่แตะผิวจึงไม่อิ่มตัว ไม่มีอะไรควบแน่น`, depth:0, diff};
+    if (v.wind < 3) return {fog:1, kind:'patch', depth:60, pill:'warn', tag:'เป็นหย่อม',
+      head:'ลมเบาเกินไป ได้แค่หมอกหย่อม',
+      body:`ผิวเย็นกว่าจุดน้ำค้าง <b>${diff.toFixed(1)} °C</b> แต่ไม่มีลมพาอากาศชื้นชุดใหม่เข้ามา หมอกจึงเกิดเป็นหย่อม ๆ ตรงที่ผิวเย็นจัดเท่านั้น`, diff};
+    if (v.wind <= 15){
+      const d = Math.round(clamp(120 + diff*95, 120, 950));
+      return {fog:1, kind:'bank', depth:d, pill:'crit', tag:'หมอกหนาแผ่กว้าง',
+        head:`หมอกพัดพาเต็มรูปแบบ ~${d} ฟุต`,
+        body:`ลม <b>${v.wind} kt</b> พาอากาศชื้นเข้ามาต่อเนื่อง ผิวเย็นกว่าจุดน้ำค้าง <b>${diff.toFixed(1)} °C</b> — หมอกหนาและแผ่ลึกเข้าไปในแผ่นดิน <b>แดดออกก็ไม่หาย</b> ต้องรอลมเปลี่ยนทิศ`, diff};
+    }
+    const base = Math.round(clamp(diff*70 + (v.wind-15)*40, 100, 900));
+    return {fog:2, kind:'stratus', depth:base, pill:'warn', tag:'ยกเป็นเมฆ',
+      head:`ลม ${v.wind} kt แรงจนยกหมอกขึ้น`,
+      body:`ความปั่นป่วนยกชั้นอิ่มตัวให้ลอยพ้นพื้น กลายเป็น <b>เมฆ stratus ฐาน ~${base} ฟุต</b> ทัศนวิสัยที่ผิวดีขึ้น แต่เพดานยังต่ำอยู่`, diff};
+  },
+  draw(v, r, f){
+    const key='adv', c=TOK['--cloud'], on = f !== null;
+    const prog = on ? clamp((f+1)/14, 0.05, 1) : 1;
+    let s = scene(false, key);
+    s += `<rect x="0" y="${GY}" width="330" height="${SH-GY}" fill="${mix(TOK['--hot'],TOK['--ink-3'],.32)}"/>`;
+    s += `<rect x="330" y="${GY}" width="${SW-330}" height="${SH-GY}" fill="${mix(TOK['--cold'],'#0B121A',.45)}"/>`;
+    const n = clamp(Math.round(v.wind/5)+1, 1, 5);
+    for (let i=0;i<n;i++) s += windArrow(30, 96 + i*26, v.wind, key, TOK['--hot'], 1, on ? (f*6 + i*4)%13 : 0);
+    if (r.fog === 1){
+      const h = clamp(r.depth/1000*150, 12, 120);
+      const x0 = r.kind === 'patch' ? 420 : 300 + clamp((v.wind-8)*6, -30, 60);
+      const x1 = x0 + (SW-6-x0)*prog;
+      if (x1 > x0+12) s += fogBand(x0, x1, GY-4-h, GY, key, r.kind==='patch'?0.62:0.88, on ? f : 0);
+      s += tag(SW-20, GY-14-h, `หนา ~${r.depth} ฟุต`, TOK['--cold'], 'end');
+    } else if (r.fog === 2){
+      const yb = GY - clamp(r.depth/1000*150, 20, 130);
+      const x1 = 280 + (SW-280)*prog;
+      s += fogBand(280, x1, yb-30, yb, key, 0.85, on ? f : 0);
+      s += tag(SW-20, yb-40, `ฐานเมฆ ~${r.depth} ฟุต`, TOK['--cold'], 'end');
+    }
+    s += lbl(165, GY+26, `ผิวอุ่น · Td อากาศ ${v.td.toFixed(1)}°C`, '#fff', 'middle', 12.5);
+    s += lbl(515, GY+26, `ผิวเย็น ${v.ts.toFixed(1)}°C`, '#fff', 'middle', 12.5);
+    s += lbl(20, 34, 'อากาศอุ่นชื้นถูกลมพัดมาตกบนผิวที่เย็นกว่า', c);
+    return s;
+  }
+},
+
+/* ---------- หมอกไอน้ำ ---------- */
+steam: {
+  frames: 14,
+  controls:[
+    {k:'tw',   name:'อุณหภูมิผิวน้ำ', min:0, max:35, step:0.5, u:' °C'},
+    {k:'ta',   name:'อุณหภูมิอากาศเหนือน้ำ', min:-20, max:35, step:0.5, u:' °C',
+     hint:'ต้องเย็นกว่าน้ำมาก ๆ ไอน้ำที่ระเหยขึ้นไปถึงจะควบแน่นทันที'},
+    {k:'wind', name:'ความเร็วลม', min:0, max:25, step:1, u:' kt',
+     hint:'ลมแรงพัดไอกระจายจนบางลง'}
+  ],
+  play:'กด ▶ ดูไอน้ำลอยขึ้นจากผิวน้ำ — ลมยิ่งแรงยิ่งเอียง',
+  calc(v){
+    const diff = v.tw - v.ta;
+    if (diff < 5) return {fog:0, pill:'good', tag:'ไม่เกิด', head:'อุณหภูมิต่างกันน้อยเกินไป',
+      body:`น้ำอุ่นกว่าอากาศแค่ <b>${diff.toFixed(1)} °C</b> ไอน้ำที่ระเหยขึ้นไปยังไม่ถูกทำให้เย็นพอจะควบแน่น ต้องต่างกันราว 10 °C ขึ้นไป`, diff, depth:0};
+    let kind, tagT, head, depth;
+    if (diff < 10){ kind='thin'; tagT='ไอบาง ๆ'; depth=25; head='ไอน้ำบาง ๆ เป็นหย่อม'; }
+    else if (diff < 20){ kind='mid'; tagT='sea smoke ชัดเจน'; depth=60; head='หมอกไอน้ำชัดเจน'; }
+    else { kind='thick'; tagT='หนาแน่น'; depth=110; head='ไอน้ำหนาแน่น อากาศปั่นป่วน'; }
+    if (v.wind > 15){ depth = Math.round(depth*0.55); tagT += ' (ถูกลมพัดกระจาย)'; }
+    const ice = v.ta < 0 ? ' · อากาศต่ำกว่า 0 °C ระวัง <b>icing</b> จากหยดน้ำเย็นยิ่งยวด' : '';
+    return {fog:1, kind, depth, pill: diff>=20?'crit':'warn', tag:tagT, head,
+      body:`น้ำอุ่นกว่าอากาศ <b>${diff.toFixed(1)} °C</b> ไอน้ำระเหยขึ้นไปเจออากาศเย็นแล้วควบแน่นทันที สูงราว <b>${depth} ฟุต</b> เหนือผิวน้ำ${diff>=20?' — อากาศชั้นล่างไม่เสถียรมาก คาดว่าจะเจอ turbulence':''}${ice}`, diff};
+  },
+  draw(v, r, f){
+    const key='steam', c=TOK['--cloud'], on = f !== null;
+    let s = scene(false, key);
+    s += `<rect x="0" y="${GY-8}" width="${SW}" height="${SH-GY+8}" fill="${mix(TOK['--cold'],TOK['--hot'],.12)}"/>`;
+    if (r.fog){
+      const n = clamp(Math.round(4 + r.diff/2.2), 4, 13);
+      const hMax = clamp(r.depth*1.05, 22, 118);
+      const rnd = prng(17);
+      for (let i=0;i<n;i++){
+        const x = 40 + i*(SW-80)/(n-1) + (rnd()-0.5)*18;
+        const ph = on ? ((i*0.31 + f/SIM.steam.frames) % 1) : 0.72;
+        const h = hMax*(0.35 + ph*0.75), tilt = v.wind*1.5*(0.4+ph);
+        const op = (on ? clamp(1.15 - ph, 0.18, 0.9) : 0.62) * (0.7 + (i%3)*0.18);
+        s += `<path d="M${x.toFixed(0)},${GY-6} C${(x-10+tilt*0.3).toFixed(0)},${(GY-6-h*0.4).toFixed(0)} ${(x+12+tilt*0.7).toFixed(0)},${(GY-6-h*0.7).toFixed(0)} ${(x+tilt).toFixed(0)},${(GY-6-h).toFixed(0)}"
+              stroke="${c}" stroke-width="${(7+r.diff/6).toFixed(1)}" fill="none" stroke-linecap="round" opacity="${op.toFixed(2)}" filter="url(#bl_${key})"/>`;
+      }
+      s += tag(SW-20, GY-24-hMax, `สูงราว ${r.depth} ฟุต`, TOK['--cold'], 'end');
+    }
+    s += windArrow(30, 92, v.wind, key, TOK['--cold'], 1, on ? (f*6)%13 : 0);
+    s += lbl(20, 34, `อากาศ ${v.ta.toFixed(1)} °C พัดผ่านผิวน้ำ ${v.tw.toFixed(1)} °C`, c);
+    s += lbl(SW/2, GY+26, 'น้ำอุ่นกว่าอากาศ — ระเหยแล้วควบแน่นทันที', '#fff', 'middle', 12.5);
+    return s;
+  }
+},
+
+/* ---------- หมอกลาดเขา ---------- */
+up: {
+  frames: 22,
+  controls:[
+    {k:'spread', name:'T − Td ที่เชิงเขา', min:0, max:14, step:0.5, u:' °C',
+     hint:'ฐานเมฆ = ค่านี้ ÷ 2.5 × 1,000 ฟุต — สูตรเดียวกับแท็บแรกเป๊ะ'},
+    {k:'peak',   name:'ความสูงยอดเขา', min:1000, max:12000, step:500, u:' ft'},
+    {k:'wind',   name:'ลมพัดขึ้นลาดเขา', min:0, max:25, step:1, u:' kt',
+     hint:'ไม่มีลมยก อากาศก็ไม่ไต่ขึ้นไปเย็นตัว'}
+  ],
+  play:'กด ▶ ดูลูกอากาศไต่ขึ้นเขา แล้วควบแน่นตรงจุดที่ถึงจุดน้ำค้าง',
+  calc(v){
+    const lcl = v.spread/2.5*1000;
+    if (v.wind < 3) return {fog:0, lcl, pill:'good', tag:'ไม่เกิด', head:'ไม่มีลมยกอากาศขึ้นเขา',
+      body:`ลมแค่ <b>${v.wind} kt</b> ไม่พอจะดันอากาศให้ไต่ลาดเขา เมื่อไม่มีการยกตัวก็ไม่มีการเย็นตัวแบบ adiabatic และไม่มีการควบแน่น`};
+    if (lcl >= v.peak) return {fog:0, lcl, pill:'good', tag:'ไม่เกิด', head:'อากาศแห้งเกินกว่าความสูงของเขา',
+      body:`ต้องไต่ขึ้นไปถึง <b>${fmt(Math.round(lcl/100)*100)} ฟุต</b> ถึงจะอิ่มตัว แต่ยอดเขาสูงแค่ <b>${fmt(v.peak)} ฟุต</b> — อากาศถึงยอดแล้วก็ยังไม่ควบแน่น`};
+    const cover = v.peak - lcl;
+    return {fog:1, lcl, cover, pill: cover > 2500 ? 'crit':'warn', tag:'หมอกคลุมลาดเขา',
+      head:`หมอกเริ่มที่ ${fmt(Math.round(lcl/100)*100)} ฟุต`,
+      body:`อากาศไต่ขึ้นเขาเย็นตัว 3 °C ต่อ 1,000 ฟุต ถึงจุดน้ำค้างที่ <b>${fmt(Math.round(lcl/100)*100)} ฟุต</b> แล้วควบแน่น — คลุมลาดเขาสูงขึ้นไปอีก <b>${fmt(Math.round(cover/100)*100)} ฟุต</b> จนถึงยอด · คนบนเขาเรียกหมอก คนข้างล่างมองเห็นเป็นเมฆ`};
+  },
+  draw(v, r, f){
+    const key='up', c=TOK['--cloud'], on = f !== null;
+    const MAXFT = 13000, yFt = ft => GY - clamp(ft/MAXFT, 0, 1)*(GY-30);
+    const slope = x => { const t = clamp(x/SW,0,1), fq = t*t*(3-2*t); return GY - (GY - yFt(v.peak))*fq; };
+    let s = scene(false, key);
+    let d = `M0,${SH} L0,${GY.toFixed(1)}`;
+    for (let x=0; x<=SW; x+=25) d += ` L${x},${slope(x).toFixed(1)}`;
+    d += ` L${SW},${SH} Z`;
+    s += `<path d="${d}" fill="${mix('#141A22',TOK['--hot'],.2)}"/>`;
+    [2000,4000,6000,8000,10000,12000].forEach(ft => {
+      const y = yFt(ft);
+      s += `<line x1="0" y1="${y.toFixed(1)}" x2="${SW}" y2="${y.toFixed(1)}" stroke="${TOK['--cloud']}" stroke-width="0.5" opacity="0.16"/>`;
+      s += `<text x="${SW-8}" y="${(y-4).toFixed(1)}" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="${TOK['--cloud']}" opacity="0.5">${fmt(ft)}</text>`;
+    });
+    const px = on ? 20 + (SW+30-20)*(f/(SIM.up.frames-1)) : SW+40;
+    if (r.fog){
+      const yL = yFt(r.lcl);
+      s += `<line x1="0" y1="${yL.toFixed(1)}" x2="${SW}" y2="${yL.toFixed(1)}" stroke="${TOK['--cold']}" stroke-width="1.4" stroke-dasharray="3 4"/>`;
+      let xL = SW; for (let x=0;x<=SW;x+=5){ if (slope(x) <= yL){ xL = x; break; } }
+      s += `<g filter="url(#bl_${key})">`;
+      for (let x=xL-12; x<=SW+24; x+=32){
+        if (x > px + 20) break;
+        s += puff(x, slope(clamp(x,0,SW))-15, 29, 17, c, 0.82);
+      }
+      s += `</g>`;
+      s += tag(Math.max(120, xL-10), yL-12, `ฐานเมฆ ${fmt(Math.round(r.lcl/100)*100)} ft`, TOK['--cold'], 'middle');
+    }
+    let wd = `M20,${(slope(20)-8).toFixed(1)}`;
+    for (let x=20; x<=Math.min(SW-90, 420); x+=20) wd += ` L${x},${(slope(x)-8).toFixed(1)}`;
+    if (v.wind >= 3) s += `<path d="${wd}" stroke="${TOK['--hot']}" stroke-width="${(1.6+v.wind/7).toFixed(1)}" fill="none" stroke-dasharray="8 6" marker-end="url(#hot_${key})" ${on?`stroke-dashoffset="${-(f*5)%14}"`:''}/>`;
+    if (on && v.wind >= 3 && px <= SW+10){
+      const py = slope(clamp(px,0,SW)) - 16;
+      const sat = r.fog && py <= yFt(r.lcl);
+      s += `<circle cx="${px.toFixed(0)}" cy="${py.toFixed(0)}" r="9" fill="${sat ? TOK['--cold'] : TOK['--hot']}" stroke="${TOK['--surface']}" stroke-width="2"/>`;
+      if (sat) s += `<circle cx="${px.toFixed(0)}" cy="${py.toFixed(0)}" r="14" fill="none" stroke="${TOK['--cold']}" stroke-width="1.3" stroke-dasharray="3 3"/>`;
+    }
+    s += lbl(20, 34, `ลม ${v.wind} kt ดันอากาศไต่ขึ้นเขาสูง ${fmt(v.peak)} ฟุต`, c);
+    return s;
+  }
+},
+
+/* ---------- หมอกจากฝน ---------- */
+rain: {
+  frames: 12,
+  controls:[
+    {k:'rain',   name:'ความแรงของฝน', min:0, max:100, step:5, u:' %',
+     hint:'ฝนที่ตกผ่านอากาศเย็นจะระเหยเติมไอน้ำเข้าไป ดันจุดน้ำค้างให้สูงขึ้น'},
+    {k:'spread', name:'T − Td ของอากาศเย็นด้านล่าง', min:0, max:8, step:0.5, u:' °C'},
+    {k:'wind',   name:'ความเร็วลมผิวพื้น', min:0, max:25, step:1, u:' kt',
+     hint:'ลมแรงผสมอากาศจนหมอกก่อตัวไม่ติด'}
+  ],
+  play:'กด ▶ ดูฝนตกผ่านลิ่มอากาศเย็นแล้วหมอกค่อย ๆ ก่อตัว',
+  calc(v){
+    const add = v.rain/100*6;
+    if (v.wind > 15) return {fog:0, add, pill:'warn', tag:'ไม่เกิดหมอก', head:'ลมแรงผสมอากาศจนหมอกไม่ก่อตัว',
+      body:`ลม <b>${v.wind} kt</b> กวนอากาศชั้นล่างตลอด ไอน้ำจากฝนกระจายไปทั่วแทนที่จะสะสมติดพื้น — ทัศนวิสัยยังแย่จากตัวฝนเอง แต่ไม่ใช่หมอก`};
+    if (add < v.spread) return {fog:0, add, pill:'good', tag:'ยังไม่เกิด',
+      head:'ฝนยังเติมความชื้นไม่พอ',
+      body:`ฝนระดับนี้ดันจุดน้ำค้างขึ้นได้ราว <b>${add.toFixed(1)} °C</b> แต่ยังห่างจากอิ่มตัวอยู่ <b>${v.spread.toFixed(1)} °C</b> — เพิ่มความแรงฝน หรือเริ่มจากอากาศที่ชื้นกว่านี้`};
+    const over = add - v.spread;
+    const d = Math.round(clamp(150 + over*180, 150, 1200));
+    return {fog:1, add, depth:d, pill: over>2 ? 'crit':'warn', tag:'หมอกจากฝน',
+      head:`อากาศเย็นด้านล่างอิ่มตัวแล้ว`,
+      body:`ฝนเติมไอน้ำเกินที่ต้องการไป <b>${over.toFixed(1)} °C</b> อากาศเย็นใต้แนวปะทะจึงอิ่มตัวและกลายเป็นหมอกหนา <b>~${d} ฟุต</b> — มาพร้อมเพดานเมฆต่ำและฝน กินพื้นที่กว้างเป็นร้อยไมล์`};
+  },
+  draw(v, r, f){
+    const key='rain', c=TOK['--cloud'], on = f !== null;
+    const prog = on ? clamp((f+1)/9, 0.08, 1) : 1;
+    let s = scene(false, key);
+    const fx1=110, fy1=GY+4, fx2=660, fy2=54;
+    s += `<rect x="0" y="0" width="${SW}" height="${SH}" fill="${mix(TOK['--hot'],TOK['--sky-low'],.62)}" opacity="0.45"/>`;
+    s += `<path d="M${fx1},${fy1} L${fx2},${fy2} L${SW},${fy2} L${SW},${SH} L${fx1},${SH} Z" fill="${mix(TOK['--cold'],'#0B121A',.5)}" opacity="0.78"/>`;
+    s += `<path d="M${fx1},${fy1} L${fx2},${fy2}" stroke="${TOK['--hot']}" stroke-width="2.6"/>`;
+    s += `<g filter="url(#bl_${key})">${puff(250,54,150,24,c,.8)}${puff(430,40,150,22,c,.75)}${puff(600,30,130,20,c,.7)}</g>`;
+    const rnd = prng(31), n = Math.round(v.rain/100*70), shift = on ? (f*22)%44 : 0;
+    for (let i=0;i<n;i++){
+      const x = 170 + rnd()*500, y0 = 62 + ((rnd()*46 + shift) % 46);
+      s += `<line x1="${x.toFixed(0)}" y1="${y0.toFixed(0)}" x2="${(x-6).toFixed(0)}" y2="${Math.min(GY+30, y0+36+rnd()*44).toFixed(0)}" stroke="${TOK['--cold']}" stroke-width="1.4" opacity="0.62"/>`;
+    }
+    if (r.fog){
+      const h = clamp(r.depth/1000*130, 14, 120)*prog;
+      s += fogBand(160, SW-6, GY+8-h, GY+12, key, 0.88, on ? f : 0);
+      s += tag(SW-20, GY-4-h, `หนา ~${r.depth} ฟุต`, TOK['--cold'], 'end');
+    }
+    s += windArrow(24, GY-18, v.wind, key, TOK['--cloud'], 1, on ? (f*6)%13 : 0);
+    s += `<rect x="12" y="16" width="392" height="34" rx="8" fill="${TOK['--surface']}" opacity="0.9"/>`;
+    s += lbl(28, 38, `ฝน ${v.rain}% ตกผ่านลิ่มอากาศเย็นด้านล่าง`, TOK['--ink']);
+    s += tag(676, 128, 'ลิ่มอากาศเย็น', TOK['--cold'], 'end');
+    return s;
+  }
+},
+
+/* ---------- ชนิดของเมฆ ---------- */
+cldtype: {
+  H: 340, frames: 18,
+  controls:[
+    {k:'rh',   name:'ความชื้นที่ผิวพื้น', min:20, max:100, step:1, u:' %',
+     hint:'กำหนดว่าฐานเมฆจะอยู่สูงแค่ไหน — ชื้นมากฐานเมฆต่ำ'},
+    {k:'elr',  name:'อุณหภูมิลดต่อ 1,000 ft', min:0.5, max:4, step:0.1, u:' °C',
+     hint:'ต่ำกว่า 1.5 = อากาศเสถียร ได้เมฆแผ่น · เกิน 2.5 = ไม่เสถียร ได้เมฆก้อน'},
+    {k:'lift', name:'แรงยกตัวของอากาศ', min:0, max:100, step:5, u:'',
+     hint:'มาจากพื้นร้อน ภูเขา หรือแนวปะทะอากาศ'}
+  ],
+  play:'กด ▶ ดูเมฆเคลื่อนตัวและก่อตัว',
+  calc(v){
+    const T0 = 30, Td = dewFromRH(T0, v.rh), base = clamp((T0-Td)/2.5*1000, 300, 20000);
+    if (v.lift < 15) return {alert:0, pill:'good', tag:'ฟ้าโปร่ง', head:'ไม่มีแรงยก อากาศก็ไม่เกิดเมฆ',
+      body:'เมฆทุกชนิดเกิดจากอากาศที่ถูกยกขึ้นแล้วเย็นตัวจนถึงจุดน้ำค้าง ถ้าไม่มีอะไรยกอากาศขึ้นไป ต่อให้ชื้นแค่ไหนก็ได้แค่ฟ้าหลัวหรือหมอกที่ผิวพื้น', base, top:base, kind:'none'};
+    let kind, name, en, tagT, pill, note;
+    if (v.elr < 1.5){
+      if (v.lift < 45){ kind='st'; name='สเตรตัส'; en='Stratus (St)'; tagT='เมฆแผ่นต่ำ'; pill='warn'; note='เพดานต่ำ ทัศนวิสัยแย่ อาจมีฝนละออง'; }
+      else { kind='ns'; name='นิมโบสเตรตัส'; en='Nimbostratus (Ns)'; tagT='เมฆแผ่นให้ฝน'; pill='crit'; note='ฝนพรำต่อเนื่องเป็นชั่วโมง เพดานต่ำทั้งบริเวณ'; }
+    } else if (v.elr < 2.5){
+      if (base > 8000){ kind='ac'; name='อัลโตคิวมูลัส'; en='Altocumulus (Ac)'; tagT='เมฆก้อนระดับกลาง'; pill='good'; note='เห็นเป็นแพก้อนเรียงตัว มักบอกว่าอากาศระดับกลางเริ่มไม่เสถียร'; }
+      else { kind='sc'; name='สเตรโตคิวมูลัส'; en='Stratocumulus (Sc)'; tagT='เมฆแผ่นเป็นก้อน'; pill='warn'; note='เมฆชั้นเดียวเป็นแพ มีช่องให้ลอดได้บ้าง'; }
+    } else {
+      if (v.lift < 40){ kind='cu'; name='คิวมูลัส'; en='Cumulus humilis (Cu)'; tagT='เมฆก้อนอากาศดี'; pill='good'; note='เมฆก้อนเล็กฐานแบน อากาศกระเพื่อมเบา ๆ ใต้ฐานเมฆ'; }
+      else if (v.lift < 72 || v.rh < 60){ kind='tcu'; name='คิวมูลัสก่อตัวสูง'; en='Towering Cumulus (TCU)'; tagT='ก่อตัวสูง'; pill='warn'; note='ยอดเริ่มพุ่งขึ้นเหมือนดอกกะหล่ำ มี turbulence แรงข้างใน'; }
+      else { kind='cb'; name='คิวมูโลนิมบัส'; en='Cumulonimbus (Cb)'; tagT='เมฆฝนฟ้าคะนอง'; pill='crit'; note='อันตรายทุกอย่างรวมกัน — ฟ้าผ่า ลูกเห็บ wind shear microburst'; }
+    }
+    const growth = {none:0, st:900, ns:6000, sc:2500, ac:3000, cu:2500, tcu:12000, cb:30000}[kind];
+    const top = clamp(base + growth*(0.5 + v.lift/140) * (0.6 + v.rh/220), base+400, 45000);
+    const band = base < 6500 ? 'เมฆระดับต่ำ' : base < 20000 ? 'เมฆระดับกลาง (Alto-)' : 'เมฆระดับสูง (Cirro-)';
+    return {alert: pill==='crit'?1:0, kind, pill, tag:tagT, head:`${name} · ${en}`,
+      body:`ฐานเมฆ <b>${fmt(Math.round(base/100)*100)} ฟุต</b> ยอดราว <b>${fmt(Math.round(top/500)*500)} ฟุต</b> — ${band} · ${note}`,
+      base, top, name, en};
+  },
+  draw(v, r, f){
+    const key='cldtype', c=TOK['--cloud'], H=340, on = f !== null;
+    const MAX = 45000, yF = ft => H-26 - clamp(ft/MAX,0,1)*(H-70);
+    const dx = on ? (f*8)%64 - 32 : 0;
+    let s = `<defs>
+      <linearGradient id="dg_${key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${mix(TOK['--sky-high'],'#0A1424',.35)}"/><stop offset="1" stop-color="${TOK['--sky-low']}"/>
+      </linearGradient>
+      <filter id="bl_${key}" x="-30%" y="-70%" width="160%" height="240%"><feGaussianBlur stdDeviation="4"/></filter>
+      <marker id="hot_${key}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M0,1 L9,5 L0,9 z" fill="${TOK['--hot']}"/></marker>
+    </defs>
+    <rect x="0" y="0" width="${SW}" height="${H}" fill="url(#dg_${key})"/>`;
+    [6500,20000].forEach(ft => {
+      const y = yF(ft);
+      s += `<line x1="0" y1="${y.toFixed(1)}" x2="${SW}" y2="${y.toFixed(1)}" stroke="${c}" stroke-width="0.8" stroke-dasharray="4 6" opacity="0.3"/>`;
+    });
+    [[3000,'ระดับต่ำ'],[12000,'ระดับกลาง · Alto-'],[30000,'ระดับสูง · Cirro-']].forEach(([ft,t]) => {
+      s += `<text x="10" y="${(yF(ft)+4).toFixed(1)}" font-family="IBM Plex Sans Thai,sans-serif" font-size="11.5" fill="${c}" opacity="0.55">${t}</text>`;
+    });
+    [10000,20000,30000,40000].forEach(ft => {
+      s += `<text x="${SW-8}" y="${(yF(ft)-3).toFixed(1)}" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="${c}" opacity="0.45">${fmt(ft)} ft</text>`;
+    });
+    /* เมฆชั้นสูงประดับ */
+    s += `<g opacity="0.5">`;
+    [0,1,2].forEach(i => { const y = yF(34000) + i*11;
+      s += `<path d="M${140+i*90+dx*0.6},${y} q40,-7 90,-2 q30,3 70,-4" stroke="${c}" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>`; });
+    s += `</g>` + `<text x="${SW-8}" y="${(yF(34000)-10).toFixed(1)}" text-anchor="end" font-family="IBM Plex Sans Thai,sans-serif" font-size="11" fill="${c}" opacity="0.55">เซอร์รัส — ผลึกน้ำแข็ง</text>`;
+    s += `<rect x="0" y="${H-26}" width="${SW}" height="26" fill="${mix('#141A22',TOK['--hot'],.2)}"/>`;
+
+    const yb = yF(r.base), yt = yF(r.top), cx = 350 + dx;
+    if (r.kind === 'none'){
+      s += `<circle cx="600" cy="60" r="26" fill="${TOK['--hot']}" opacity="0.75"/>`;
+      s += tag(SW/2, H-46, 'ไม่มีเมฆ — ไม่มีอะไรยกอากาศขึ้นไป', TOK['--ink'], 'middle');
+      return s;
+    }
+    const g = `<g filter="url(#bl_${key})">`;
+    if (r.kind === 'st' || r.kind === 'ns'){
+      s += g + `<rect x="0" y="${yt.toFixed(1)}" width="${SW}" height="${(yb-yt).toFixed(1)}" fill="${c}" opacity="${r.kind==='ns'?0.9:0.8}"/></g>`;
+      if (r.kind === 'ns'){
+        const rnd = prng(5), sh = on ? (f*20)%40 : 0;
+        for (let i=0;i<40;i++){ const x = rnd()*SW, y0 = yb + ((rnd()*30+sh)%30);
+          s += `<line x1="${x.toFixed(0)}" y1="${y0.toFixed(0)}" x2="${(x-4).toFixed(0)}" y2="${Math.min(H-26,y0+24).toFixed(0)}" stroke="${TOK['--cold']}" stroke-width="1.3" opacity="0.6"/>`; }
+      }
+    } else if (r.kind === 'sc' || r.kind === 'ac'){
+      s += g;
+      for (let i=0;i<7;i++) s += puff(60 + i*100 + dx*0.5, (yb+yt)/2, 46, Math.max(9,(yb-yt)/2), c, 0.85);
+      s += `</g>`;
+    } else {
+      const w = r.kind === 'cb' ? 120 : r.kind === 'tcu' ? 90 : 70;
+      s += g + `<rect x="${cx-w}" y="${(yb-8).toFixed(1)}" width="${w*2}" height="14" rx="7" fill="${c}" opacity="0.9"/>`;
+      const steps = Math.max(2, Math.round((yb-yt)/26));
+      for (let i=0;i<steps;i++){
+        const t = i/steps, yy = yb - (yb-yt)*t - 10;
+        const rr = w*(1 - t*0.45) * (r.kind==='cu' ? 0.75 : 1);
+        s += puff(cx + Math.sin(i*1.3)*10, yy, rr, Math.max(12, (yb-yt)/steps*0.85), c, 0.88);
+      }
+      if (r.kind === 'cb') s += puff(cx+40, yt+14, 190, 22, c, 0.9);
+      s += `</g>`;
+    }
+    s += tag(SW/2, yb + 26, `${r.name} · ฐาน ${fmt(Math.round(r.base/100)*100)} ft`, TOK['--ink'], 'middle');
+    return s;
+  }
+},
+
+/* ---------- การเกิดเมฆฝน ---------- */
+cldrain: {
+  H: 340, frames: 30,
+  controls:[
+    {k:'rh',    name:'ความชื้นที่ผิวพื้น', min:30, max:100, step:1, u:' %',
+     hint:'เชื้อเพลิงของพายุ — ความชื้นคือพลังงานที่ปล่อยออกมาตอนควบแน่น'},
+    {k:'elr',   name:'ความไม่เสถียร (°C/1,000 ft)', min:1.5, max:4, step:0.1, u:'',
+     hint:'ยิ่งมาก อากาศยิ่งพุ่งขึ้นแรงและสูง'},
+    {k:'shear', name:'ลมเฉือนตามความสูง', min:0, max:40, step:2, u:' kt',
+     hint:'ลมเฉือนทำให้พายุเอียง ฝนไม่ตกทับกระแสลมขึ้น พายุจึงอยู่ได้นานขึ้น'}
+  ],
+  play:'กด ▶ ดูวงจรชีวิตพายุ 3 ระยะ ตั้งแต่ก่อตัวจนสลาย',
+  calc(v, f){
+    const st = f === null ? 0.5 : f/(SIM.cldrain.frames-1);
+    const stage = st < 0.34 ? 0 : st < 0.72 ? 1 : 2;
+    const T0 = 30, Td = dewFromRH(T0, v.rh), base = clamp((T0-Td)/2.5*1000, 500, 12000);
+    const maxTop = clamp(8000 + (v.elr-1.5)*11000 + v.rh*90, 9000, 48000);
+    const grow = stage === 0 ? 0.35 + st*1.6 : 1;
+    const top = clamp(base + (maxTop-base)*Math.min(grow,1), base+2000, maxTop);
+    const names = ['ระยะก่อตัว (Cumulus stage)','ระยะเจริญเต็มที่ (Mature stage)','ระยะสลาย (Dissipating stage)'];
+    const pills = ['warn','crit','warn'];
+    const bodies = [
+      `มีแต่ <b>กระแสลมขึ้น (updraft)</b> อย่างเดียว เมฆพุ่งขึ้นเรื่อย ๆ ยอดตอนนี้ <b>${fmt(Math.round(top/500)*500)} ฟุต</b> ยังไม่มีฝนตกถึงพื้น — บินเข้าไปเจอ turbulence แรงและ updraft ที่ดันเครื่องขึ้นเอง`,
+      `<b>ขึ้นและลงพร้อมกัน</b> ฝนที่ตกลงมาลากอากาศเย็นลงเป็น downdraft ยอดเมฆชนเพดานแล้วแผ่เป็น <b>ทั่ง (anvil)</b> ที่ ${fmt(Math.round(top/500)*500)} ฟุต — ระยะที่อันตรายที่สุด: ฟ้าผ่า ลูกเห็บ <b>microburst</b> และ wind shear ที่ระดับต่ำ`,
+      `เหลือแต่ <b>กระแสลมลง</b> ฝนอ่อนลง เมฆแผ่ออกและสลายตัว แต่ <b>gust front ยังวิ่งออกไปได้ไกลหลายไมล์</b> ทำให้ลมเปลี่ยนทิศกะทันหันแม้ท้องฟ้าเหนือสนามจะดูดีขึ้นแล้ว`
+    ];
+    return {alert: stage===1?1:0, stage, base, top, pill:pills[stage], tag:['ก่อตัว','เจริญเต็มที่','สลายตัว'][stage],
+      head:names[stage], body:bodies[stage]};
+  },
+  draw(v, r, f){
+    const key='cldrain', c=TOK['--cloud'], H=340, on = f !== null;
+    const MAX = 50000, yF = ft => H-26 - clamp(ft/MAX,0,1)*(H-56);
+    let s = `<defs>
+      <linearGradient id="dg_${key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${mix(TOK['--sky-high'],'#0A1424',.3)}"/><stop offset="1" stop-color="${TOK['--sky-low']}"/>
+      </linearGradient>
+      <filter id="bl_${key}" x="-30%" y="-70%" width="160%" height="240%"><feGaussianBlur stdDeviation="4.5"/></filter>
+      <marker id="hot_${key}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M0,1 L9,5 L0,9 z" fill="${TOK['--hot']}"/></marker>
+      <marker id="cold_${key}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M0,1 L9,5 L0,9 z" fill="${TOK['--cold']}"/></marker>
+    </defs>
+    <rect x="0" y="0" width="${SW}" height="${H}" fill="url(#dg_${key})"/>`;
+    [10000,20000,30000,40000].forEach(ft => {
+      s += `<line x1="0" y1="${yF(ft).toFixed(1)}" x2="${SW}" y2="${yF(ft).toFixed(1)}" stroke="${c}" stroke-width="0.5" opacity="0.14"/>`;
+      s += `<text x="${SW-8}" y="${(yF(ft)-3).toFixed(1)}" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="${c}" opacity="0.45">${fmt(ft)} ft</text>`;
+    });
+    s += `<rect x="0" y="${H-26}" width="${SW}" height="26" fill="${mix('#141A22',TOK['--hot'],.2)}"/>`;
+
+    const yb = yF(r.base), yt = yF(r.top), tilt = v.shear*1.5;
+    const cx = 300;
+    s += `<g filter="url(#bl_${key})">`;
+    s += `<rect x="${cx-105}" y="${(yb-9).toFixed(1)}" width="210" height="16" rx="8" fill="${c}" opacity="0.9"/>`;
+    const steps = Math.max(4, Math.round((yb-yt)/18));
+    for (let i=0;i<steps;i++){
+      const t = i/steps, yy = yb - (yb-yt)*t - 10, sx = cx + tilt*t;
+      s += puff(sx + Math.sin(i*1.2)*9, yy, 105*(1-t*0.32)*(0.92+Math.sin(i*2.1)*0.08), Math.max(16,(yb-yt)/steps*1.6), c, 0.9);
+    }
+    if (r.stage >= 1){
+      const aw = r.stage === 1 ? 200 : 250;
+      s += puff(cx + tilt + aw*0.35, yt + 16, aw, 24, c, 0.92);
+    }
+    s += `</g>`;
+    if (r.stage >= 1){
+      s += lbl(cx + tilt + 130, yt + 6, 'ทั่ง (anvil)', c, 'start', 12);
+    }
+    /* กระแสลม */
+    if (r.stage === 0 || r.stage === 1){
+      s += `<path d="M${cx-30},${(yb+30).toFixed(1)} L${(cx-30+tilt*0.6).toFixed(0)},${(yt+50).toFixed(1)}" stroke="${TOK['--hot']}" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#hot_${key})" ${on?`stroke-dashoffset="${-(f*6)%14}"`:''}/>`;
+      s += lbl(cx-84, (yb+yt)/2, 'updraft', TOK['--hot'], 'start', 12);
+    }
+    if (r.stage >= 1){
+      s += `<path d="M${(cx+70+tilt*0.7).toFixed(0)},${(yt+70).toFixed(1)} L${cx+70},${(H-34).toFixed(1)}" stroke="${TOK['--cold']}" stroke-width="3" stroke-dasharray="8 6" marker-end="url(#cold_${key})" ${on?`stroke-dashoffset="${-(f*6)%14}"`:''}/>`;
+      s += lbl(cx+92, (H-70), 'downdraft', TOK['--cold'], 'start', 12);
+      const rnd = prng(43), sh = on ? (f*24)%48 : 0, dens = r.stage === 1 ? 60 : 26;
+      for (let i=0;i<dens;i++){
+        const x = cx-60 + rnd()*220, y0 = yb + ((rnd()*60 + sh) % 60);
+        s += `<line x1="${x.toFixed(0)}" y1="${y0.toFixed(0)}" x2="${(x-5).toFixed(0)}" y2="${Math.min(H-26, y0+26).toFixed(0)}" stroke="${TOK['--cold']}" stroke-width="1.5" opacity="0.62"/>`;
+      }
+      const gx = cx + 150 + (r.stage === 2 ? 90 : 0);
+      s += `<path d="M${gx},${H-32} q40,-14 90,-2" stroke="${TOK['--cold']}" stroke-width="2.4" fill="none" marker-end="url(#cold_${key})"/>`;
+      s += lbl(gx+6, H-42, 'gust front · wind shear', TOK['--cold'], 'start', 12);
+    }
+    if (r.stage === 1){
+      s += `<path d="M${cx+10},${(yb-60).toFixed(1)} l-16,34 l16,0 l-12,30" stroke="#F5C542" stroke-width="2.6" fill="none" stroke-linejoin="round"/>`;
+    }
+    s += tag(24, 34, ['ระยะก่อตัว','ระยะเจริญเต็มที่','ระยะสลาย'][r.stage], TOK['--ink'], 'start');
+    s += tag(SW-24, 34, `ยอดเมฆ ${fmt(Math.round(r.top/500)*500)} ft`, TOK['--ink'], 'end');
+    return s;
+  }
+},
+
+/* ---------- ฝน / หิมะตก ---------- */
+precip: {
+  H: 340, frames: 20,
+  controls:[
+    {k:'ts',    name:'อุณหภูมิที่ผิวพื้น', min:-12, max:30, step:0.5, u:' °C'},
+    {k:'warm',  name:'ชั้นอากาศอุ่นแทรกกลาง', min:0, max:100, step:5, u:'',
+     hint:'ชั้นที่อุ่นกว่า 0 °C คั่นกลางอากาศ ทำให้หิมะละลายกลางทางแล้วไปเจอความเย็นอีกรอบ'},
+    {k:'water', name:'ปริมาณน้ำในเมฆ', min:10, max:100, step:5, u:'',
+     hint:'น้อย = ฝนละออง (drizzle) · มาก = ฝนหนัก'}
+  ],
+  play:'กด ▶ ดูเม็ดน้ำร่วงลงมา แล้วเปลี่ยนสถานะทีละชั้น',
+  calc(v){
+    const hasWarm = v.warm > 10;
+    const warmT = v.warm/100*6;
+    const fl = v.ts > 0 ? v.ts/2*1000 : 0;
+    let code, name, pill, note;
+    if (!hasWarm){
+      if (v.ts <= 0){ code='SN'; name='หิมะ'; pill='warn'; note='ผลึกน้ำแข็งไม่เคยละลายเลยตลอดทาง ตกถึงพื้นเป็นหิมะ — ทัศนวิสัยแย่ แต่ไม่เกาะเป็นน้ำแข็งใสบนปีก'; }
+      else if (v.ts <= 2){ code='RASN'; name='ฝนปนหิมะ'; pill='warn'; note='ละลายไม่ทันก่อนถึงพื้น เลยตกลงมาทั้งเกล็ดและหยดปนกัน'; }
+      else { code = v.water < 30 ? 'DZ' : 'RA'; name = v.water < 30 ? 'ฝนละออง' : 'ฝน'; pill = v.water>70?'warn':'good';
+             note = v.water < 30 ? 'หยดเล็กมาก ลอยตามลม ทัศนวิสัยลดลงเยอะกว่าที่คิด' : 'ผลึกน้ำแข็งละลายหมดตั้งแต่ผ่านระดับเยือกแข็ง กลายเป็นหยดน้ำ'; }
+    } else {
+      if (v.ts > 0){ code='RA'; name='ฝน'; pill='good'; note='ละลายในชั้นอุ่น แล้วอากาศข้างล่างก็ยังอุ่นอยู่ ตกถึงพื้นเป็นฝนธรรมดา'; }
+      else if (v.ts > -5){ code='FZRA'; name='ฝนเยือกแข็ง'; pill='crit';
+        note='<b>อันตรายที่สุดสำหรับการบิน</b> — หยดน้ำเย็นยิ่งยวดจับตัวเป็นน้ำแข็งใสทันทีที่แตะเครื่องบินหรือรันเวย์ ห้ามบินเข้าเด็ดขาด'; }
+      else { code='PL'; name='เม็ดน้ำแข็ง'; pill='warn';
+        note='ชั้นเย็นด้านล่างหนาพอให้หยดน้ำแข็งตัวใหม่ทั้งเม็ดก่อนถึงพื้น — เม็ดน้ำแข็งเด้งเวลากระทบพื้น เป็นสัญญาณว่ามีชั้นฝนเยือกแข็งอยู่ข้างบน'; }
+    }
+    const layer = hasWarm ? `มีชั้นอุ่น <b>+${warmT.toFixed(1)} °C</b> คั่นที่ 5,000–8,000 ฟุต` : 'ไม่มีชั้นอุ่นคั่น อุณหภูมิลดต่อเนื่องตามความสูง';
+    return {alert: pill==='crit'?1:0, code, name, pill, tag:code, hasWarm, warmT, fl,
+      head:`${name} (${code})`,
+      body:`${layer} · ผิวพื้น <b>${v.ts.toFixed(1)} °C</b>${v.ts>0?` ระดับเยือกแข็งอยู่ที่ <b>${fmt(Math.round(fl/100)*100)} ฟุต</b>`:' — ต่ำกว่าจุดเยือกแข็งตั้งแต่ผิวพื้น'} · ${note}`};
+  },
+  draw(v, r, f){
+    const key='precip', c=TOK['--cloud'], H=340, on = f !== null;
+    const MAX = 20000, yF = ft => H-26 - clamp(ft/MAX,0,1)*(H-56);
+    const tAt = ft => {
+      if (r.hasWarm && ft >= 5000 && ft <= 8000) return r.warmT;
+      return v.ts - 2*ft/1000;
+    };
+    let s = `<defs>
+      <linearGradient id="dg_${key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${mix(TOK['--sky-high'],'#0A1424',.25)}"/><stop offset="1" stop-color="${TOK['--sky-low']}"/>
+      </linearGradient>
+      <filter id="bl_${key}" x="-30%" y="-70%" width="160%" height="240%"><feGaussianBlur stdDeviation="4"/></filter>
+    </defs>
+    <rect x="0" y="0" width="${SW}" height="${H}" fill="url(#dg_${key})"/>`;
+
+    if (r.hasWarm){
+      s += `<rect x="0" y="${yF(8000).toFixed(1)}" width="${SW}" height="${(yF(5000)-yF(8000)).toFixed(1)}" fill="${TOK['--hot']}" opacity="0.2"/>`;
+      s += lbl(14, yF(6500)+4, `ชั้นอากาศอุ่น +${r.warmT.toFixed(1)} °C`, TOK['--hot'], 'start', 12);
+    }
+    if (v.ts > 0){
+      const y = yF(r.fl);
+      s += `<line x1="0" y1="${y.toFixed(1)}" x2="${SW}" y2="${y.toFixed(1)}" stroke="${TOK['--cold']}" stroke-width="1.4" stroke-dasharray="4 4"/>`;
+      s += lbl(14, y-8, `ระดับเยือกแข็ง 0 °C · ${fmt(Math.round(r.fl/100)*100)} ft`, TOK['--cold'], 'start', 12);
+    } else {
+      s += lbl(14, H-46, 'ต่ำกว่า 0 °C ตั้งแต่ผิวพื้น', TOK['--cold'], 'start', 12);
+    }
+    [5000,10000,15000,20000].forEach(ft => {
+      s += `<text x="${SW-8}" y="${(yF(ft)-3).toFixed(1)}" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="${c}" opacity="0.45">${fmt(ft)} ft</text>`;
+    });
+    s += `<g filter="url(#bl_${key})">${puff(200,yF(19000)+10,180,26,c,.9)}${puff(420,yF(19400)+8,190,24,c,.9)}${puff(600,yF(18800)+12,150,22,c,.85)}</g>`;
+    s += lbl(14, yF(19000)+6, 'ยอดเมฆเย็นจัด — เริ่มต้นเป็นผลึกน้ำแข็งเสมอ', TOK['--ink'], 'start', 12);
+    s += `<rect x="0" y="${H-26}" width="${SW}" height="26" fill="${mix('#141A22',TOK['--hot'],.2)}"/>`;
+
+    const flake = (x,y,sz,col) => {
+      let g='';
+      for (let a=0;a<3;a++){ const rad=a*Math.PI/3;
+        g += `<line x1="${(x-Math.cos(rad)*sz).toFixed(1)}" y1="${(y-Math.sin(rad)*sz).toFixed(1)}" x2="${(x+Math.cos(rad)*sz).toFixed(1)}" y2="${(y+Math.sin(rad)*sz).toFixed(1)}" stroke="${col}" stroke-width="1.6" stroke-linecap="round"/>`; }
+      return g;
+    };
+    const drop = (x,y,sz,col) => `<path d="M${x},${(y-sz*1.5).toFixed(1)} q${sz},${sz*1.4} 0,${sz*2.2} q${-sz},${-sz*0.8} 0,${-sz*2.2} z" fill="${col}"/>`;
+    const pellet = (x,y,sz,col) => `<circle cx="${x}" cy="${y}" r="${sz*0.9}" fill="${col}" stroke="${TOK['--surface']}" stroke-width="0.8"/>`;
+
+    const nCol = 14, span = 470, x0 = 140;
+    const yTop = yF(18000), yGnd = H-30;
+    for (let i=0;i<nCol;i++){
+      const x = x0 + i*span/(nCol-1);
+      const base = (i*0.617 + (on ? f/SIM.precip.frames : 0.42)) % 1;
+      const y = yTop + (yGnd-yTop)*base;
+      const ft = clamp((H-26-y)/(H-56)*MAX, 0, MAX);
+      let sym;
+      const meltedAloft = r.hasWarm && ft < 7000;
+      if (!r.hasWarm){
+        if (v.ts <= 0) sym = flake(x, y, 5, '#FFFFFF');
+        else sym = ft > r.fl ? flake(x, y, 5, '#FFFFFF') : drop(x, y, 3.4, TOK['--cold']);
+      } else {
+        if (ft > 8000) sym = flake(x, y, 5, '#FFFFFF');
+        else if (ft > 5000) sym = drop(x, y, 3.4, mix(TOK['--cold'],TOK['--hot'],.35));
+        else if (r.code === 'PL' && ft < 2500) sym = pellet(x, y, 3.6, '#DDE7F0');
+        else sym = drop(x, y, 3.4, TOK['--cold']);
+      }
+      s += sym;
+    }
+    if (r.code === 'FZRA'){
+      s += `<rect x="${x0-30}" y="${(yGnd-6).toFixed(1)}" width="${span+60}" height="6" rx="3" fill="${TOK['--cold']}" opacity="0.75"/>`;
+      s += lbl(x0+span/2, yGnd+18, 'น้ำแข็งใสเคลือบพื้นและตัวเครื่องบิน', '#fff', 'middle', 12);
+    }
+    s += tag(SW-24, 34, `ตกถึงพื้นเป็น: ${r.name} (${r.code})`, r.pill==='crit'?TOK['--crit']:TOK['--ink'], 'end');
+    return s;
+  }
+}
+};
+
+/* ============ เนื้อหาประกอบแต่ละหัวข้อ ============ */
+const FOG_TYPES = [
+  {id:'rad', th:'หมอกแผ่รังสี', en:'Radiation Fog', code:'FG',
+   lead:'หมอกที่นักเรียนการบินเจอบ่อยที่สุด เกิดตอนกลางคืนที่ฟ้าใสและลมสงบ พื้นดินคายความร้อนออกไปในอวกาศจนตัวเองเย็นจัด แล้วดึงให้อากาศชั้นติดพื้นเย็นตามลงมาถึงจุดน้ำค้าง',
+   form:['ฟ้าใส ไม่มีเมฆคลุมให้ความร้อนสะท้อนกลับ','ลมสงบ <b>0–5 kt</b> (นิ่งเกินไปจะได้แค่น้ำค้าง ลมแรงเกินไปจะกลายเป็นเมฆ stratus)','อากาศชั้นล่างชื้นอยู่แล้ว เช่น หลังฝนตกตอนเย็น','พื้นที่เป็นแอ่ง หุบเขา ริมแม่น้ำ ทุ่งนา'],
+   clear:['แดดขึ้นอุ่นพื้น ปกติสลายภายใน <b>1–3 ชั่วโมง</b> หลังพระอาทิตย์ขึ้น','ลมแรงขึ้นเกิน 10 kt แล้วผสมอากาศแห้งจากข้างบนลงมา','มวลอากาศแห้งเคลื่อนเข้ามาแทน'],
+   pilot:['พบมากช่วง <b>ตี 4 ถึง 8 โมงเช้า</b> — ตรงกับเวลาบินเช้าพอดี','ดู METAR เมื่อคืน ถ้า T กับ Td ชิดกันและลมสงบ ให้เตรียม alternate ไว้เลย','หมอกชนิดนี้ตื้น มองจากอากาศอาจเห็นรันเวย์ แต่พอเข้า final แล้วมองไม่เห็นเลย'],
+   try:'ลองเลื่อนลมจาก 1 → 5 → 10 kt ดูว่าหมอกเปลี่ยนจากน้ำค้าง เป็นหมอกหนา แล้วยกตัวเป็นเมฆยังไง'},
+
+  {id:'adv', th:'หมอกพัดพา', en:'Advection Fog', code:'FG',
+   lead:'อากาศอุ่นชื้นถูกลมพัดไปตกบนผิวที่เย็นกว่าจุดน้ำค้างของมัน เช่น ลมทะเลพัดเข้าหาฝั่งที่เย็น หรืออากาศจากอ่าวอุ่นพัดผ่านผิวน้ำเย็น อันตรายกว่าหมอกแผ่รังสีเพราะไม่สนใจว่ากลางวันหรือกลางคืน',
+   form:['อากาศอุ่นชื้นเคลื่อนมาบนผิวที่เย็นกว่า','ต้องมีลม <b>5–15 kt</b> คอยพาอากาศชุดใหม่มาเรื่อย ๆ','ต่างจากหมอกแผ่รังสีตรงที่ลมยิ่งพัดหมอกยิ่งหนา'],
+   clear:['ต้องเปลี่ยนทิศลมหรือเปลี่ยนมวลอากาศเท่านั้น','<b>แดดออกก็ไม่หาย</b> อยู่ได้ต่อเนื่องเป็นวัน ๆ'],
+   pilot:['พบบ่อยแถบชายฝั่ง สนามบินริมทะเล','มาเร็วมาก — สนามเปิดอยู่ดี ๆ ทัศนวิสัยตกใน 15–30 นาที','เป็นเหตุผลที่ต้องเช็ก TAF เรื่องทิศลม ไม่ใช่แค่ความเร็ว'],
+   try:'ลองตั้งจุดน้ำค้าง 20 °C แล้วค่อย ๆ ลดอุณหภูมิผิวจาก 25 ลงมา 12 °C ดูว่าหมอกเริ่มเกิดตอนไหน'},
+
+  {id:'steam', th:'หมอกไอน้ำ', en:'Steam Fog / Sea Smoke', code:'FG',
+   lead:'ตรงข้ามกับหมอกพัดพา — คราวนี้ผิวน้ำอุ่นกว่าอากาศมาก น้ำระเหยขึ้นไปเจออากาศเย็นจัดแล้วควบแน่นทันทีเหมือนไอจากถ้วยกาแฟร้อน',
+   form:['ผิวน้ำอุ่นกว่าอากาศราว <b>10 °C ขึ้นไป</b>','อากาศเย็นจัดพัดผ่านทะเลสาบ แม่น้ำ หรือทะเล','เช้าตรู่ฤดูหนาว'],
+   clear:['อากาศอุ่นขึ้นในตอนสาย','ลมเปลี่ยนทิศ พาอากาศอุ่นเข้ามาแทน'],
+   pilot:['มักตื้นแค่ไม่กี่สิบฟุต แต่บดบัง touchdown zone ได้','อากาศข้างล่างไม่เสถียร คาดว่าจะเจอ <b>turbulence เบา ๆ</b> ตอน final','ในเขตหนาวจัดอาจมากับ icing เพราะเป็นหยดน้ำเย็นยิ่งยวด'],
+   try:'ตรึงอุณหภูมิน้ำไว้ที่ 22 °C แล้วลากอุณหภูมิอากาศลงจาก 20 ไป 0 °C — ดูไอน้ำสูงขึ้นเรื่อย ๆ'},
+
+  {id:'up', th:'หมอกลาดเขา', en:'Upslope Fog', code:'FG',
+   lead:'ลมพัดอากาศชื้นไต่ขึ้นตามลาดเขา อากาศขยายตัวและเย็นลงเอง 3 °C ต่อ 1,000 ft จนถึงจุดน้ำค้าง — พูดให้ตรงคือมันคือ <b>ฐานเมฆในแท็บแรก</b> ที่บังเอิญไปตัดกับพื้นภูเขาพอดี',
+   form:['ลมพัดขึ้นลาดเขาอย่างต่อเนื่อง','อากาศต้นทางมีความชื้นสูงพอ','ความสูงของฐานเมฆ (LCL) ต่ำกว่ายอดเขา'],
+   clear:['ลมหยุดพัดขึ้นเขา หรือเปลี่ยนเป็นลมพัดลง (อากาศจะอุ่นและแห้งลงแทน)','ความชื้นในมวลอากาศลดลง'],
+   pilot:['สนามบินบนที่สูงหรือในหุบเขาต้องระวัง เพดานเมฆอาจอยู่ต่ำกว่ายอดเขาโดยรอบ','ฐานเมฆคำนวณเหมือนแท็บแรกทุกอย่าง — ต่างกันแค่มีภูเขามาขวาง','อย่าไต่ตามลาดเขาเข้าไปในหมอกโดยหวังว่าจะทะลุออกอีกด้าน'],
+   try:'ตั้งยอดเขา 6,000 ฟุต แล้วเลื่อน T − Td จาก 14 ลงมา 2 °C — ฐานเมฆจะไหลลงมาจนจมทั้งลูก'},
+
+  {id:'rain', th:'หมอกจากฝน', en:'Precipitation / Frontal Fog', code:'FG',
+   lead:'เกิดหน้าแนวปะทะอากาศอุ่น ฝนที่ตกจากอากาศอุ่นด้านบนร่วงผ่านลิ่มอากาศเย็นด้านล่าง แล้วระเหยเติมไอน้ำให้อากาศเย็นนั้นจนอิ่มตัวกลายเป็นหมอก',
+   form:['มีแนวปะทะอากาศอุ่นเคลื่อนเข้ามา','ฝนตกต่อเนื่องผ่านชั้นอากาศเย็นด้านล่าง','ลมเบา อากาศชั้นล่างไม่ถูกกวน'],
+   clear:['แนวปะทะเคลื่อนผ่านไป อากาศอุ่นเข้าแทนที่','ฝนหยุด และอากาศชั้นล่างอุ่นขึ้น'],
+   pilot:['มาเป็นชุด: ทัศนวิสัยแย่ + เพดานเมฆต่ำ + ฝน พร้อมกันทีเดียว','กินพื้นที่กว้างเป็นร้อยไมล์ — alternate ต้องอยู่ไกลพอสมควร','ถ้าอยู่ในเขตอุณหภูมิใกล้ 0 °C ระวัง freezing rain ควบคู่ไปด้วย'],
+   try:'ตั้ง T − Td ไว้ 3 °C แล้วเพิ่มความแรงฝนทีละขั้น ดูว่าต้องแรงแค่ไหนหมอกถึงก่อตัว'}
+];
+
+const CLOUD_TYPES = [
+  {id:'cldtype', th:'ชนิดของเมฆ', en:'Cloud Types', badge:'10 ตระกูล',
+   lead:'เมฆทุกก้อนเกิดจากเรื่องเดียวกัน — อากาศถูกยกขึ้นแล้วเย็นจนถึงจุดน้ำค้าง ที่ต่างกันคือ <b>ยกด้วยอะไร</b> และ <b>อากาศเสถียรหรือไม่</b> อากาศเสถียรได้เมฆแผ่น อากาศไม่เสถียรได้เมฆก้อน',
+   cols:[
+     {h:'อ่านชื่อเมฆให้เป็น', li:['<b>Cirro-</b> = ระดับสูง เกิน 20,000 ฟุต เป็นผลึกน้ำแข็ง','<b>Alto-</b> = ระดับกลาง 6,500–20,000 ฟุต','ไม่มีคำนำหน้า = ระดับต่ำ ต่ำกว่า 6,500 ฟุต','<b>Cumulus</b> = ก้อนปุย · <b>Stratus</b> = แผ่นเรียบ','<b>Nimbo-</b> หรือ <b>-nimbus</b> = ให้ฝน']},
+     {h:'อากาศเสถียร → เมฆแผ่น', li:['Stratus (St) เพดานต่ำ ฟ้าปิดเรียบ','Stratocumulus (Sc) แผ่นเป็นแพก้อน','Nimbostratus (Ns) ฝนพรำต่อเนื่องหลายชั่วโมง','บินเข้าไปนิ่ง แต่ทัศนวิสัยเป็นศูนย์และมี icing ถ้าอุณหภูมิต่ำกว่า 0']},
+     {h:'อากาศไม่เสถียร → เมฆก้อน', li:['Cumulus (Cu) ก้อนเล็ก ฟ้าเป็นใจ','Towering Cumulus (TCU) เริ่มพุ่งสูง turbulence แรง','Cumulonimbus (Cb) พายุฟ้าคะนองเต็มรูปแบบ','บินเข้าไปกระแทกหนัก ให้อ้อมไม่ต่ำกว่า 20 ไมล์ทะเลจาก Cb']}
+   ],
+   try:'ตั้งความไม่เสถียรไว้ที่ 3.2 แล้วค่อย ๆ เพิ่มแรงยกตัว — จะเห็นเมฆไต่จาก Cu → TCU → Cb'},
+
+  {id:'cldrain', th:'การเกิดเมฆฝน', en:'Thunderstorm Life Cycle', badge:'3 ระยะ',
+   lead:'เมฆฝนฟ้าคะนองมีวงจรชีวิตชัดเจน 3 ระยะ กินเวลารวมราว 30–60 นาทีต่อหนึ่งเซลล์ ทั้งสามระยะมีอันตรายคนละแบบ และระยะที่แย่ที่สุดสำหรับเครื่องบินไม่ใช่ตอนที่ฝนแรงที่สุดเสมอไป',
+   cols:[
+     {h:'ระยะที่ 1 · ก่อตัว', li:['มีแต่กระแสลมขึ้น เมฆพุ่งสูงเร็วมาก','ยังไม่มีฝนตกถึงพื้น','มองจากพื้นเห็นเป็นก้อนปุยขอบคมกำลังโต','อันตราย: updraft แรง turbulence']},
+     {h:'ระยะที่ 2 · เจริญเต็มที่', li:['มีทั้งลมขึ้นและลมลงในก้อนเดียวกัน','ยอดชนเพดานแล้วแผ่เป็นทั่ง (anvil) ชี้ทิศลมชั้นบน','อันตราย: <b>ฟ้าผ่า ลูกเห็บ microburst wind shear</b>','ระยะที่ห้ามเข้าใกล้ที่สุด']},
+     {h:'ระยะที่ 3 · สลาย', li:['เหลือแต่กระแสลมลง ฝนอ่อนลง','เมฆแผ่กระจาย ทั่งยังค้างอยู่','อันตราย: <b>gust front</b> ที่วิ่งออกไปไกลจากตัวพายุหลายไมล์','ท้องฟ้าเหนือสนามดูดีขึ้นแล้วแต่ลมยังเปลี่ยนกะทันหันได้']}
+   ],
+   try:'ลองเพิ่มลมเฉือน (shear) แล้วกด ▶ — พายุจะเอียง ฝนไม่ตกทับ updraft ทำให้อยู่ได้นานขึ้น'},
+
+  {id:'precip', th:'ฝน / หิมะตก', en:'Precipitation Types', badge:'RA · SN · FZRA · PL',
+   lead:'ฝนแทบทุกเม็ดในเขตอบอุ่นเริ่มต้นเป็น <b>ผลึกน้ำแข็ง</b> ที่ยอดเมฆซึ่งเย็นจัด สิ่งที่ตัดสินว่าตกถึงพื้นเป็นอะไร คือ <b>โปรไฟล์อุณหภูมิระหว่างทาง</b> — ผ่านชั้นอุ่นไหม แล้วเจอชั้นเย็นซ้ำอีกหรือเปล่า',
+   cols:[
+     {h:'เม็ดน้ำโตขึ้นได้ยังไง', li:['<b>กระบวนการเบอร์เจอรอน</b> — ผลึกน้ำแข็งแย่งไอน้ำจากหยดน้ำเย็นยิ่งยวดรอบตัว จนโตพอจะร่วง (เมฆเย็น)','<b>ชนแล้วรวม</b> — หยดใหญ่ร่วงเร็วกว่า ไล่ชนหยดเล็กแล้วกลืนไปเรื่อย ๆ (เมฆอุ่นในเขตร้อน)','เม็ดต้องโตราว 1 ล้านเท่าของหยดในเมฆ ถึงจะตกถึงพื้นได้']},
+     {h:'รหัสที่เจอใน METAR', li:['<b>RA</b> ฝน · <b>DZ</b> ฝนละออง · <b>SN</b> หิมะ','<b>FZRA</b> ฝนเยือกแข็ง — เกาะเป็นน้ำแข็งใสทันทีที่แตะ','<b>PL</b> เม็ดน้ำแข็ง (เด้งเวลากระทบพื้น)','<b>GR</b> ลูกเห็บ — มาจาก Cb เท่านั้น']},
+     {h:'ทำไมนักบินต้องแคร์', li:['<b>FZRA คือสภาพอากาศที่อันตรายที่สุดอย่างหนึ่ง</b> น้ำแข็งเกาะเร็วกว่าระบบละลายน้ำแข็งจะไล่ทัน','เจอ PL ที่พื้น = มีชั้น FZRA อยู่เหนือหัว','หิมะทำให้ทัศนวิสัยแย่และรันเวย์ลื่น แต่ไม่เกาะปีกเท่าฝนเยือกแข็ง','ฝนหนักใต้ Cb มักมาพร้อม microburst']}
+   ],
+   try:'ตั้งผิวพื้นไว้ −2 °C แล้วเปิดชั้นอากาศอุ่นแทรกกลาง — จะได้ฝนเยือกแข็ง แล้วลดผิวพื้นลงไป −8 °C ดูว่ามันเปลี่ยนเป็นอะไร'}
+];
+
+const SUMMARY = [
+  ['หมอกแผ่รังสี','พื้นดินเย็นลงตอนกลางคืนจนอากาศถึง Td','สงบ 0–5 kt','ก่อนรุ่งสาง ฤดูหนาว','แดดออก 1–3 ชม.'],
+  ['หมอกพัดพา','อากาศอุ่นชื้นเคลื่อนบนผิวเย็น','5–15 kt','ได้ทั้งวันทั้งคืน ชายฝั่ง','เปลี่ยนทิศลม / มวลอากาศ'],
+  ['หมอกไอน้ำ','น้ำอุ่นระเหยเข้าอากาศเย็นจัด','เบา ๆ','เช้าตรู่หน้าหนาว เหนือแหล่งน้ำ','อากาศอุ่นขึ้นตอนสาย'],
+  ['หมอกลาดเขา','อากาศชื้นไต่เขาแล้วเย็นตัวเอง','พัดขึ้นเขาต่อเนื่อง','ตลอดเวลาที่ลมยังพัดขึ้น','ลมเปลี่ยนทิศ'],
+  ['หมอกจากฝน','ฝนอุ่นระเหยในอากาศเย็นด้านล่าง','เบา','ช่วงแนวปะทะอากาศอุ่นผ่าน','แนวปะทะเคลื่อนผ่านไป']
+];
+
+/* ============ วาดและอัปเดตแบบจำลอง ============ */
+function drawType(id){
+  const sim = SIM[id], v = FS[id];
+  const svg = document.querySelector('#sim-'+id);
+  if (!svg && !sim.canvas) return;
+  const f = (PLAY.id === id) ? PLAY.f : null;
+  const r = sim.calc(v, f);
+  if (sim.canvas) sim.render(v, r, f);
+  else svg.innerHTML = sim.draw(v, r, f);
+  sim.controls.forEach(c => {
+    const el = $(`v-${id}-${c.k}`);
+    if (el) el.textContent = ((c.k === 'peak' || c.k === 'radkm') ? fmt(v[c.k]) : v[c.k]) + c.u;
+  });
+  const vd = $(`vd-${id}`); if (!vd) return;
+  vd.className = 'verdict ' + ((r.fog || r.alert) ? 'sink' : 'rise');
+  $(`vh-${id}`).innerHTML = `${r.head} <span class="pill ${r.pill}">${r.tag}</span>`;
+  $(`vb-${id}`).innerHTML = r.body;
+  const bar = $(`bar-${id}`); if (bar) bar.innerHTML = `<span class="pill ${r.pill}">${r.tag}</span>`;
+}
+
+function simPanelHTML(t, infoHTML){
+  const sim = SIM[t.id], v = FS[t.id];
+  const ctrls = sim.controls.map(c => `
+        <div class="ctrl">
+          <div class="row"><span class="name">${c.name}</span><span class="val" id="v-${t.id}-${c.k}">${c.k==='peak'?fmt(v[c.k]):v[c.k]}${c.u}</span></div>
+          <input type="range" id="c-${t.id}-${c.k}" data-t="${t.id}" data-k="${c.k}" min="${c.min}" max="${c.max}" step="${c.step}" value="${v[c.k]}" aria-label="${c.name}">
+          ${c.hint ? `<span class="hint">${c.hint}</span>` : ''}
+        </div>`).join('');
+  return `
+      <div class="fogintro">
+        <div class="frow"><h3>${t.th}<small>${t.en}</small></h3><span class="pill ${t.code?'crit':''}">${t.code ? 'METAR: '+t.code : t.badge}</span></div>
+        <p class="flead">${t.lead}</p>
+      </div>
+
+      <div class="lab">
+        <div class="stage">
+          <div class="scroller"><svg id="sim-${t.id}" viewBox="0 0 ${SW} ${sim.H || SH}" role="img" aria-label="แผนภาพ${t.th}"></svg></div>
+          <div class="parcelbar">
+            <button class="go" id="play-${t.id}" data-play="${t.id}">▶ เล่นภาพ</button>
+            <span id="bar-${t.id}"></span>
+            <span style="flex:1 1 auto"></span>
+            <span class="hint" style="max-width:46ch">${sim.play || t.try}</span>
+          </div>
+        </div>
+        <aside class="panel">
+          <h2>ลองขยับดู</h2>
+          ${ctrls}
+          <div class="verdict" id="vd-${t.id}">
+            <div class="vhead" id="vh-${t.id}">—</div>
+            <div class="vbody" id="vb-${t.id}">—</div>
+          </div>
+          <p class="hint" style="margin:14px 0 0">${t.try}</p>
+        </aside>
+      </div>
+
+      ${infoHTML}`;
+}
+
+function wirePanel(pn){
+  pn.querySelectorAll('input[type=range]').forEach(inp => {
+    inp.addEventListener('input', e => {
+      FS[e.target.dataset.t][e.target.dataset.k] = Number(e.target.value);
+      drawType(e.target.dataset.t);
+    });
+  });
+  pn.querySelectorAll('[data-play]').forEach(b => {
+    b.addEventListener('click', () => togglePlay(b.dataset.play));
+  });
+}
+
+function renderFogTypes(){
+  FOG_TYPES.forEach(t => {
+    const pn = document.querySelector(`.fogpanel[data-panel="${t.id}"]`);
+    if (!pn) return;
+    const li = a => a.map(x => `<li>${x}</li>`).join('');
+    pn.innerHTML = simPanelHTML(t, `
+      <div class="fogcard">
+        <div class="foggrid">
+          <div><h4>เกิดเมื่อ</h4><ul>${li(t.form)}</ul></div>
+          <div><h4>สลายเมื่อ</h4><ul>${li(t.clear)}</ul></div>
+          <div><h4>สำหรับนักบิน</h4><ul>${li(t.pilot)}</ul></div>
+        </div>
+      </div>`);
+    wirePanel(pn);
+    drawType(t.id);
+  });
+
+  $('sumTable').innerHTML =
+    `<thead><tr><th>ชนิด</th><th>กลไก</th><th>ลมที่ต้องมี</th><th>เจอบ่อยตอนไหน</th><th>สลายเมื่อ</th></tr></thead><tbody>`
+    + SUMMARY.map(r => `<tr><th>${r[0]}</th><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td></tr>`).join('')
+    + `</tbody>`;
+}
+
+function renderCloudTypes(){
+  CLOUD_TYPES.forEach(t => {
+    const pn = document.querySelector(`.fogpanel[data-cpanel="${t.id}"]`);
+    if (!pn) return;
+    const li = a => a.map(x => `<li>${x}</li>`).join('');
+    pn.innerHTML = simPanelHTML(t, `
+      <div class="fogcard">
+        <div class="foggrid">
+          ${t.cols.map(c => `<div><h4>${c.h}</h4><ul>${li(c.li)}</ul></div>`).join('')}
+        </div>
+      </div>`);
+    wirePanel(pn);
+    drawType(t.id);
+  });
+}
+
+
+/* ============ แนวปะทะอากาศ ============ */
+const FW = 700, FH = 320, FGY = 262, STX = 500;
+const fyF = ft => FGY - clamp(ft/40000,0,1)*(FGY-34);
+const COLDC = () => TOK['--cold'], WARMC = () => TOK['--hot'], OCCC = '#7C5CD6';
+
+function frontDefs(key){
+  return `<defs>
+      <linearGradient id="dg_${key}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${mix(TOK['--sky-high'],'#0A1424',.3)}"/><stop offset="1" stop-color="${TOK['--sky-low']}"/>
+      </linearGradient>
+      <filter id="bl_${key}" x="-30%" y="-70%" width="160%" height="240%"><feGaussianBlur stdDeviation="4"/></filter>
+      <marker id="hot_${key}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M0,1 L9,5 L0,9 z" fill="${TOK['--hot']}"/></marker>
+      <marker id="cold_${key}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+        <path d="M0,1 L9,5 L0,9 z" fill="${TOK['--cold']}"/></marker>
+    </defs>
+    <rect x="0" y="0" width="${FW}" height="${FH}" fill="url(#dg_${key})"/>`;
+}
+function frontGround(){
+  let s = `<rect x="0" y="${FGY}" width="${FW}" height="${FH-FGY}" fill="${mix('#141A22',TOK['--hot'],.2)}"/>`;
+  [10000,20000,30000].forEach(ft => {
+    s += `<line x1="0" y1="${fyF(ft).toFixed(1)}" x2="${FW}" y2="${fyF(ft).toFixed(1)}" stroke="${TOK['--cloud']}" stroke-width="0.5" opacity="0.13"/>`;
+    s += `<text x="${FW-8}" y="${(fyF(ft)-3).toFixed(1)}" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="${TOK['--cloud']}" opacity="0.42">${fmt(ft)} ft</text>`;
+  });
+  return s;
+}
+function station(x, label){
+  return `<g><line x1="${x}" y1="${FGY}" x2="${x}" y2="${FGY-26}" stroke="${TOK['--cloud']}" stroke-width="2.4"/>
+    <path d="M${x},${FGY-26} l16,5 l-16,5 z" fill="${TOK['--cloud']}"/>
+    <circle cx="${x}" cy="${FGY}" r="4" fill="${TOK['--cloud']}"/>
+    <text x="${x}" y="${FGY+20}" text-anchor="middle" font-family="IBM Plex Sans Thai,sans-serif" font-size="11.5" font-weight="600" fill="#fff">${label||'สนามบินของเรา'}</text></g>`;
+}
+/* แถบเมฆเกาะไปตามผิวแนวปะทะ */
+function cloudAlong(fn, xa, xb, thick, key, op, seed){
+  const rnd = prng((seed||0)*13 + 3);
+  let s = `<g filter="url(#bl_${key})">`;
+  const stepx = 26;
+  for (let x = Math.min(xa,xb); x <= Math.max(xa,xb); x += stepx){
+    const y = fn(x);
+    if (y < 20 || y > FGY) continue;
+    const t = clamp(Math.abs(x - xa)/Math.max(1,Math.abs(xb-xa)), 0, 1);
+    const h = thick*(1-t*0.72) + 6;
+    s += puff(x, y - h*0.45, 26, h*0.6, TOK['--cloud'], (op||0.85)*(1-t*0.35));
+  }
+  return s + `</g>`;
+}
+function rainBand(x0, x1, yTop, dens, colr, f, seed){
+  const rnd = prng((seed||0)+61), sh = f !== null ? (f*20)%40 : 0;
+  let s = '';
+  for (let i=0;i<dens;i++){
+    const x = x0 + rnd()*(x1-x0), y0 = yTop + ((rnd()*40 + sh) % 40);
+    s += `<line x1="${x.toFixed(0)}" y1="${y0.toFixed(0)}" x2="${(x-5).toFixed(0)}" y2="${Math.min(FGY, y0+26).toFixed(0)}" stroke="${colr}" stroke-width="1.4" opacity="0.6"/>`;
+  }
+  return s;
+}
+
+Object.assign(FS, {
+  warm: {rh:75, speed:12, slope:200},
+  cold: {rh:75, speed:25, slope:70},
+  stat: {rh:80, wind:14, days:2},
+  occl: {rh:80, speed:20, dt:-6}
+});
+
+Object.assign(SIM, {
+
+/* ---------- แนวปะทะอากาศอุ่น ---------- */
+warm: {
+  H: FH, frames: 30,
+  controls:[
+    {k:'rh',    name:'ความชื้นของอากาศอุ่น', min:30, max:100, step:1, u:' %',
+     hint:'ยิ่งชื้น เมฆยิ่งหนาและฝนยิ่งกินพื้นที่กว้าง'},
+    {k:'speed', name:'ความเร็วที่แนวเคลื่อนที่', min:5, max:30, step:1, u:' kt',
+     hint:'แนวปะทะอากาศอุ่นเคลื่อนช้ากว่าแนวเย็นเสมอ'},
+    {k:'slope', name:'ความชันของแนว (1 ต่อ ...)', min:100, max:400, step:10, u:'',
+     hint:'ชันน้อยมาก — 1:200 แปลว่าไปข้างหน้า 200 ไมล์ ถึงจะสูงขึ้น 1 ไมล์'}
+  ],
+  play:'กด ▶ ดูแนวปะทะเคลื่อนผ่านสนามบิน — สังเกตลำดับเมฆที่มาก่อน',
+  calc(v, f){
+    const reach = 200*(v.slope/200);
+    const xf = f === null ? 250 : 90 + (620-90)*(f/(SIM.warm.frames-1));
+    const d = STX - xf;
+    const lead = Math.round(d*1.5);
+    let ph, wx, pill;
+    if (d > reach*1.5){ ph='ยังอยู่ไกล'; pill='good'; wx=`ท้องฟ้าโปร่ง เริ่มเห็น <b>เซอร์รัส (Ci)</b> ริ้วบาง ๆ ทางขอบฟ้า · ความกดอากาศเริ่มลด · แนวยังอยู่ห่างราว <b>${fmt(lead)} ไมล์</b>`; }
+    else if (d > reach*0.85){ ph='เมฆชั้นสูงเข้ามา'; pill='good'; wx='<b>เซอร์โรสเตรตัส (Cs)</b> คลุมทั่วฟ้า เห็นดวงอาทิตย์เป็นวงแหวน (halo) · ความกดอากาศลดต่อเนื่อง · ยังบิน VFR ได้'; }
+    else if (d > reach*0.35){ ph='เพดานเมฆเริ่มลด'; pill='warn'; wx='<b>อัลโตสเตรตัส (As)</b> ฟ้าเป็นสีเทาทึบ ดวงอาทิตย์เหมือนมองผ่านกระจกฝ้า · เพดานลดลงเรื่อย ๆ · เริ่มมีฝนละออง'; }
+    else if (d > 0){ ph='ฝนพรำเต็มที่'; pill='crit'; wx='<b>นิมโบสเตรตัส (Ns)</b> เพดานต่ำ ฝนพรำต่อเนื่อง ทัศนวิสัยแย่ · อาจมีหมอกจากฝนที่ผิวพื้น · ระวัง icing ถ้าอุณหภูมิใกล้ 0 °C'; }
+    else { ph='ผ่านไปแล้ว — อยู่ในอากาศอุ่น'; pill='good'; wx='ฝนหยุด เพดานยกขึ้น <b>อุณหภูมิสูงขึ้นชัดเจน</b> · ลมเปลี่ยนทิศตามเข็มนาฬิกา (veer) · ความกดอากาศหยุดลดแล้วนิ่ง · อาจเหลือ stratus หรือหมอกในอากาศอุ่นชื้น'; }
+    const width = Math.round(reach*1.5*1.5);
+    return {alert: pill==='crit'?1:0, xf, reach, pill, tag:ph, head:`สนามบิน: ${ph}`,
+      body:`${wx}<br><span style="opacity:.75">แนวเคลื่อนที่ ${v.speed} kt · ความชัน 1:${v.slope} · เมฆกินพื้นที่ล่วงหน้าราว <b>${fmt(width)} ไมล์</b></span>`};
+  },
+  draw(v, r, f){
+    const key='warm', c=TOK['--cloud'];
+    const yTop = fyF(26000), surf = x => x <= r.xf ? FGY : Math.max(yTop, FGY - (x-r.xf)/(r.reach*1.6)*(FGY-yTop));
+    let s = frontDefs(key);
+    s += `<rect x="0" y="0" width="${FW}" height="${FGY}" fill="${mix(TOK['--hot'],TOK['--sky-low'],.6)}" opacity="0.28"/>`;
+    /* อากาศเย็นเป็นลิ่มอยู่ข้างหน้า (ขวา) */
+    let d = `M${r.xf},${FGY}`;
+    for (let x=r.xf; x<=FW; x+=14) d += ` L${x.toFixed(0)},${surf(x).toFixed(1)}`;
+    d += ` L${FW},${FGY} Z`;
+    s += `<path d="${d}" fill="${mix(TOK['--cold'],'#0B121A',.45)}" opacity="0.8"/>`;
+    s += cloudAlong(surf, r.xf, Math.min(FW, r.xf + r.reach*1.7), 34*(0.45+v.rh/140), key, 0.88, 1);
+    s += rainBand(Math.max(0,r.xf-10), Math.min(FW, r.xf + r.reach*0.5), FGY-70, Math.round(v.rh/2), TOK['--cold'], f, 2);
+    /* เส้นแนวปะทะ */
+    let fl = `M${r.xf},${FGY}`;
+    for (let x=r.xf; x<=FW; x+=14) fl += ` L${x.toFixed(0)},${surf(x).toFixed(1)}`;
+    s += `<path d="${fl}" stroke="${WARMC()}" stroke-width="2.6" fill="none"/>`;
+    s += frontGround();
+    s += `<circle cx="${r.xf}" cy="${FGY}" r="6" fill="${WARMC()}"/>`;
+    s += station(STX);
+    s += lbl(24, FGY-16, 'อากาศอุ่น (ไล่ขึ้นบนลิ่มอากาศเย็น)', WARMC(), 'start', 12.5);
+    s += lbl(FW-20, FGY-14, 'อากาศเย็นที่อยู่ข้างหน้า', c, 'end', 12.5);
+    [['Ns',0.12],['As',0.5],['Cs',1.0],['Ci',1.5]].forEach(([nm,k]) => {
+      const x = r.xf + r.reach*1.6*k;
+      if (x < FW-30 && x > 20) s += lbl(x, Math.max(26, surf(x)-24), nm, c, 'middle', 12);
+    });
+    s += tag(24, 34, `แนวปะทะอากาศอุ่น · ${v.speed} kt`, TOK['--ink'], 'start');
+    return s;
+  }
+},
+
+/* ---------- แนวปะทะอากาศเย็น ---------- */
+cold: {
+  H: FH, frames: 30,
+  controls:[
+    {k:'rh',    name:'ความชื้นของอากาศอุ่นด้านหน้า', min:30, max:100, step:1, u:' %',
+     hint:'ชื้นมาก + แนวเร็ว = แนวพายุฝนฟ้าคะนอง (squall line)'},
+    {k:'speed', name:'ความเร็วที่แนวเคลื่อนที่', min:10, max:45, step:1, u:' kt',
+     hint:'เร็วกว่าแนวอุ่นราวสองเท่า จึงไล่ทันจนเกิดแนวปะทะปิดได้'},
+    {k:'slope', name:'ความชันของแนว (1 ต่อ ...)', min:40, max:150, step:5, u:'',
+     hint:'ชันกว่าแนวอุ่นมาก อากาศอุ่นจึงถูกดันขึ้นเร็วและรุนแรง'}
+  ],
+  play:'กด ▶ ดูแนวเย็นกวาดผ่านสนามบิน — มาไวไปไว แต่รุนแรง',
+  calc(v, f){
+    const squall = v.rh > 70 && v.speed > 28;
+    const xf = f === null ? 420 : 90 + (620-90)*(f/(SIM.cold.frames-1));
+    const d = STX - xf;
+    let ph, wx, pill;
+    if (d > 190){ ph='ยังไม่ถึง'; pill='good'; wx=`อากาศอุ่นชื้น ลมทิศใต้ อาจมีเมฆ Cu กระจาย · ความกดอากาศลดช้า ๆ · แนวยังห่างราว <b>${fmt(Math.round(d*1.2))} ไมล์</b>`; }
+    else if (d > 70){ ph='เห็นแนวเมฆข้างหน้า'; pill='warn'; wx=`เห็นกำแพงเมฆ <b>คิวมูโลนิมบัส</b> ตั้งชันขึ้นทางขอบฟ้า${squall?' · ก่อตัวเป็น <b>squall line</b> นำหน้าแนวจริงราว 50–100 ไมล์':''} · ลมเริ่มกระโชก`; }
+    else if (d > -40){ ph='แนวกำลังผ่าน'; pill='crit'; wx='<b>ช่วงที่รุนแรงที่สุด</b> — ฝนหนักช่วงสั้น ๆ ฟ้าคะนอง ลมกระโชกเปลี่ยนทิศกะทันหัน <b>wind shear</b> ความกดอากาศดิ่งลงแล้วเด้งขึ้นทันที · อาจมีลูกเห็บ'; }
+    else { ph='ผ่านไปแล้ว'; pill='good'; wx='<b>อุณหภูมิลดฮวบ ลมเปลี่ยนเป็นทิศเหนือ–ตะวันตก</b> ความกดอากาศขึ้นเร็ว · ฟ้าเปิด ทัศนวิสัยดีมาก เหลือ Cu กระจาย · แต่อากาศไม่เสถียร คาดว่าจะกระเพื่อมตอนบินต่ำ'; }
+    return {alert: pill==='crit'?1:0, xf, squall, pill, tag:ph, head:`สนามบิน: ${ph}`,
+      body:`${wx}<br><span style="opacity:.75">แนวเคลื่อนที่ ${v.speed} kt · ความชัน 1:${v.slope} · แถบฝนกว้างแค่ราว <b>${fmt(Math.round(30+v.rh))} ไมล์</b> ต่างจากแนวอุ่นที่กว้างหลายร้อยไมล์</span>`};
+  },
+  draw(v, r, f){
+    const key='cold', c=TOK['--cloud'];
+    const steep = 150*(v.slope/70);
+    const yTop = fyF(13000), surf = x => x >= r.xf ? FGY : Math.max(yTop, FGY - (r.xf-x)/steep*(FGY-yTop));
+    let s = frontDefs(key);
+    s += `<rect x="0" y="0" width="${FW}" height="${FGY}" fill="${mix(TOK['--hot'],TOK['--sky-low'],.6)}" opacity="0.28"/>`;
+    let d = `M${r.xf},${FGY}`;
+    for (let x=r.xf; x>=0; x-=14) d += ` L${x.toFixed(0)},${surf(x).toFixed(1)}`;
+    d += ` L0,${FGY} Z`;
+    s += `<path d="${d}" fill="${mix(TOK['--cold'],'#0B121A',.45)}" opacity="0.82"/>`;
+    /* เมฆก้อนสูงตรงแนว */
+    const top = fyF(clamp(16000 + v.rh*220 + v.speed*180, 16000, 40000));
+    const cb = `<g filter="url(#bl_${key})">`;
+    let g = cb;
+    const steps = Math.max(4, Math.round((FGY-60-top)/18));
+    for (let i=0;i<steps;i++){
+      const t = i/steps, yy = FGY-60 - (FGY-60-top)*t;
+      g += puff(r.xf + 10 + t*40, yy, 74*(1-t*0.3), 20, c, 0.9);
+    }
+    g += puff(r.xf + 66, top + 14, 150, 20, c, 0.9);
+    s += g + `</g>`;
+    if (r.squall){
+      s += `<g filter="url(#bl_${key})">${puff(r.xf+150, FGY-110, 60, 46, c, 0.8)}</g>`;
+      s += lbl(r.xf+150, FGY-166, 'squall line', TOK['--hot'], 'middle', 12);
+    }
+    s += rainBand(r.xf-20, r.xf + 80, FGY-80, Math.round(v.rh/1.4), TOK['--cold'], f, 4);
+    let fl = `M${r.xf},${FGY}`;
+    for (let x=r.xf; x>=0; x-=14) fl += ` L${x.toFixed(0)},${surf(x).toFixed(1)}`;
+    s += `<path d="${fl}" stroke="${COLDC()}" stroke-width="2.8" fill="none"/>`;
+    s += frontGround();
+    s += `<circle cx="${r.xf}" cy="${FGY}" r="6" fill="${COLDC()}"/>`;
+    s += `<path d="M${r.xf+14},${FGY-14} L${r.xf+64},${FGY-14}" stroke="${COLDC()}" stroke-width="2.6" marker-end="url(#cold_${key})"/>`;
+    s += station(STX);
+    s += lbl(24, FGY-16, 'อากาศเย็นหนาแน่นดันเข้ามาใต้อากาศอุ่น', c, 'start', 12.5);
+    s += lbl(FW-20, FGY-14, 'อากาศอุ่นชื้นที่ถูกดันขึ้น', WARMC(), 'end', 12.5);
+    s += tag(24, 34, `แนวปะทะอากาศเย็น · ${v.speed} kt`, TOK['--ink'], 'start');
+    return s;
+  }
+},
+
+/* ---------- แนวปะทะคงที่ ---------- */
+stat: {
+  H: FH, frames: 24,
+  controls:[
+    {k:'rh',   name:'ความชื้นของอากาศอุ่น', min:30, max:100, step:1, u:' %'},
+    {k:'wind', name:'ความเร็วลมที่พัดขนานแนว', min:0, max:30, step:1, u:' kt',
+     hint:'ลมสองฝั่งพัดสวนกันขนานแนว ไม่มีฝ่ายไหนดันอีกฝ่ายได้'},
+    {k:'days', name:'ค้างอยู่มาแล้ว', min:0, max:5, step:1, u:' วัน',
+     hint:'ยิ่งค้างนาน ยิ่งสะสมฝนและปัญหาน้ำท่วม'}
+  ],
+  play:'กด ▶ จะเห็นว่าแนวแทบไม่ขยับ — ฝนตกซ้ำที่เดิมทั้งวัน',
+  calc(v, f){
+    const xf = 330 + (f === null ? 0 : Math.sin(f/3)*14);
+    const pill = v.days >= 3 ? 'crit' : v.rh > 70 ? 'warn' : 'good';
+    return {alert: v.days>=3?1:0, xf, pill,
+      tag: v.days >= 3 ? `ค้างมา ${v.days} วัน` : 'แนวไม่ขยับ',
+      head:'แนวปะทะคงที่ (Stationary Front)',
+      body:`ลมสองฝั่งพัด <b>ขนานไปกับแนว</b> คนละทิศด้วยความเร็วใกล้เคียงกัน (${v.wind} kt) ไม่มีฝ่ายไหนดันอีกฝ่ายถอยได้ แนวจึงค้างอยู่กับที่<br>
+      สภาพอากาศเหมือนแนวปะทะอากาศอุ่นแบบยืดเวลา — <b>As และ Ns ค้างอยู่หลายวัน ฝนพรำต่อเนื่อง เพดานต่ำ</b> ทัศนวิสัยแย่ยาว ๆ
+      ${v.days>=3?'<br><b>ค้างมา '+v.days+' วันแล้ว</b> — พื้นที่ใต้แนวสะสมฝนจนน้ำท่วมได้ และสนามบินในแนวนี้แทบไม่เปิดเลย':''}
+      <br><span style="opacity:.75">พอฝ่ายใดฝ่ายหนึ่งแรงขึ้น มันจะกลายเป็นแนวอุ่นหรือแนวเย็นทันที</span>`};
+  },
+  draw(v, r, f){
+    const key='stat', c=TOK['--cloud'];
+    const yTop = fyF(24000), surf = x => x <= r.xf ? FGY : Math.max(yTop, FGY - (x-r.xf)/260*(FGY-yTop));
+    let s = frontDefs(key);
+    let d = `M${r.xf},${FGY}`;
+    for (let x=r.xf; x<=FW; x+=14) d += ` L${x.toFixed(0)},${surf(x).toFixed(1)}`;
+    d += ` L${FW},${FGY} Z`;
+    s += `<rect x="0" y="0" width="${FW}" height="${FGY}" fill="${mix(TOK['--hot'],TOK['--sky-low'],.6)}" opacity="0.26"/>`;
+    s += `<path d="${d}" fill="${mix(TOK['--cold'],'#0B121A',.45)}" opacity="0.8"/>`;
+    s += cloudAlong(surf, r.xf, Math.min(FW, r.xf + 300), 40*(0.5+v.rh/150), key, 0.9, f===null?1:f);
+    s += rainBand(r.xf-40, r.xf + 190, FGY-70, Math.round(v.rh/1.6), TOK['--cold'], f, 6);
+    let fl = `M${r.xf},${FGY}`;
+    for (let x=r.xf; x<=FW; x+=14) fl += ` L${x.toFixed(0)},${surf(x).toFixed(1)}`;
+    s += `<path d="${fl}" stroke="${OCCC}" stroke-width="2.6" fill="none" stroke-dasharray="10 6"/>`;
+    s += frontGround();
+    s += `<circle cx="${r.xf}" cy="${FGY}" r="6" fill="${OCCC}"/>`;
+    /* ลมขนานแนว: ฝั่งหนึ่งเข้าหน้ากระดาษ อีกฝั่งออก */
+    s += windArrow(r.xf-190, FGY-32, v.wind, key, WARMC(), 1, f===null?0:(f*5)%13);
+    s += windArrow(r.xf+270, FGY-32, v.wind, key, TOK['--cloud'], -1, f===null?0:-(f*5)%13);
+    s += station(STX);
+    s += lbl(24, FGY-56, 'อากาศอุ่น', WARMC(), 'start', 12.5);
+    s += lbl(FW-20, FGY-14, 'อากาศเย็น', c, 'end', 12.5);
+    s += tag(24, 34, `แนวปะทะคงที่ · ค้างมา ${v.days} วัน`, TOK['--ink'], 'start');
+    return s;
+  }
+},
+
+/* ---------- แนวปะทะปิด ---------- */
+occl: {
+  H: FH, frames: 34,
+  controls:[
+    {k:'rh',    name:'ความชื้นของอากาศอุ่นที่ถูกยก', min:30, max:100, step:1, u:' %'},
+    {k:'speed', name:'ความเร็วของแนวเย็นที่ไล่ตาม', min:10, max:45, step:1, u:' kt',
+     hint:'แนวเย็นเร็วกว่าแนวอุ่นราวสองเท่า พอไล่ทันก็ยกอากาศอุ่นขึ้นพ้นพื้นทั้งก้อน'},
+    {k:'dt',    name:'อากาศด้านหลังเทียบด้านหน้า', min:-10, max:10, step:0.5, u:' °C',
+     hint:'ติดลบ = ด้านหลังเย็นกว่า จะมุดลงใต้ (cold occlusion) · เป็นบวก = ด้านหลังอุ่นกว่า จะไต่ขึ้นบน (warm occlusion)'}
+  ],
+  play:'กด ▶ ดูแนวเย็นไล่ทัน แล้วมวลอากาศสองก้อนซ้อนทับกัน',
+  calc(v, f){
+    const T0 = 0.42;
+    const t = f === null ? 0.78 : f/(SIM.occl.frames-1);
+    const kind = v.dt < 0 ? 'cold' : 'warm';
+    const closed = t >= T0;
+    const xc = 90 + 650*t;
+    const xw = 300 + 150*t;
+    const xo = closed ? 363 + 210*(t-T0)/(1-T0) : xw;
+    const lift = closed ? (t-T0)/(1-T0) : 0;
+    const gap = Math.max(0, xw - xc);
+    let head, body, tagT, pill;
+    if (!closed){
+      tagT='กำลังไล่ทัน'; pill='warn'; head='แนวเย็นกำลังไล่ตามแนวอุ่น';
+      body = `แนวเย็นวิ่ง <b>${v.speed} kt</b> เร็วกว่าแนวอุ่นราวสองเท่า ช่องอากาศอุ่นที่ผิวพื้น (warm sector) เหลือกว้างอีก <b>${fmt(Math.round(gap*1.4))} ไมล์</b> เท่านั้น<br>ตอนนี้ยังเห็นสภาพอากาศแยกกันสองชุด — ฝนพรำจากแนวอุ่นข้างหน้า และ Cb จากแนวเย็นข้างหลัง`;
+    } else if (kind === 'cold'){
+      tagT='ปิดแบบเย็น · มุดลงใต้'; pill='crit'; head='Cold occlusion — อากาศด้านหลังมุดลงใต้';
+      body = `อากาศด้านหลัง <b>เย็นกว่าด้านหน้า ${Math.abs(v.dt).toFixed(1)} °C</b> จึงหนักกว่า มันเลย <b>มุดเข้าไปใต้</b>อากาศเย็นด้านหน้า แล้วยกทั้งอากาศเย็นด้านหน้าและอากาศอุ่นให้ลอยขึ้นไปซ้อนกันอยู่ข้างบน<br>
+      ตอนนี้อากาศอุ่นถูกยกขึ้นไปแล้ว <b>${fmt(Math.round(lift*16000/500)*500)} ฟุต</b> — จุดที่มวลอากาศสามก้อนมาเจอกันเรียกว่า <b>triple point</b> และมันไต่สูงขึ้นเรื่อย ๆ<br>
+      <b>สภาพอากาศ:</b> Ns ฝนพรำกว้างแบบแนวอุ่น <b>บวก Cb ฝังใน</b>แบบแนวเย็น ฝนตกทั้งสองฝั่ง · เป็นแบบที่พบบ่อยที่สุดในแผ่นดิน`;
+    } else {
+      tagT='ปิดแบบอุ่น · ไต่ขึ้นบน'; pill='crit'; head='Warm occlusion — อากาศด้านหลังไต่ขึ้นบน';
+      body = `อากาศด้านหลัง <b>อุ่นกว่าด้านหน้า ${v.dt.toFixed(1)} °C</b> จึงเบากว่า มันมุดลงใต้ไม่ได้ ต้อง <b>ไต่ขึ้นไปซ้อนอยู่บน</b>อากาศเย็นจัดที่อยู่ข้างหน้าแทน<br>
+      อากาศอุ่นเดิมถูกดันขึ้นไปอีกชั้นหนึ่ง สูงราว <b>${fmt(Math.round(lift*16000/500)*500)} ฟุต</b> — กลายเป็นสามชั้นซ้อนกัน<br>
+      <b>สภาพอากาศ:</b> คล้ายแบบเย็นแต่ฝนหนักเยื้องไปทางด้านหลังของแนวมากกว่า · พบแถบชายฝั่งตะวันตกในฤดูหนาว ที่อากาศจากทะเลอุ่นกว่าอากาศในแผ่นดิน`;
+    }
+    return {alert:1, xc, xw, xo, t, lift, kind, closed, pill, tag:tagT, head, body};
+  },
+  draw(v, r, f){
+    const key='occl', c=TOK['--cloud'], on = f !== null;
+    const SC = 1.15, SW_ = 3.0;                       /* px แนวราบ ต่อ px แนวสูง */
+    const yG = FGY;
+    const coldCol = mix(TOK['--cold'],'#050A12',.55);
+    const coolCol = mix(TOK['--cold'],'#0B121A',.18);
+    const warmCol = mix(TOK['--hot'],TOK['--sky-low'],.55);
+    let s = frontDefs(key);
+    s += `<rect x="0" y="0" width="${FW}" height="${yG}" fill="${warmCol}" opacity="0.34"/>`;
+
+    const clampY = y => Math.max(24, y);
+    const upLeft  = (x0) => { const y = clampY(yG - x0/SC); return {x:0, y}; };
+    const upRight = (x0) => { const y = clampY(yG - (FW-x0)/SW_); return {x:FW, y}; };
+
+    if (!r.closed){
+      /* --- ยังไม่ปิด: สองแนวแยกกัน มี warm sector คั่นกลาง --- */
+      const a = upLeft(r.xc);
+      s += `<path d="M0,${yG} L${r.xc},${yG} L${a.x},${a.y} L0,${a.y} Z" fill="${coldCol}" opacity="0.9"/>`;
+      const b = upRight(r.xw);
+      s += `<path d="M${r.xw},${yG} L${b.x},${b.y} L${FW},${yG} Z" fill="${coolCol}" opacity="0.85"/>`;
+      s += `<path d="M${r.xc},${yG} L${a.x},${a.y}" stroke="${COLDC()}" stroke-width="2.6" fill="none"/>`;
+      s += `<path d="M${r.xw},${yG} L${b.x},${b.y}" stroke="${WARMC()}" stroke-width="2.6" fill="none"/>`;
+      s += cloudAlong(x => Math.max(24, yG - (x-r.xw)/SW_), r.xw, Math.min(FW, r.xw+300), 30*(0.5+v.rh/150), key, 0.86, 7);
+      const top = fyF(clamp(18000 + v.rh*140, 18000, 36000));
+      let g = `<g filter="url(#bl_${key})">`;
+      const st = Math.max(4, Math.round((yG-70-top)/18));
+      for (let i=0;i<st;i++){ const t2=i/st; g += puff(r.xc + 8 + t2*26, yG-70-(yG-70-top)*t2, 64*(1-t2*0.28), 20, c, 0.9); }
+      g += puff(r.xc + 56, top + 14, 130, 20, c, 0.9);
+      s += g + `</g>`;
+      s += rainBand(r.xc-40, r.xc+40, yG-70, Math.round(v.rh/2), TOK['--cold'], f, 8);
+      s += rainBand(r.xw, r.xw+180, yG-64, Math.round(v.rh/3), TOK['--cold'], f, 9);
+      s += `<circle cx="${r.xc}" cy="${yG}" r="6" fill="${COLDC()}"/>`;
+      s += `<circle cx="${r.xw}" cy="${yG}" r="6" fill="${WARMC()}"/>`;
+      s += `<path d="M${(r.xc+r.xw)/2 - 40},${yG-22} L${(r.xc+r.xw)/2 + 40},${yG-22}" stroke="${WARMC()}" stroke-width="2" stroke-dasharray="4 4"/>`;
+      s += lbl((r.xc+r.xw)/2, yG-30, 'warm sector', WARMC(), 'middle', 12);
+      s += lbl(24, yG-16, 'อากาศเย็นด้านหลัง', c, 'start', 12.5);
+      s += lbl(FW-20, yG-14, 'อากาศเย็นด้านหน้า', c, 'end', 12.5);
+    } else if (r.kind === 'cold'){
+      /* --- ปิดแบบเย็น: ก้อนหลังมุดลงใต้ ก้อนหน้าถูกยกไปซ้อนอยู่บน --- */
+      const hTP = Math.min(r.lift*150, Math.max(24, (r.xo-80)/SC));   /* px สูงของ triple point */
+      const xTP = r.xo - hTP*SC, yTP = yG - hTP;
+      const a = upLeft(r.xo);
+      s += `<path d="M0,${yG} L${r.xo},${yG} L${a.x},${a.y} L0,${a.y} Z" fill="${coldCol}" opacity="0.92"/>`;
+      const b = upRight(xTP + (yG-yTP)*0);
+      const yR = clampY(yTP - (FW-xTP)/SW_);
+      s += `<path d="M${r.xo},${yG} L${xTP.toFixed(1)},${yTP.toFixed(1)} L${FW},${yR.toFixed(1)} L${FW},${yG} Z" fill="${coolCol}" opacity="0.88"/>`;
+      s += `<path d="M${r.xo},${yG} L${a.x},${a.y}" stroke="${COLDC()}" stroke-width="2.6" fill="none"/>`;
+      s += `<path d="M${xTP.toFixed(1)},${yTP.toFixed(1)} L${FW},${yR.toFixed(1)}" stroke="${WARMC()}" stroke-width="2.4" stroke-dasharray="7 5" fill="none"/>`;
+      s += `<circle cx="${xTP.toFixed(1)}" cy="${yTP.toFixed(1)}" r="5" fill="${OCCC}"/>`;
+      s += lbl(xTP-10, yTP-10, 'triple point', OCCC, 'end', 11.5);
+      s += `<path d="M${r.xo-150},${yG-12} L${r.xo-40},${yG-12}" stroke="${COLDC()}" stroke-width="2.8" marker-end="url(#cold_${key})"/>`;
+      s += lbl(r.xo-156, yG-8, 'มุดลงใต้', COLDC(), 'end', 12);
+      s += `<path d="M${r.xo+30},${yG-30} L${(xTP+90).toFixed(0)},${(yTP-30).toFixed(0)}" stroke="${TOK['--cloud']}" stroke-width="2.4" marker-end="url(#cl_${key})" opacity="0.9"/>`;
+      s += lbl(r.xo+40, yG-42, 'ก้อนหน้าถูกยกขึ้นไปซ้อนอยู่บน', TOK['--cloud'], 'start', 12);
+      s += lbl(24, yG-16, 'เย็นจัด (ด้านหลัง)', c, 'start', 12.5);
+      s += lbl(FW-20, yG-14, 'เย็น (ด้านหน้า)', c, 'end', 12.5);
+    } else {
+      /* --- ปิดแบบอุ่น: ก้อนหลังไต่ขึ้นไปซ้อนอยู่บนก้อนหน้า --- */
+      const hTP = Math.min(r.lift*150, Math.max(24, (FW-95 - r.xo)/SW_));
+      const xTP = r.xo + hTP*SW_, yTP = yG - hTP;
+      const yR = clampY(yG - (FW-r.xo)/SW_);
+      s += `<path d="M${r.xo},${yG} L${FW},${yR.toFixed(1)} L${FW},${yG} Z" fill="${coldCol}" opacity="0.92"/>`;
+      const aL = clampY(yTP - xTP/SC);
+      s += `<path d="M0,${yG} L${r.xo},${yG} L${xTP.toFixed(1)},${yTP.toFixed(1)} L0,${aL.toFixed(1)} Z" fill="${coolCol}" opacity="0.88"/>`;
+      s += `<path d="M${r.xo},${yG} L${FW},${yR.toFixed(1)}" stroke="${WARMC()}" stroke-width="2.6" fill="none"/>`;
+      s += `<path d="M${xTP.toFixed(1)},${yTP.toFixed(1)} L0,${aL.toFixed(1)}" stroke="${COLDC()}" stroke-width="2.4" stroke-dasharray="7 5" fill="none"/>`;
+      s += `<circle cx="${xTP.toFixed(1)}" cy="${yTP.toFixed(1)}" r="5" fill="${OCCC}"/>`;
+      s += lbl(xTP+10, yTP-10, 'triple point', OCCC, 'start', 11.5);
+      s += `<path d="M${r.xo-160},${yG-24} L${(r.xo-30).toFixed(0)},${(yG-70).toFixed(0)}" stroke="${TOK['--cloud']}" stroke-width="2.6" marker-end="url(#cl_${key})"/>`;
+      s += lbl(r.xo-166, yG-30, 'ก้อนหลังไต่ขึ้นบน', TOK['--cloud'], 'end', 12);
+      s += lbl(24, yG-16, 'อุ่นกว่า (ด้านหลัง)', WARMC(), 'start', 12.5);
+      s += lbl(FW-20, yG-14, 'เย็นจัด (ด้านหน้า)', c, 'end', 12.5);
+    }
+
+    if (r.closed){
+      const top = fyF(clamp(18000 + v.rh*160, 18000, 38000));
+      let g = `<g filter="url(#bl_${key})">`;
+      const st = Math.max(4, Math.round((yG-80-top)/18));
+      for (let i=0;i<st;i++){ const t2=i/st; g += puff(r.xo + 4 + t2*26, yG-80-(yG-80-top)*t2, 76*(1-t2*0.24), 21, c, 0.9); }
+      g += puff(r.xo + 56, top + 14, 150, 20, c, 0.9);
+      s += g + `</g>`;
+      s += rainBand(r.xo-80, r.xo+70, yG-84, Math.round(v.rh/1.5), TOK['--cold'], f, 8);
+      s += rainBand(r.xo+70, r.xo+240, yG-70, Math.round(v.rh/2.6), TOK['--cold'], f, 9);
+      s += lbl(r.xo + (r.kind==='cold' ? 150 : -90), fyF(24000), 'อากาศอุ่นถูกยกขึ้นไปข้างบนสุด', WARMC(), 'middle', 12);
+      s += `<circle cx="${r.xo}" cy="${yG}" r="6.5" fill="${OCCC}"/>`;
+    }
+    s += frontGround();
+    s += station(STX);
+    s += tag(24, 34, r.closed ? (r.kind==='cold' ? 'ปิดแบบเย็น — ก้อนหลังมุดลงใต้' : 'ปิดแบบอุ่น — ก้อนหลังไต่ขึ้นบน') : 'warm sector กำลังแคบลง', TOK['--ink'], 'start');
+    return s;
+  }
+}
+});
+
+const FRONT_TYPES = [
+  {id:'warm', th:'แนวปะทะอากาศอุ่น', en:'Warm Front', badge:'เคลื่อนช้า · เตือนล่วงหน้านาน',
+   lead:'อากาศอุ่นเคลื่อนเข้าไปแทนที่อากาศเย็น แต่ดันอากาศเย็นไม่ลง เลยต้องไต่ขึ้นไปบนลิ่มอากาศเย็นแทน ความชันน้อยมาก (1:200) เมฆจึงกินพื้นที่ล่วงหน้าหลายร้อยไมล์ — เป็นแนวเดียวที่บอกล่วงหน้าได้เป็นวัน',
+   cols:[
+     {h:'ก่อนแนวผ่าน', li:['ลำดับเมฆที่ต้องจำ: <b>Ci → Cs → As → Ns</b>','เห็น halo รอบดวงอาทิตย์ = Cs กำลังคลุม','เพดานลดลงเรื่อย ๆ ฝนพรำเริ่มมา','ความกดอากาศลดลงต่อเนื่อง','ระวัง <b>หมอกจากฝน</b> และ icing']},
+     {h:'ขณะผ่าน', li:['ฝนพรำต่อเนื่อง ทัศนวิสัยแย่','เพดานต่ำสุด อาจต่ำกว่า minima','ลมเริ่มเปลี่ยนทิศตามเข็มนาฬิกา','ความกดอากาศหยุดลด']},
+     {h:'หลังผ่าน', li:['<b>อุณหภูมิและจุดน้ำค้างสูงขึ้นชัดเจน</b>','ฝนหยุด เพดานยกขึ้น','ลมเปลี่ยนเป็นทิศใต้ (ซีกโลกเหนือ)','อาจเหลือ stratus หรือหมอกในอากาศอุ่นชื้น']}
+   ],
+   try:'ลองลดความชันลง (ตัวเลขน้อย = ชันขึ้น) แล้วดูว่าแถบเมฆหดสั้นลงยังไง'},
+
+  {id:'cold', th:'แนวปะทะอากาศเย็น', en:'Cold Front', badge:'เคลื่อนเร็ว · รุนแรงช่วงสั้น',
+   lead:'อากาศเย็นหนาแน่นดันมุดเข้าใต้อากาศอุ่นแล้วยกมันขึ้นอย่างรวดเร็ว ความชันสูง (1:70) อากาศอุ่นจึงพุ่งขึ้นแรงจนเกิด Cb — แถบฝนแคบแต่รุนแรง มาไวไปไว และหลังผ่านไปทัศนวิสัยดีที่สุดในรอบสัปดาห์',
+   cols:[
+     {h:'ก่อนแนวผ่าน', li:['อากาศอุ่นชื้น อึดอัด ลมทิศใต้','เห็นกำแพงเมฆ Cb ตั้งชันทางขอบฟ้า','ถ้าชื้นมากและแนวเร็ว จะมี <b>squall line</b> นำหน้า 50–100 ไมล์','ความกดอากาศลดเร็วช่วงใกล้แนว']},
+     {h:'ขณะผ่าน', li:['<b>ฝนหนัก ฟ้าคะนอง อาจมีลูกเห็บ</b>','ลมกระโชกและ <b>เปลี่ยนทิศกะทันหัน</b> — wind shear ที่ระดับต่ำ','ทัศนวิสัยตกฮวบชั่วคราว','ความกดอากาศดิ่งแล้วเด้งขึ้นทันทีที่แนวผ่าน']},
+     {h:'หลังผ่าน', li:['<b>อุณหภูมิลดฮวบ ความกดอากาศขึ้นเร็ว</b>','ลมเปลี่ยนเป็นทิศเหนือ–ตะวันตก','ฟ้าเปิด ทัศนวิสัยดีมาก เหลือ Cu กระจาย','อากาศไม่เสถียร คาดว่าจะกระเพื่อมตอนบินต่ำ']}
+   ],
+   try:'ตั้งความชื้น 85% แล้วดันความเร็วขึ้นเกิน 28 kt — จะเห็น squall line โผล่มานำหน้าแนว'},
+
+  {id:'stat', th:'แนวปะทะคงที่', en:'Stationary Front', badge:'ไม่ขยับ · ยืดเยื้อ',
+   lead:'ลมทั้งสองฝั่งพัดขนานไปกับแนวคนละทิศด้วยกำลังพอ ๆ กัน ไม่มีใครดันใครได้ แนวจึงค้างอยู่กับที่เป็นวัน ๆ สภาพอากาศคล้ายแนวปะทะอากาศอุ่นแต่ยืดเวลาออกไป',
+   cols:[
+     {h:'ลักษณะเด่น', li:['สัญลักษณ์บนแผนที่มีทั้งสามเหลี่ยมและครึ่งวงกลม <b>สลับข้างกัน</b>','เมฆ As และ Ns ค้างที่เดิม','ฝนพรำต่อเนื่องหลายวัน','พื้นที่ใต้แนวเสี่ยงน้ำท่วม']},
+     {h:'ผลต่อการบิน', li:['สนามบินในแนวอาจปิดต่อเนื่องหลายวัน','ต้องวางแผน alternate ที่อยู่ไกลจากแนวจริง ๆ','พยากรณ์ยากว่าจะดีขึ้นเมื่อไหร่','ระวัง icing ถ้าอยู่ในเขตอุณหภูมิใกล้ 0 °C']},
+     {h:'จะจบยังไง', li:['ฝ่ายอากาศเย็นแรงขึ้น → กลายเป็น <b>แนวปะทะอากาศเย็น</b>','ฝ่ายอากาศอุ่นแรงขึ้น → กลายเป็น <b>แนวปะทะอากาศอุ่น</b>','หรือสลายไปเองเมื่อความต่างของสองมวลอากาศลดลง']}
+   ],
+   try:'เลื่อน "ค้างอยู่มาแล้ว" ไปที่ 4–5 วัน เพื่อดูข้อความเตือนเรื่องฝนสะสม'},
+
+  {id:'occl', th:'แนวปะทะปิด', en:'Occluded Front', badge:'สองแนวรวมกัน',
+   lead:'แนวเย็นเคลื่อนเร็วกว่าแนวอุ่นราวสองเท่า สุดท้ายจึงไล่ทันและบีบให้ช่องอากาศอุ่นตรงกลางแคบลงจนถูกยกพ้นพื้นไปทั้งก้อน เหลืออากาศเย็นสองก้อนมาเจอกันที่ผิวพื้น — เป็นสัญญาณว่าพายุหมุนกำลังแก่ตัวและใกล้สลาย',
+   cols:[
+     {h:'สองแบบที่ต้องแยก', li:['<b>Cold occlusion</b> — อากาศด้านหลังเย็นกว่า จึง <b>มุดลงใต้</b> ยกก้อนหน้าขึ้นไปซ้อนอยู่บน (พบบ่อยที่สุด)','<b>Warm occlusion</b> — อากาศด้านหลังอุ่นกว่า จึง <b>ไต่ขึ้นไปซ้อนอยู่บน</b> ก้อนหน้าที่เย็นจัดกว่า','จุดที่มวลอากาศสามก้อนมาเจอกันเรียก <b>triple point</b> — ไต่สูงขึ้นเรื่อย ๆ ตามอายุของระบบ','สัญลักษณ์เป็นสีม่วง มีทั้งสามเหลี่ยมและครึ่งวงกลมอยู่ข้างเดียวกัน']},
+     {h:'สภาพอากาศ', li:['ได้ทั้งสองแบบผสมกัน — <b>Ns ฝนพรำกว้าง + Cb ฝังในที่ให้ฝนหนัก</b>','ฝนตกทั้งสองฝั่งของแนว ไม่ใช่ฝั่งเดียว','เพดานต่ำและทัศนวิสัยแย่เป็นบริเวณกว้าง','icing รุนแรงในชั้นที่อากาศอุ่นถูกยกขึ้นไป']},
+     {h:'สำหรับนักบิน', li:['เป็นแนวที่พยากรณ์ยากที่สุด เพราะสภาพผสมกัน','ตรงจุดที่แนวสามมาบรรจบ (triple point) อากาศแปรปรวนที่สุด','เมื่อเห็นแนวปิดบนแผนที่ แปลว่าพายุกำลังอ่อนลง แต่ยังกินพื้นที่กว้าง']}
+   ],
+   try:'กด ▶ ก่อน แล้วลากสไลเดอร์ตัวที่สามข้ามศูนย์ จาก −6 ไป +6 °C — จะเห็นก้อนอากาศสลับกันระหว่างมุดลงใต้กับไต่ขึ้นบน'}
+];
+
+/* ============ สัญลักษณ์แนวปะทะบนแผนที่ ============ */
+function frontLine(x1,y1,x2,y2,type,side){
+  const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy), ux=dx/len, uy=dy/len;
+  const nx=-uy, ny=ux;
+  const col = type==='cold' ? COLDC() : type==='warm' ? WARMC() : type==='occl' ? OCCC : TOK['--ink-3'];
+  let s = `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="3.2" stroke-linecap="round"/>`;
+  let i = 0;
+  for (let d=20; d<len-10; d+=32){
+    const x=x1+ux*d, y=y1+uy*d;
+    let kind = type, sd = side;
+    if (type==='stat'){ kind = i%2 ? 'warm' : 'cold'; sd = i%2 ? -side : side; }
+    else if (type==='occl'){ kind = i%2 ? 'warm' : 'cold'; }
+    const cc = type==='occl' ? OCCC : kind==='cold' ? COLDC() : WARMC();
+    const ax=x-ux*8, ay=y-uy*8, bx=x+ux*8, by=y+uy*8;
+    if (kind==='cold'){
+      s += `<path d="M${ax.toFixed(1)},${ay.toFixed(1)} L${bx.toFixed(1)},${by.toFixed(1)} L${(x+nx*sd*12).toFixed(1)},${(y+ny*sd*12).toFixed(1)} Z" fill="${cc}"/>`;
+    } else {
+      const sweep = sd > 0 ? 1 : 0;
+      s += `<path d="M${ax.toFixed(1)},${ay.toFixed(1)} A 8 8 0 0 ${sweep} ${bx.toFixed(1)},${by.toFixed(1)} Z" fill="${cc}"/>`;
+    }
+    i++;
+  }
+  return s;
+}
+
+function renderFrontMap(){
+  const el = $('frontMap');
+  if (!el) return;
+  const c = TOK['--ink'], c2 = TOK['--ink-2'], c3 = TOK['--ink-3'];
+  let s = `<rect x="0" y="0" width="700" height="360" fill="${TOK['--surface-2']}"/>`;
+  /* ไอโซบาร์ */
+  [1,2,3].forEach(k => {
+    s += `<ellipse cx="250" cy="140" rx="${58*k}" ry="${44*k}" fill="none" stroke="${c3}" stroke-width="1" opacity="${0.5-k*0.09}"/>`;
+  });
+  s += `<text x="250" y="146" text-anchor="middle" font-family="Bai Jamjuree,sans-serif" font-size="30" font-weight="700" fill="${TOK['--cold']}">L</text>`;
+  s += tag(250, 190, 'ศูนย์กลางความกดอากาศต่ำ', c2, 'middle');
+  /* แนวปะทะรอบหย่อมความกดอากาศต่ำ */
+  s += frontLine(250,140, 90,268, 'cold', 1);
+  s += frontLine(250,140, 470,214, 'warm', -1);
+  s += frontLine(250,140, 150,44, 'occl', 1);
+  s += lbl(96, 292, 'แนวเย็น', COLDC(), 'start', 12.5);
+  s += lbl(452, 236, 'แนวอุ่น', WARMC(), 'start', 12.5);
+  s += lbl(120, 34, 'แนวปิด', OCCC, 'start', 12.5);
+  s += lbl(300, 252, 'ช่องอากาศอุ่น (warm sector)', WARMC(), 'middle', 12.5);
+  s += lbl(70, 180, 'อากาศเย็น', c2, 'start', 12.5);
+  s += lbl(500, 110, 'อากาศเย็นด้านหน้า', c2, 'start', 12.5);
+  s += `<path d="M540,300 L620,300" stroke="${c3}" stroke-width="2.4" marker-end="url(#mapar)"/>`;
+  s += `<defs><marker id="mapar" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="${c3}"/></marker></defs>`;
+  s += lbl(580, 292, 'ทิศที่ระบบเคลื่อนที่', c3, 'middle', 11.5);
+  /* ตารางสัญลักษณ์ */
+  s += `<rect x="470" y="24" width="212" height="150" rx="10" fill="${TOK['--surface']}" stroke="${TOK['--line']}"/>`;
+  s += lbl(486, 46, 'สัญลักษณ์บนแผนที่', c, 'start', 12.5);
+  [['cold','แนวปะทะอากาศเย็น'],['warm','แนวปะทะอากาศอุ่น'],['stat','แนวปะทะคงที่'],['occl','แนวปะทะปิด']].forEach((row,i) => {
+    const y = 72 + i*26;
+    s += frontLine(486, y, 546, y, row[0], -1);
+    s += lbl(556, y+4, row[1], c2, 'start', 11.5);
+  });
+  el.innerHTML = s;
+}
+
+const FRONT_SUM = [
+  ['แนวปะทะอากาศเย็น','สามเหลี่ยมสีน้ำเงิน','ชัน 1:50–1:100','Cb แถบแคบ','แรงช่วงสั้น อาจมีพายุ','เย็นลง แห้งขึ้น ทัศนวิสัยดีมาก'],
+  ['แนวปะทะอากาศอุ่น','ครึ่งวงกลมสีแดง','ชันน้อย 1:100–1:300','Ci → Cs → As → Ns','พรำต่อเนื่อง กว้างหลายร้อยไมล์','อุ่นขึ้น ชื้นขึ้น อาจมี stratus/หมอก'],
+  ['แนวปะทะคงที่','สามเหลี่ยม+ครึ่งวงกลมสลับข้าง','เกือบไม่ขยับ','As, Ns ค้างที่เดิม','พรำต่อเนื่องหลายวัน','เหมือนเดิมจนกว่าฝ่ายใดฝ่ายหนึ่งจะแรงขึ้น'],
+  ['แนวปะทะปิด','สีม่วง สามเหลี่ยม+ครึ่งวงกลมข้างเดียวกัน','ผสมทั้งสองแบบ','Ns กว้าง + Cb ฝังใน','ตกทั้งสองฝั่งของแนว','เย็นลง ฟ้าค่อย ๆ เปิด พายุเริ่มสลาย']
+];
+
+function renderFrontTypes(){
+  FRONT_TYPES.forEach(t => {
+    const pn = document.querySelector(`.fogpanel[data-fpanel="${t.id}"]`);
+    if (!pn) return;
+    const li = a => a.map(x => `<li>${x}</li>`).join('');
+    pn.innerHTML = simPanelHTML(t, `
+      <div class="fogcard">
+        <div class="foggrid">
+          ${t.cols.map(cc => `<div><h4>${cc.h}</h4><ul>${li(cc.li)}</ul></div>`).join('')}
+        </div>
+      </div>`);
+    wirePanel(pn);
+    drawType(t.id);
+  });
+  renderFrontMap();
+  const tb = $('frontTable');
+  if (tb) tb.innerHTML =
+    `<thead><tr><th>แนวปะทะ</th><th>สัญลักษณ์</th><th>ความชัน</th><th>เมฆ</th><th>ฝน</th><th>หลังผ่านไป</th></tr></thead><tbody>`
+    + FRONT_SUM.map(r => `<tr><th>${r[0]}</th><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td></tr>`).join('')
+    + `</tbody>`;
+}
+
+
+/* ============ ห้องทดลองความกดอากาศ (canvas) ============ */
+const PW = 760, PH = 470, NX = 48, NY = 30;
+const KMPX = 1.6;                                   /* 1 px ≈ 1.6 กม. */
+const PR = {mode:'L', sys:[]};
+FS.press = {amp:16, radkm:460, speed:20};
+
+const coastAt = ny => 0.20 + Math.sin(ny*Math.PI*2.2)*0.035;
+const ridgeAt = ny => 0.56 + Math.sin(ny*Math.PI*1.6 + 1)*0.05;
+function elevAt(nx, ny){
+  if (nx < coastAt(ny)) return -0.2;
+  const d = (nx - ridgeAt(ny))/0.075;
+  return 0.05 + Math.exp(-d*d)*0.95;
+}
+function moistSrc(nx, ny){
+  if (nx < coastAt(ny)) return 1;
+  if (nx < ridgeAt(ny)-0.03) return 0.55;
+  return 0.10;
+}
+function sysState(sy, f){
+  const age = f === null ? 0 : f;
+  const life = clamp(age/SIM.press.frames, 0, 1);
+  const g = life < 0.25 ? 0.6 + 1.6*life : 1 - (life-0.25)*0.95;
+  return {
+    x: sy.x + age*0.39*FS.press.speed,
+    y: sy.y - age*0.07*FS.press.speed,
+    amp: sy.amp*clamp(g, 0, 1.05),
+    rad: sy.rad*(1 + life*0.45),
+    life
+  };
+}
+
+let terrainCache = null;
+function drawTerrain(ctx){
+  if (terrainCache){ ctx.drawImage(terrainCache, 0, 0, PW, PH); return; }
+  const off = document.createElement('canvas');
+  off.width = PW*2; off.height = PH*2;
+  const g = off.getContext('2d');
+  g.scale(2,2);
+  g.fillStyle = '#12293C'; g.fillRect(0,0,PW,PH);
+  for (let i=0;i<26;i++){
+    g.strokeStyle = 'rgba(255,255,255,0.05)'; g.lineWidth = 1;
+    g.beginPath();
+    for (let y=0;y<=PH;y+=10){ const ny=y/PH; const x=(coastAt(ny)*PW)*(i/26); y===0?g.moveTo(x,y):g.lineTo(x,y); }
+    g.stroke();
+  }
+  const land = new Path2D();
+  land.moveTo(PW, 0);
+  for (let y=0;y<=PH;y+=6){ land.lineTo(coastAt(y/PH)*PW, y); }
+  land.lineTo(PW, PH); land.closePath();
+  const grad = g.createLinearGradient(0.2*PW,0,PW,0);
+  grad.addColorStop(0,'#25452F'); grad.addColorStop(0.42,'#2E4A31'); grad.addColorStop(0.62,'#5B5334'); grad.addColorStop(1,'#6E5B39');
+  g.fillStyle = grad; g.fill(land);
+  g.save(); g.clip(land);
+  for (let y=0;y<=PH;y+=7){
+    const ny=y/PH, rx=ridgeAt(ny)*PW;
+    g.fillStyle = 'rgba(120,104,84,0.85)';
+    g.beginPath(); g.ellipse(rx, y, 44, 7, 0, 0, Math.PI*2); g.fill();
+    g.fillStyle = 'rgba(196,182,158,0.5)';
+    g.beginPath(); g.ellipse(rx-6, y-2, 20, 3.4, 0, 0, Math.PI*2); g.fill();
+  }
+  g.restore();
+  g.strokeStyle = 'rgba(190,225,245,0.55)'; g.lineWidth = 1.6;
+  g.beginPath();
+  for (let y=0;y<=PH;y+=6){ const x=coastAt(y/PH)*PW; y===0?g.moveTo(x,y):g.lineTo(x,y); }
+  g.stroke();
+  g.font = '600 12px "IBM Plex Sans Thai", sans-serif';
+  g.fillStyle = 'rgba(190,225,245,0.75)'; g.fillText('ทะเล', 34, 40);
+  g.fillStyle = 'rgba(200,230,200,0.8)'; g.fillText('ที่ราบชื้น', 226, 40);
+  g.fillStyle = 'rgba(235,215,170,0.85)'; g.fillText('แนวเขา', 404, 24);
+  g.fillStyle = 'rgba(238,220,180,0.8)'; g.fillText('ที่ราบสูงแห้ง (เงาฝน)', 560, 40);
+  [[250,150,'สนาม A'],[610,330,'สนาม B']].forEach(a => {
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(a[0],a[1],3.5,0,Math.PI*2); g.fill();
+    g.fillStyle = 'rgba(255,255,255,0.85)'; g.font = '11px "IBM Plex Sans Thai", sans-serif';
+    g.fillText(a[2], a[0]+8, a[1]+4);
+  });
+  g.strokeStyle = 'rgba(255,255,255,0.6)'; g.lineWidth = 2;
+  g.beginPath(); g.moveTo(PW-150, PH-22); g.lineTo(PW-25, PH-22); g.stroke();
+  g.fillStyle = 'rgba(255,255,255,0.75)'; g.font = '10px "IBM Plex Mono", monospace';
+  g.fillText('200 กม.', PW-100, PH-28);
+  terrainCache = off;
+  ctx.drawImage(off, 0, 0, PW, PH);
+}
+
+function pressField(f){
+  const st = PR.sys.map(sy => sysState(sy, f));
+  const P = [], W = [], DIV = [], MO = [], CL = [];
+  const dx = PW/NX, dy = PH/NY;
+  const pAt = (x,y) => {
+    let p = 1013;
+    for (const s of st){
+      const ex = x-s.x, ey = y-s.y;
+      p += s.amp*Math.exp(-(ex*ex+ey*ey)/(2*s.rad*s.rad));
+    }
+    return p;
+  };
+  for (let j=0;j<=NY;j++){ P[j]=[]; for (let i=0;i<=NX;i++) P[j][i] = pAt(i*dx, j*dy); }
+  let maxG = 0;
+  for (let j=0;j<=NY;j++){
+    W[j]=[];
+    for (let i=0;i<=NX;i++){
+      const gx = (P[j][Math.min(NX,i+1)] - P[j][Math.max(0,i-1)])/(2*dx);
+      const gy = (P[Math.min(NY,j+1)][i] - P[Math.max(0,j-1)][i])/(2*dy);
+      const g = Math.hypot(gx,gy);
+      let u=0, v=0;
+      if (g > 1e-7){
+        const a = 25*Math.PI/180, ca = Math.cos(a), sa = Math.sin(a);
+        u = (gy/g)*ca + (-gx/g)*sa;
+        v = (-gx/g)*ca + (-gy/g)*sa;
+      }
+      const sp = g*760;
+      if (g > maxG) maxG = g;
+      W[j][i] = {u, v, sp, g};
+    }
+  }
+  for (let j=0;j<=NY;j++){
+    DIV[j]=[];
+    for (let i=0;i<=NX;i++){
+      const a=W[j][Math.min(NX,i+1)], b=W[j][Math.max(0,i-1)];
+      const c=W[Math.min(NY,j+1)][i], d=W[Math.max(0,j-1)][i];
+      DIV[j][i] = (a.u*a.sp-b.u*b.sp)/(2*dx) + (c.v*c.sp-d.v*d.sp)/(2*dy);
+    }
+  }
+  for (let j=0;j<=NY;j++){
+    MO[j]=[]; CL[j]=[];
+    for (let i=0;i<=NX;i++){
+      let x=i*dx, y=j*dy, m=0, wsum=0, dry=0;
+      for (let k=0;k<9;k++){
+        const ii = clamp(Math.round(x/dx),0,NX), jj = clamp(Math.round(y/dy),0,NY);
+        const w = W[jj][ii];
+        const nx = clamp(x/PW,0,1), ny = clamp(y/PH,0,1);
+        const wt = 1/(k+1.4);
+        m += moistSrc(nx,ny)*wt; wsum += wt;
+        if (elevAt(nx,ny) > 0.55) dry += 0.16;
+        x -= w.u*16; y -= w.v*16;
+        if (x<0||x>PW||y<0||y>PH) break;
+      }
+      MO[j][i] = clamp(m/Math.max(wsum,0.001) - dry, 0, 1);
+      const nx = clamp(i*dx/PW,0,1), ny = clamp(j*dy/PH,0,1);
+      const e0 = elevAt(nx,ny);
+      const w = W[j][i];
+      const ex = (elevAt(clamp(nx+0.012,0,1),ny)-elevAt(clamp(nx-0.012,0,1),ny))/0.024;
+      const ey = (elevAt(nx,clamp(ny+0.02,0,1))-elevAt(nx,clamp(ny-0.02,0,1)))/0.04;
+      const upslope = (w.u*ex + w.v*ey)*w.sp*0.0022;
+      const conv = -DIV[j][i]*13;
+      CL[j][i] = clamp((conv + Math.max(0,upslope))*MO[j][i]*1.5, 0, 1);
+    }
+  }
+  return {P, W, DIV, MO, CL, st, maxG, dx, dy};
+}
+
+function isobars(ctx, P, dx, dy){
+  ctx.lineWidth = 1.1; ctx.strokeStyle = 'rgba(255,255,255,0.42)';
+  for (let lev=960; lev<=1060; lev+=4){
+    ctx.beginPath();
+    for (let j=0;j<NY;j++) for (let i=0;i<NX;i++){
+      const a=P[j][i], b=P[j][i+1], c=P[j+1][i+1], d=P[j+1][i];
+      const x0=i*dx, y0=j*dy, x1=x0+dx, y1=y0+dy;
+      const pts=[];
+      const ip=(pa,pb,xa,ya,xb,yb)=>{const t=(lev-pa)/(pb-pa); return [xa+(xb-xa)*t, ya+(yb-ya)*t];};
+      if ((a<lev)!==(b<lev)) pts.push(ip(a,b,x0,y0,x1,y0));
+      if ((b<lev)!==(c<lev)) pts.push(ip(b,c,x1,y0,x1,y1));
+      if ((c<lev)!==(d<lev)) pts.push(ip(c,d,x1,y1,x0,y1));
+      if ((d<lev)!==(a<lev)) pts.push(ip(d,a,x0,y1,x0,y0));
+      if (pts.length>=2){ ctx.moveTo(pts[0][0],pts[0][1]); ctx.lineTo(pts[1][0],pts[1][1]); }
+    }
+    ctx.stroke();
+  }
+}
+
+function canvasFront(ctx, x1,y1,x2,y2, type, side){
+  const dx=x2-x1, dy=y2-y1, len=Math.hypot(dx,dy);
+  if (len < 8) return;
+  const ux=dx/len, uy=dy/len, nx=-uy*side, ny=ux*side;
+  const col = type==='cold' ? '#4FA3DC' : type==='warm' ? '#E8743B' : '#9B7BE0';
+  ctx.strokeStyle = col; ctx.lineWidth = 2.6; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  let i=0;
+  for (let d=16; d<len-6; d+=26){
+    const x=x1+ux*d, y=y1+uy*d;
+    const kind = type==='occl' ? (i%2?'warm':'cold') : type;
+    ctx.fillStyle = type==='occl' ? col : (kind==='cold' ? '#4FA3DC' : '#E8743B');
+    ctx.beginPath();
+    if (kind==='cold'){
+      ctx.moveTo(x-ux*6, y-uy*6); ctx.lineTo(x+ux*6, y+uy*6); ctx.lineTo(x+nx*9, y+ny*9); ctx.closePath();
+    } else {
+      const ang = Math.atan2(uy,ux);
+      ctx.arc(x, y, 6, ang, ang+Math.PI, side<0);
+    }
+    ctx.fill();
+    i++;
+  }
+}
+
+SIM.press = {
+  canvas: true, frames: 100,
+  controls:[
+    {k:'amp',   name:'ความแรงของระบบ', min:4, max:30, step:1, u:' hPa',
+     hint:'ต่างจากความกดปกติ 1013 hPa มากเท่าไหร่'},
+    {k:'radkm', name:'ขนาดของระบบ', min:200, max:900, step:20, u:' กม.',
+     hint:'ระบบเล็กแต่แรง = ความชันความกดอากาศสูง = ลมแรง'},
+    {k:'speed', name:'ความเร็วที่ระบบเคลื่อนที่', min:0, max:40, step:1, u:' kt',
+     hint:'ระบบความกดอากาศมักเคลื่อนจากตะวันตกไปตะวันออก'}
+  ],
+  play:'จิ้มบนแผนที่เพื่อวางระบบ แล้วกด ▶ ดูมันโต เคลื่อนที่ ปะทะกัน แล้วสลาย',
+  calc(v, f){
+    const G = pressField(f);
+    const hrs = f === null ? 0 : Math.round(f*20/60);
+    if (!PR.sys.length){
+      return {grid:G, pill:'good', tag:'ยังไม่มีระบบ', head:'จิ้มลงบนแผนที่เพื่อเริ่ม',
+        body:'เลือกว่าจะวาง <b>H</b> (ความกดอากาศสูง) หรือ <b>L</b> (ความกดอากาศต่ำ) ปรับความแรงกับขนาดทางขวา แล้วคลิกลงบนแผนที่ · วางสองจุดขึ้นไปเพื่อดูการปะทะกันของสองระบบ'};
+    }
+    const grad100 = G.maxG*100/KMPX;
+    const wind = Math.round(G.maxG*760);
+    let pairTxt = '';
+    if (G.st.length >= 2){
+      let best=null;
+      for (let a=0;a<G.st.length;a++) for (let b=a+1;b<G.st.length;b++){
+        const A=G.st[a], B=G.st[b], dist=Math.hypot(A.x-B.x, A.y-B.y);
+        const dp = Math.abs(A.amp-B.amp);
+        const sc = dp/Math.max(dist,1);
+        if (!best || sc>best.sc) best={A,B,dist,dp,sc};
+      }
+      pairTxt = `<br>ระบบสองตัวที่ใกล้กันที่สุดห่างกัน <b>${fmt(Math.round(best.dist*KMPX))} กม.</b> ความกดต่างกัน <b>${best.dp.toFixed(1)} hPa</b> — ยิ่งใกล้และยิ่งต่างมาก เส้นความกดยิ่งชิด ลมยิ่งแรงตรงช่องระหว่างสองระบบ`;
+    }
+    const life = G.st.reduce((m,s)=>Math.max(m,s.life),0);
+    const stage = life < 0.25 ? 'กำลังทวีกำลัง' : life < 0.62 ? 'เต็มกำลัง' : 'กำลังสลาย';
+    const pill = grad100 > 3 ? 'crit' : grad100 > 1.5 ? 'warn' : 'good';
+    const hasL = PR.sys.some(s=>s.amp<0), hasH = PR.sys.some(s=>s.amp>0);
+    return {grid:G, pill, tag:`${stage} · ลมสูงสุด ${wind} kt`,
+      head:`ชั่วโมงที่ ${hrs} · ${stage}`,
+      body:`<b>ความชันความกดอากาศสูงสุด ${grad100.toFixed(1)} hPa ต่อ 100 กม.</b> → ลมราว <b>${wind} kt</b> (เส้นความกดยิ่งชิด ลมยิ่งแรง)
+        ${hasL?'<br><b>รอบ L</b> ลมหมุนทวนเข็มนาฬิกาและเบนเข้าหาศูนย์กลาง อากาศจึงมารวมกันแล้วถูกดันขึ้น → เมฆและฝน':''}
+        ${hasH?'<br><b>รอบ H</b> ลมหมุนตามเข็มนาฬิกาและกระจายออก อากาศจากข้างบนจมลงมาแทน → ฟ้าโปร่ง แห้ง':''}
+        ${pairTxt}`};
+  },
+  render(v, r, f){
+    const cv = $('pmap');
+    if (!cv) return;
+    const ctx = cv.getContext('2d');
+    if (cv.width !== PW*2){ cv.width = PW*2; cv.height = PH*2; }
+    ctx.setTransform(2,0,0,2,0,0);
+    ctx.clearRect(0,0,PW,PH);
+    drawTerrain(ctx);
+    const G = r.grid, dx = G.dx, dy = G.dy;
+    /* ลม: แถบสีตามความเร็ว */
+    for (let j=0;j<NY;j++) for (let i=0;i<NX;i++){
+      const sp = G.W[j][i].sp;
+      if (sp < 6) continue;
+      const t = clamp(sp/70, 0, 1);
+      const cr = t<0.5 ? [80+t*300, 200, 255] : [255, 230-(t-0.5)*300, 120-(t-0.5)*200];
+      ctx.fillStyle = `rgba(${cr[0]|0},${cr[1]|0},${cr[2]|0},${(0.05+t*0.3).toFixed(2)})`;
+      ctx.fillRect(i*dx, j*dy, dx+1, dy+1);
+    }
+    /* เมฆ (เบลอให้ดูเหมือนภาพดาวเทียม) */
+    ctx.save();
+    if ('filter' in ctx) ctx.filter = 'blur(8px)';
+    for (let j=0;j<NY;j++) for (let i=0;i<NX;i++){
+      const cl = G.CL[j][i];
+      if (cl < 0.12) continue;
+      ctx.fillStyle = `rgba(255,255,255,${(cl*0.46).toFixed(2)})`;
+      ctx.beginPath(); ctx.ellipse(i*dx+dx/2, j*dy+dy/2, dx*0.95, dy*0.95, 0, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+    /* ฝน */
+    for (let j=0;j<NY;j++) for (let i=0;i<NX;i++){
+      const cl = G.CL[j][i];
+      if (cl <= 0.5) continue;
+      ctx.strokeStyle = `rgba(130,200,255,${(cl*0.8).toFixed(2)})`; ctx.lineWidth = 1.3;
+      const off = f === null ? 0 : (f*5)%10;
+      for (let k=0;k<3;k++){
+        const px = i*dx + 4 + k*6, py = j*dy + ((k*5+off)%12);
+        ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(px-2.5, py+7); ctx.stroke();
+      }
+    }
+    isobars(ctx, G.P, dx, dy);
+    /* ลูกศรลม */
+    for (let j=1;j<NY;j+=3) for (let i=1;i<NX;i+=3){
+      const w = G.W[j][i];
+      if (w.sp < 5) continue;
+      const x = i*dx+dx/2, y = j*dy+dy/2, L = clamp(6+w.sp*0.34, 6, 22);
+      ctx.strokeStyle = `rgba(255,255,255,${clamp(0.3+w.sp/70,0.3,0.92).toFixed(2)})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(x-w.u*L/2, y-w.v*L/2); ctx.lineTo(x+w.u*L/2, y+w.v*L/2); ctx.stroke();
+      const hx = x+w.u*L/2, hy = y+w.v*L/2;
+      ctx.beginPath();
+      ctx.moveTo(hx, hy);
+      ctx.lineTo(hx-w.u*5-w.v*3, hy-w.v*5+w.u*3);
+      ctx.lineTo(hx-w.u*5+w.v*3, hy-w.v*5-w.u*3);
+      ctx.closePath(); ctx.fillStyle = ctx.strokeStyle; ctx.fill();
+    }
+    /* แนวปะทะรอบหย่อมความกดต่ำ + สัญลักษณ์ H/L */
+    G.st.forEach((s, idx) => {
+      if (Math.abs(s.amp) < 2) return;
+      if (s.amp < 0){
+        const ang = -0.5 + s.life*1.7, len = s.rad*1.25;
+        const cx1 = s.x + Math.cos(ang+2.5)*len, cy1 = s.y + Math.sin(ang+2.5)*len;
+        const wx1 = s.x + Math.cos(ang+0.15)*len*0.8, wy1 = s.y + Math.sin(ang+0.15)*len*0.8;
+        if (s.life > 0.5){
+          const ox = s.x + Math.cos(ang+2.5)*len*0.45, oy = s.y + Math.sin(ang+2.5)*len*0.45;
+          canvasFront(ctx, s.x, s.y, ox, oy, 'occl', 1);
+          canvasFront(ctx, ox, oy, cx1, cy1, 'cold', 1);
+        } else {
+          canvasFront(ctx, s.x, s.y, cx1, cy1, 'cold', 1);
+        }
+        canvasFront(ctx, s.x, s.y, wx1, wy1, 'warm', -1);
+      }
+      const isH = s.amp > 0;
+      const p0 = 1013 + s.amp;
+      ctx.font = '700 30px "Bai Jamjuree", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = isH ? '#5AB0EC' : '#F0743A';
+      ctx.strokeStyle = 'rgba(10,16,24,0.85)'; ctx.lineWidth = 4;
+      ctx.strokeText(isH?'H':'L', s.x, s.y+8);
+      ctx.fillText(isH?'H':'L', s.x, s.y+8);
+      ctx.font = '600 12px "IBM Plex Mono", monospace';
+      ctx.strokeText(Math.round(p0)+' hPa', s.x, s.y+26);
+      ctx.fillStyle = 'rgba(255,255,255,0.92)';
+      ctx.fillText(Math.round(p0)+' hPa', s.x, s.y+26);
+      ctx.textAlign = 'left';
+    });
+    /* คำอธิบายมุมล่าง */
+    ctx.font = '600 11.5px "IBM Plex Sans Thai", sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.fillText(f === null ? 'กด ▶ เพื่อเริ่มเดินเวลา' : `ชั่วโมงที่ ${Math.round(f*20/60)}`, 16, PH-16);
+    /* แถบสีความเร็วลม */
+    const bw = 120, bx = PW-160, by = PH-46;
+    for (let k=0;k<bw;k++){
+      const t = k/bw;
+      const cr = t<0.5 ? [80+t*300, 200, 255] : [255, 230-(t-0.5)*300, 120-(t-0.5)*200];
+      ctx.fillStyle = `rgba(${cr[0]|0},${cr[1]|0},${cr[2]|0},0.85)`;
+      ctx.fillRect(bx+k, by, 1, 7);
+    }
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.75)';
+    ctx.fillText('0', bx-8, by+8); ctx.fillText('70 kt', bx+bw+4, by+8);
+  }
+};
+
+let pressWired = false;
+function wirePressure(){
+  const cv = $('pmap');
+  if (!cv) return;
+  if (pressWired){ drawType('press'); return; }
+  pressWired = true;
+  cv.addEventListener('click', e => {
+    stopPlay(false);
+    const rect = cv.getBoundingClientRect();
+    const x = (e.clientX-rect.left)/rect.width*PW;
+    const y = (e.clientY-rect.top)/rect.height*PH;
+    PR.sys.push({x, y, amp: (PR.mode === 'H' ? 1 : -1)*FS.press.amp, rad: FS.press.radkm/KMPX});
+    drawType('press');
+  });
+  document.querySelectorAll('[data-pmode]').forEach(b => {
+    b.addEventListener('click', () => {
+      PR.mode = b.dataset.pmode;
+      document.querySelectorAll('[data-pmode]').forEach(x => x.setAttribute('aria-selected', String(x===b)));
+    });
+  });
+  const cl = $('pclear');
+  if (cl) cl.addEventListener('click', () => { stopPlay(false); PR.sys = []; drawType('press'); });
+  const dm = $('pdemo');
+  if (dm) dm.addEventListener('click', () => {
+    stopPlay(false);
+    PR.sys = [{x:200, y:300, amp:-FS.press.amp, rad:FS.press.radkm/KMPX},
+              {x:560, y:150, amp: FS.press.amp, rad:FS.press.radkm/KMPX}];
+    drawType('press');
+  });
+  const pn = document.querySelector('#view-press');
+  if (pn) wirePanel(pn);
+  drawType('press');
+}
+
+/* ============ ตัวควบคุมของแท็บหมอก ============ */
+let fraf = null;
+const stopFog = () => { if (fraf){ cancelAnimationFrame(fraf); fraf = null; } };
+
+function bindF(id, key){
+  $(id).addEventListener('input', e => {
+    stopFog();
+    F[key] = Number(e.target.value);
+    if (F.Td > F.T) { if (key === 'Td') F.T = F.Td; else F.Td = F.T; }
+    renderVis();
+  });
+}
+bindF('FT','T'); bindF('FTd','Td'); bindF('FPM','pm');
+
+$('sunset').addEventListener('click', () => {
+  stopFog();
+  const target = F.Td - 2.5;
+  if (reduced.matches){ F.T = Math.max(target, F.Td - 2.5); F.Td = Math.min(F.Td, F.T); F.night = 1; renderVis(); return; }
+  let last = performance.now();
+  const step = now => {
+    const dt = Math.min(0.06, (now-last)/1000); last = now;
+    F.T = Math.max(target, F.T - 1.1*dt);
+    F.night = Math.min(1, F.night + 0.22*dt);
+    if (F.Td > F.T) F.Td = F.T;
+    renderVis();
+    if (F.T <= target + 0.01 && F.night >= 1){ fraf = null; return; }
+    fraf = requestAnimationFrame(step);
+  };
+  fraf = requestAnimationFrame(step);
+});
+
+$('fogReset').addEventListener('click', () => {
+  stopFog();
+  F.T = 17; F.Td = 15; F.pm = 40; F.night = 0;
+  renderVis();
+});
+
+/* ============ ธีม ============ */
+function boot(){ readTokens(); renderStatic(); renderCirc(); renderVis(); renderFogTypes(); renderCloudTypes(); renderFrontTypes(); wirePressure(); }
+boot();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', boot);
+new MutationObserver(() => { stopPlay(false); boot(); }).observe(root, {attributes:true, attributeFilter:['data-theme']});
+document.fonts && document.fonts.ready.then(() => { if (!PLAY.id){ renderStatic(); renderCirc(); renderVis(); renderFogTypes(); renderCloudTypes(); renderFrontTypes(); wirePressure(); } });
+
+})();
+</script>
+
+</body></html>

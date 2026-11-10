@@ -1,0 +1,1917 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<meta charset="utf-8">
+<title>ระบบเครื่องยนต์ C172S และ DA42</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --bg:#E4E8E7; --surface:#F4F7F6; --surface-2:#D6DCDA; --sunk:#CBD3D1;
+  --ink:#111819; --ink-2:#4C5A5C; --ink-3:#71807F; --line:#BDC7C5;
+  --arc:#0E6E4F; --arc-soft:#D5E7DF; --redline:#B93227;
+  --air:#2F79A8; --fuel:#B27810; --mix:#217F66; --exh:#8E5344; --fire:#D14A22;
+  --oil:#8A5B22; --cool:#127F86;
+  --panel:#141B1D; --panel-2:#1D2628; --panel-line:#31403F; --panel-ink:#E7EDEB; --panel-ink-2:#8FA09E;
+  --shadow:0 1px 2px rgba(17,24,25,.06),0 8px 24px -12px rgba(17,24,25,.22);
+  --f-display:"Chakra Petch",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans Thai",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono","IBM Plex Sans Thai",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#101617; --surface:#18201F; --surface-2:#222C2B; --sunk:#0C1112;
+    --ink:#E7EDEB; --ink-2:#A6B4B2; --ink-3:#7C8C8A; --line:#2E3A39;
+    --arc:#43BE92; --arc-soft:#1B3730; --redline:#E4695A;
+    --air:#6FB4E0; --fuel:#EDB149; --mix:#4FC0A0; --exh:#D08D79; --fire:#FF8154;
+  --oil:#E0A055; --cool:#4FC2CC;
+    --oil:#E0A055; --cool:#4FC2CC;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#101617; --surface:#18201F; --surface-2:#222C2B; --sunk:#0C1112;
+  --ink:#E7EDEB; --ink-2:#A6B4B2; --ink-3:#7C8C8A; --line:#2E3A39;
+  --arc:#43BE92; --arc-soft:#1B3730; --redline:#E4695A;
+  --air:#6FB4E0; --fuel:#EDB149; --mix:#4FC0A0; --exh:#D08D79; --fire:#FF8154;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);
+  font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.page{max-width:1180px;margin:0 auto;padding:clamp(20px,4vw,52px) clamp(16px,4vw,32px) 72px;
+  display:flex;flex-direction:column;gap:clamp(32px,5vw,60px)}
+
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:clamp(30px,5.2vw,52px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(21px,2.6vw,28px);font-weight:600}
+h3{font-size:17px;font-weight:600}
+p{margin:0}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3);margin:0 0 14px}
+
+/* masthead */
+.masthead{display:flex;flex-direction:column;gap:16px;padding-top:8px}
+.masthead .lede{max-width:64ch;color:var(--ink-2);font-size:clamp(15px,1.6vw,17.5px)}
+.rulepair{display:flex;gap:6px;align-items:center}
+.rulepair i{height:4px;border-radius:2px;display:block}
+
+/* engine plates */
+.plates{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.plate{appearance:none;text-align:left;cursor:pointer;font-family:var(--f-body);color:var(--ink);
+  background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:16px 18px 18px;
+  display:flex;flex-direction:column;gap:2px;position:relative;transition:border-color .18s,background .18s,transform .18s}
+.plate:hover{border-color:var(--ink-3)}
+.plate:focus-visible{outline:2px solid var(--arc);outline-offset:3px}
+.plate .pt{font-family:var(--f-display);font-size:19px;font-weight:700;letter-spacing:.01em}
+.plate .ps{font-size:13.5px;color:var(--ink-2)}
+.plate .pm{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);margin-bottom:6px}
+.plate[aria-selected="true"]{background:var(--arc-soft);border-color:var(--arc)}
+.plate[aria-selected="true"] .pt{color:var(--arc)}
+.plate[aria-selected="true"]::after{content:"";position:absolute;left:-1px;top:-1px;bottom:-1px;width:3px;background:var(--arc)}
+
+.egtrig{display:grid;grid-template-columns:318px minmax(0,1fr);gap:24px;padding:18px 20px}
+@media (max-width:900px){.egtrig{grid-template-columns:1fr}}
+.egt-left{display:flex;flex-direction:column;gap:12px}
+#egtGauge{width:100%;max-width:318px;height:auto;font-family:var(--f-body)}
+#egtCurve{width:100%;height:auto;font-family:var(--f-body)}
+.ro{display:grid;grid-template-columns:1fr auto;gap:5px 12px;font-size:12.5px;
+  border-top:1px solid var(--panel-line);padding-top:12px}
+.ro > div{display:contents}
+.ro span{color:var(--panel-ink-2)}
+.ro b{font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--panel-ink);font-weight:500}
+.egt-right{display:flex;flex-direction:column;gap:14px;min-width:0}
+.sliders{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 22px;
+  border-top:1px solid var(--panel-line);padding-top:14px}
+.sliders label{display:flex;flex-direction:column;gap:5px;font-size:13px;color:var(--panel-ink-2)}
+.sliders label b{font-family:var(--f-mono);color:var(--panel-ink);font-weight:500}
+.sliders input[type=range]{width:100%}
+.sliders em{font-style:normal;font-size:11px;color:var(--panel-ink-2);opacity:.85}
+.simbtns{display:flex;flex-wrap:wrap;gap:8px}
+
+/* topic tabs */
+.topics{display:flex;flex-wrap:wrap;gap:0;border-bottom:1px solid var(--line);margin-top:-14px}
+.topic{appearance:none;cursor:pointer;font-family:var(--f-display);font-weight:600;font-size:15px;
+  color:var(--ink-3);background:transparent;border:0;border-bottom:2px solid transparent;
+  padding:12px 20px 11px;margin-bottom:-1px;transition:color .16s,border-color .16s}
+.topic:hover{color:var(--ink)}
+.topic:focus-visible{outline:2px solid var(--arc);outline-offset:-2px}
+.topic[aria-selected="true"]{color:var(--arc);border-bottom-color:var(--arc)}
+.topic small{display:block;font-family:var(--f-mono);font-weight:400;font-size:10.5px;
+  letter-spacing:.08em;text-transform:uppercase;opacity:.7;margin-top:1px}
+
+/* instrument panel */
+.panel{background:var(--panel);border:1px solid var(--panel-line);border-radius:4px;
+  color:var(--panel-ink);overflow:hidden;box-shadow:var(--shadow)}
+.panel-head{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:baseline;justify-content:space-between;
+  padding:14px 20px;border-bottom:1px solid var(--panel-line);background:var(--panel-2)}
+.panel-head .ph-t{font-family:var(--f-display);font-weight:600;font-size:16px;letter-spacing:.02em}
+.panel-head .ph-s{font-family:var(--f-mono);font-size:11px;color:var(--panel-ink-2);letter-spacing:.08em}
+.stage{padding:8px 10px 2px;border-bottom:1px solid var(--panel-line);overflow-x:auto}
+#cyl{display:block;width:100%;min-width:700px;height:auto;font-family:var(--f-body)}
+.rig{display:block}
+.rig-right{padding:18px 20px 20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+#wheel{width:250px;height:auto;flex:none;font-family:var(--f-mono)}
+.wheelrow{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap}
+.bankwrap{display:flex;flex-direction:column;gap:6px;flex:none;width:290px}
+#bank{width:100%;max-width:360px;height:auto;font-family:var(--f-body)}
+.readout{flex:1;min-width:290px;display:flex;flex-direction:column;gap:10px}
+.rd-phase{font-family:var(--f-display);font-size:clamp(22px,3vw,30px);font-weight:700;line-height:1.1}
+.rd-sub{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--panel-ink-2)}
+.rd-text{font-size:14.5px;line-height:1.7;color:#C9D4D2;max-width:52ch}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;padding:3px 8px;border-radius:2px;
+  border:1px solid var(--panel-line);color:var(--panel-ink-2);white-space:nowrap}
+.chip.on{color:#0F1618;border-color:transparent;font-weight:500}
+.chip.on[data-k="intake"]{background:#79BEE8}
+.chip.on[data-k="exhaust"]{background:#DE9A87}
+.chip.on[data-k="fire"]{background:#FF8A5C}
+.chip.on[data-k="fuel"]{background:#F0B84E}
+
+.controls{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;padding:12px 20px;
+  border-top:1px solid var(--panel-line);background:var(--panel-2)}
+.btn{appearance:none;cursor:pointer;font-family:var(--f-body);font-size:13.5px;color:var(--panel-ink);
+  background:transparent;border:1px solid var(--panel-line);border-radius:2px;padding:6px 13px;
+  transition:background .15s,border-color .15s}
+.btn:hover{background:#283335;border-color:#4A5C5A}
+.btn:focus-visible{outline:2px solid #43BE92;outline-offset:2px}
+.btn.primary{background:#43BE92;border-color:#43BE92;color:#08201A;font-weight:600}
+.btn.primary:hover{background:#5ED0A6}
+.ctl-label{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--panel-ink-2)}
+input[type=range]{accent-color:#43BE92;width:120px}
+.spacer{flex:1}
+.angle{font-family:var(--f-mono);font-size:12px;color:var(--panel-ink-2);font-variant-numeric:tabular-nums}
+
+/* generic section */
+.sec{display:flex;flex-direction:column;gap:20px}
+.sec > p{max-width:66ch;color:var(--ink-2)}
+.sec-head{display:flex;flex-direction:column;gap:8px}
+
+/* schematic */
+.scroller{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:4px;
+  padding:8px;box-shadow:var(--shadow)}
+.scroller svg{display:block;min-width:760px;width:100%;height:auto;font-family:var(--f-body)}
+figure{margin:0;display:flex;flex-direction:column;gap:12px}
+figcaption{font-size:13.5px;color:var(--ink-3);max-width:74ch}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:22px;height:3px;border-radius:2px;display:block}
+
+/* answers grid */
+.qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:18px;
+  display:flex;flex-direction:column;gap:8px;border-top:3px solid var(--c,var(--line))}
+.card .q{font-family:var(--f-display);font-size:16px;font-weight:600;color:var(--c,var(--ink))}
+.card .a{font-size:14.5px;color:var(--ink-2);line-height:1.7}
+.card ol{margin:0;padding-left:18px;font-size:14px;color:var(--ink-2);line-height:1.75}
+.card ol li::marker{font-family:var(--f-mono);font-size:12px;color:var(--ink-3)}
+
+/* table */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:14.5px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{font-family:var(--f-display);font-size:13px;font-weight:600;letter-spacing:.04em;
+  background:var(--surface-2);position:sticky;top:0}
+tbody th{font-weight:500;color:var(--ink-2);width:20%;font-size:13.5px}
+tbody tr:last-child th,tbody tr:last-child td{border-bottom:0}
+td.c172{border-left:2px solid var(--air)}
+td.da42{border-left:2px solid var(--fuel)}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:13.5px}
+
+.note{border-left:3px solid var(--redline);padding:12px 0 12px 16px;font-size:14px;color:var(--ink-2);max-width:70ch}
+.note b{color:var(--redline);font-weight:600}
+footer{border-top:1px solid var(--line);padding-top:20px;font-size:13px;color:var(--ink-3);max-width:74ch}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="page">
+
+<header class="masthead">
+  <div class="rulepair" aria-hidden="true">
+    <i style="background:var(--air);width:46px"></i>
+    <i style="background:var(--fuel);width:26px"></i>
+    <i style="background:var(--mix);width:18px"></i>
+    <i style="background:var(--exh);width:34px"></i>
+  </div>
+  <p class="eyebrow" style="margin:0">Engine · Lubrication · Cooling — C172S / DA42</p>
+  <h1>อากาศเข้าทางไหน น้ำมันเข้าทางไหน<br>ผสมกันตรงไหน ไอเสียไปไหน</h1>
+  <p class="lede">แบบจำลองเครื่องยนต์ลูกสูบ 4 จังหวะ ของ Cessna 172S (Lycoming IO-360-L2A จุดระเบิดด้วยหัวเทียน)
+  และ Diamond DA42 (Austro AE300 ดีเซลคอมมอนเรล จุดระเบิดด้วยแรงอัด) — เครื่องยนต์ทั้งสองใช้วงรอบ 4 จังหวะเหมือนกัน
+  แต่ <b>จุดที่น้ำมันไปเจอกับอากาศ</b> อยู่คนละที่ และนั่นคือสิ่งที่ทำให้ทุกอย่างอื่นต่างกันตามไปหมด</p>
+  <p class="lede" style="color:var(--ink-3)">หน้านี้มีสามหัวข้อ — <b>เครื่องยนต์ 4 จังหวะ</b>, <b>ระบบหล่อลื่น</b>, <b>ระบบระบายความร้อน</b>, <b>ระบบเทอร์โบ</b>
+  และ <b>EGT กับส่วนผสม</b> เลือกได้ที่แถบด้านล่าง ทุกหัวข้อเทียบเครื่องบินสองลำคู่กันเสมอ</p>
+</header>
+
+<div class="plates" role="tablist" aria-label="เลือกเครื่องยนต์">
+  <button class="plate" role="tab" id="tab-c172" aria-selected="true" data-eng="c172">
+    <span class="pm">Cessna 172S Skyhawk</span>
+    <span class="pt">Lycoming IO-360-L2A</span>
+    <span class="ps">4 สูบนอนยันกัน · ระบายความร้อนด้วยอากาศ · หัวฉีดที่พอร์ตไอดี · AVGAS 100LL · 180 แรงม้า</span>
+  </button>
+  <button class="plate" role="tab" id="tab-da42" aria-selected="false" data-eng="da42">
+    <span class="pm">Diamond DA42 · เครื่องยนต์ละข้าง</span>
+    <span class="pt">Austro AE300</span>
+    <span class="ps">4 สูบเรียง · ระบายความร้อนด้วยของเหลว · เทอร์โบ + คอมมอนเรล · Jet A-1 · 168 แรงม้า</span>
+  </button>
+</div>
+
+<nav class="topics" role="tablist" aria-label="เลือกหัวข้อ">
+  <button class="topic" role="tab" aria-selected="true" data-topic="engine">เครื่องยนต์ 4 จังหวะ<small>engine</small></button>
+  <button class="topic" role="tab" aria-selected="false" data-topic="lube">ระบบหล่อลื่น<small>lubrication</small></button>
+  <button class="topic" role="tab" aria-selected="false" data-topic="cool">ระบบระบายความร้อน<small>cooling</small></button>
+  <button class="topic" role="tab" aria-selected="false" data-topic="turbo">ระบบเทอร์โบ<small>turbocharger</small></button>
+  <button class="topic" role="tab" aria-selected="false" data-topic="egt">EGT กับส่วนผสม<small>egt &amp; mixture</small></button>
+</nav>
+
+<!-- ============ ANIMATED CUTAWAY ============ -->
+<section class="panel" aria-label="ภาพตัดขวางกระบอกสูบขณะทำงาน">
+  <div class="panel-head">
+    <span class="ph-t" id="rigTitle">Lycoming IO-360-L2A — ภาพตัดขวาง 1 สูบ</span>
+    <span class="ph-s" id="rigSub">SPARK IGNITION · CR 8.5:1 · FIRING ORDER 1-3-2-4</span>
+  </div>
+
+  <div class="stage">
+    <svg id="cyl" viewBox="0 0 1000 640" role="img" aria-label="ภาพตัดขวางกระบอกสูบ แสดงลูกสูบ ก้านสูบ เพลาข้อเหวี่ยง ลิ้นไอดี ลิ้นไอเสีย กลไกเปิดวาล์ว และทางเดินไอดีไอเสีย"></svg>
+  </div>
+
+  <div class="rig">
+    <div class="rig-right">
+      <div class="wheelrow">
+        <svg id="wheel" viewBox="0 0 280 306" role="img" aria-label="วงล้อมุมข้อเหวี่ยง 720 องศา แสดงจังหวะและช่วงเปิดของลิ้น"></svg>
+        <div class="readout">
+          <div>
+            <div class="rd-sub" id="phaseNo">STROKE 1 / 4</div>
+            <div class="rd-phase" id="phaseTh">จังหวะดูด</div>
+          </div>
+          <p class="rd-text" id="phaseText"></p>
+          <div class="chips">
+            <span class="chip" data-k="intake" id="chIn">ลิ้นไอดี เปิด</span>
+            <span class="chip" data-k="exhaust" id="chEx">ลิ้นไอเสีย เปิด</span>
+            <span class="chip" data-k="fuel" id="chFu">กำลังฉีดน้ำมัน</span>
+            <span class="chip" data-k="fire" id="chFi">กำลังเผาไหม้</span>
+          </div>
+        </div>
+        <div class="bankwrap">
+          <span class="rd-sub">สูบที่กำลังอยู่ในจังหวะระเบิด</span>
+          <svg id="bank" viewBox="0 0 340 130" role="img" aria-label="ผังการวางสูบและลำดับจุดระเบิด"></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn primary" id="playBtn">หยุดชั่วคราว</button>
+    <button class="btn" id="stepBtn">ไปจังหวะถัดไป</button>
+    <span class="ctl-label">ความเร็ว</span>
+    <input type="range" id="speed" min="10" max="200" value="70" aria-label="ความเร็วการเคลื่อนไหว">
+    <span class="spacer"></span>
+    <span class="angle">มุมข้อเหวี่ยง <b id="angOut">0</b>° / 720°</span>
+  </div>
+</section>
+
+
+<!-- ============ EGT INTERACTIVE GAUGE ============ -->
+<section class="panel" id="egtPanel" style="display:none" aria-label="เกจ EGT แบบปรับค่าได้">
+  <div class="panel-head">
+    <span class="ph-t">เกจ EGT — ลองปรับดูเอง</span>
+    <span class="ph-s">INTERACTIVE MODEL · ALTITUDE / POWER / MIXTURE</span>
+  </div>
+  <div class="egtrig">
+    <div class="egt-left">
+      <svg id="egtGauge" viewBox="0 0 300 300" role="img" aria-label="เกจ EGT"></svg>
+      <div class="ro">
+        <div><span>กำลังที่ได้จริง</span><b id="roPwr">—</b></div>
+        <div><span id="roChtLabel">CHT</span><b id="roCht">—</b></div>
+        <div><span>อัตราสิ้นเปลือง</span><b id="roFf">—</b></div>
+        <div><span>อากาศ : น้ำมัน</span><b id="roAfr">—</b></div>
+        <div><span>ความหนาแน่นอากาศ</span><b id="roSig">—</b></div>
+        <div><span id="roPeakLabel">ตำแหน่งคันที่จะได้ Peak</span><b id="roPeak">—</b></div>
+      </div>
+      <div class="chips" id="simFlags"></div>
+    </div>
+    <div class="egt-right">
+      <svg id="egtCurve" viewBox="0 0 520 250" role="img" aria-label="กราฟ EGT ตามตำแหน่ง Mixture"></svg>
+      <div class="sliders">
+        <label><span>ความสูง <b id="valAlt">0 ft</b></span>
+          <input type="range" id="sAlt" min="0" max="14000" step="500" value="0"></label>
+        <label><span>กำลัง (ลิ้นเร่ง) <b id="valThr">75 %</b></span>
+          <input type="range" id="sThr" min="40" max="100" step="5" value="75"></label>
+        <label id="mixWrap"><span>Mixture <b id="valMix">100 %</b></span>
+          <input type="range" id="sMix" min="35" max="100" step="1" value="100">
+          <em id="mixNote"></em></label>
+      </div>
+      <div class="simbtns">
+        <button class="btn" id="btnRich">Full Rich</button>
+        <button class="btn" id="btnPeak">Lean ไปที่ Peak EGT</button>
+        <button class="btn" id="btnEcon">Lean of Peak &minus;50&deg;F</button>
+      </div>
+    </div>
+  </div>
+  <div class="controls">
+    <span class="ctl-label" style="text-transform:none;letter-spacing:0;font-size:12px">แบบจำลองเชิงหลักการสำหรับใช้เรียน ตัวเลขไม่ใช่ค่าจริงจากเครื่องบิน ให้ยึดเกจจริงและ POH เสมอ</span>
+  </div>
+</section>
+
+<!-- ============ FLOW SCHEMATIC ============ -->
+<section class="sec">
+  <div class="sec-head">
+    <p class="eyebrow" id="flowEyebrow">ทางเดินของไหล</p>
+    <h2 id="flowTitle">เส้นทางอากาศ น้ำมัน และไอเสีย</h2>
+    <p style="color:var(--ink-2);max-width:66ch" id="flowLede"></p>
+  </div>
+  <figure>
+    <div class="scroller">
+      <svg id="flow" viewBox="0 0 1120 530" role="img" aria-label="ผังทางเดินอากาศ น้ำมัน และไอเสีย ตั้งแต่ช่องรับอากาศจนถึงปลายท่อไอเสีย"></svg>
+    </div>
+    <div class="legend" id="legend"></div>
+    <figcaption id="flowCap"></figcaption>
+  </figure>
+</section>
+
+<!-- ============ FOUR ANSWERS ============ -->
+<section class="sec">
+  <div class="sec-head">
+    <p class="eyebrow" id="qaEyebrow">ตอบสี่คำถาม</p>
+    <h2 id="qaTitle">สรุปเป็นข้อ ๆ</h2>
+  </div>
+  <div class="qa" id="qa"></div>
+</section>
+
+<!-- ============ COMPARISON ============ -->
+<section class="sec">
+  <div class="sec-head">
+    <p class="eyebrow" id="cmpEyebrow">เทียบกันตรง ๆ</p>
+    <h2 id="cmpTitle">จุดที่ทำให้สองเครื่องนี้ไม่เหมือนกัน</h2>
+    <p style="color:var(--ink-2);max-width:66ch" id="cmpLede"></p>
+  </div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th scope="col">หัวข้อ</th><th scope="col">C172S — Lycoming IO-360-L2A</th><th scope="col">DA42 — Austro AE300</th></tr></thead>
+      <tbody id="cmp"></tbody>
+    </table>
+  </div>
+  <p class="note" id="topicNote"></p>
+</section>
+
+<footer>
+  ช่วงเปิด–ปิดลิ้นบนวงล้อมุมข้อเหวี่ยง ปริมาณและค่าจำกัดของน้ำมันเครื่อง อุณหภูมิ และตัวเลขอื่นในหน้านี้ เป็นค่าอ้างอิงสำหรับใช้เรียนและอธิบายหลักการ ก่อนใช้งานจริงให้ยึดตาม POH/AFM, TCDS
+  และคู่มือของผู้ผลิตเครื่องยนต์เสมอ — DA42 บางรุ่นติดตั้ง Thielert Centurion 2.0 หรือ Continental CD-135/CD-155
+  ซึ่งเป็นดีเซลคอมมอนเรลเทอร์โบเช่นเดียวกัน หลักการเดินของอากาศ น้ำมัน และไอเสียเหมือนที่แสดงไว้ แต่ตัวเลขสมรรถนะต่างกัน
+</footer>
+</div>
+
+<script>
+"use strict";
+
+/* ---------- geometry ---------- */
+var G={cx:210,bl:132,br:288,tdc:150,r:70,L:150,ck:400,ph:62};
+var TAU=Math.PI/180;
+
+var ENG={
+c172:{
+  key:"c172",
+  title:"Lycoming IO-360-L2A — ภาพตัดขวาง 1 สูบ",
+  sub:"SPARK IGNITION · CR 8.5:1 · FIRING ORDER 1-3-2-4",
+  roofSide:240, roofApex:212, maxLift:15, train:"pushrod", bowl:false, cooling:"fins", layout:"opposed", order:[1,3,2,4],
+  charge:{intake:"mix",comp:"mix"},
+  vt:{io:700,ic:240,eo:480,ec:735},
+  fire:{start:340,end:360},         /* หัวเทียนจุด */
+  burn:{start:348,peak:378,end:450},
+  inj:{start:0,end:720,where:"port"}, /* ฉีดต่อเนื่องที่พอร์ต */
+  labels:{ign:"หัวเทียน 2 หัว", cool:"ครีบระบายความร้อนด้วยอากาศ"},
+  phases:[
+   {th:"จังหวะดูด",en:"INTAKE",t:"ลิ้นไอดีเปิด ลูกสูบเลื่อนลง ความดันในกระบอกสูบต่ำกว่าบรรยากาศ อากาศจึงถูกดูดผ่านท่อร่วมไอดีเข้ามา ระหว่างทางหัวฉีดที่พอร์ตพ่นน้ำมันออกมาตลอดเวลา อากาศกับน้ำมันจึงผสมกันตั้งแต่ยังไม่เข้ากระบอกสูบ แล้วไหลลงมาพร้อมกันเป็นไอดี"},
+   {th:"จังหวะอัด",en:"COMPRESSION",t:"ลิ้นปิดทั้งสองตัว ลูกสูบเลื่อนขึ้นบีบไอดีให้เหลือราว 1 ใน 8.5 ของปริมาตรเดิม อุณหภูมิและความดันสูงขึ้นแต่ตั้งใจให้ยังไม่ถึงจุดติดไฟเอง ถ้าติดเองเมื่อไหร่คือ detonation ซึ่งเป็นสิ่งที่ต้องเลี่ยง"},
+   {th:"จังหวะระเบิด",en:"POWER",t:"หัวเทียนทั้งสองหัวจุดประกายก่อนถึงศูนย์ตายบนประมาณ 20° เปลวไฟลามจากสองจุดเข้าหากลางห้องเผาไหม้ ความดันสูงสุดเกิดหลังศูนย์ตายบนเล็กน้อยแล้วดันลูกสูบลง นี่คือจังหวะเดียวใน 4 จังหวะที่สร้างกำลัง"},
+   {th:"จังหวะคาย",en:"EXHAUST",t:"ลิ้นไอเสียเปิดก่อนถึงศูนย์ตายล่าง แก๊สที่ยังมีความดันเหลืออยู่พุ่งออกไปเอง จากนั้นลูกสูบเลื่อนขึ้นไล่ส่วนที่เหลือออกทางท่อร่วมไอเสีย ไปเข้ามัฟเฟลอร์แล้วออกใต้ลำตัว"}
+  ]
+},
+da42:{
+  key:"da42",
+  title:"Austro AE300 — ภาพตัดขวาง 1 สูบ",
+  sub:"COMPRESSION IGNITION · CR ≈18:1 · FIRING ORDER 1-3-4-2",
+  roofSide:245, roofApex:237, maxLift:10, train:"ohc", bowl:true, cooling:"jacket", layout:"inline", order:[1,3,4,2],
+  charge:{intake:"air",comp:"air"},
+  vt:{io:705,ic:235,eo:490,ec:730},
+  fire:{start:352,end:378},
+  burn:{start:360,peak:392,end:470},
+  inj:{start:352,end:378,where:"direct"},
+  labels:{ign:"หัวฉีดคอมมอนเรล", cool:"ช่องน้ำหล่อเย็น"},
+  phases:[
+   {th:"จังหวะดูด",en:"INTAKE",t:"ลิ้นไอดีเปิด ลูกสูบเลื่อนลง สิ่งที่ไหลเข้ามาคืออากาศล้วน ไม่มีน้ำมันปนมาด้วยเลย และเป็นอากาศที่เทอร์โบอัดมาแล้วผ่านอินเตอร์คูลเลอร์ให้เย็นลง จึงได้มวลอากาศต่อรอบมากกว่าเครื่องที่ดูดอากาศเอง"},
+   {th:"จังหวะอัด",en:"COMPRESSION",t:"อัดอากาศเปล่าให้เหลือราว 1 ใน 18 อุณหภูมิพุ่งขึ้นไปหลายร้อยองศา สูงพอที่จะจุดน้ำมันได้ด้วยตัวมันเอง นี่คือเหตุผลที่เครื่องนี้ไม่มีหัวเทียนและไม่มีแมกนีโต มีแต่ glow plug ไว้ช่วยตอนสตาร์ทเครื่องเย็น"},
+   {th:"จังหวะระเบิด",en:"POWER",t:"ใกล้ศูนย์ตายบน หัวฉีดไฟฟ้าพ่นน้ำมันแรงดันราว 1,800 บาร์ ตรงเข้าห้องเผาไหม้ ละอองน้ำมันเจออากาศร้อนแล้วติดไฟเอง การผสมจึงเกิดขึ้นในกระบอกสูบ ไม่ใช่ในท่อไอดี และกำลังมากน้อยขึ้นกับปริมาณน้ำมันที่ฉีด ไม่ใช่ปริมาณอากาศ"},
+   {th:"จังหวะคาย",en:"EXHAUST",t:"ลิ้นไอเสียเปิด แก๊สร้อนความดันสูงไหลออกไปหมุนกังหันเทอร์โบก่อนเป็นอย่างแรก พลังงานที่เหลือในไอเสียจึงถูกดึงกลับมาอัดอากาศขาเข้า แล้วไอเสียจึงออกทางท่อ"}
+  ]
+}};
+
+/* ---------- helpers ---------- */
+function el(tag,attrs,txt){var n=document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for(var k in attrs){if(attrs[k]!==null&&attrs[k]!==undefined)n.setAttribute(k,attrs[k]);}
+  if(txt!==undefined&&txt!==null)n.textContent=txt;return n;}
+function cvar(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function norm(a){a%=720;return a<0?a+720:a;}
+function inWin(a,s,e){a=norm(a);s=norm(s);e=norm(e);return s<=e?(a>=s&&a<=e):(a>=s||a<=e);}
+function winFrac(a,s,e){a=norm(a);s=norm(s);e=norm(e);var d=norm(e-s);var p=norm(a-s);return d===0?0:p/d;}
+
+/* ---------- cutaway ---------- */
+var cyl=document.getElementById("cyl");
+var C={};
+var CY={CX:500,BL:422,BR:578,TDC:250,R:70,ROD:150,CKY:510,PH:64,STEM:156,TILT:22,
+        SEAT:[456,544],CT:424,CB:618,CL:244,CR:756,LX:234,RX:766,PIV:62,ARM:104};
+var MET="#3B494C",MET2="#2A3437",EDGE="#5E7073",STEEL="#A2B4B7",STEEL2="#7B8D90",
+    TXT="#93A4A2",VOID="#141B1D";
+
+function seatYof(cfg,sx){
+  return cfg.roofApex+(Math.abs(sx-CY.CX)/(CY.CX-CY.BL))*(cfg.roofSide-cfg.roofApex);
+}
+function rotPt(x,y,cx,cy,deg){
+  var t=deg*TAU,c=Math.cos(t),s=Math.sin(t),dx=x-cx,dy=y-cy;
+  return [cx+dx*c-dy*s,cy+dx*s+dy*c];
+}
+function springPts(sx,baseY,topY,coils,w){
+  var out=[[sx,baseY]],n=coils*2,i;
+  for(i=1;i<n;i++)out.push([sx+(i%2?-w:w),baseY+(topY-baseY)*i/n]);
+  out.push([sx,topY]);
+  return out.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1);}).join(" ");
+}
+function lobeD(cx,cy,base,peak,dir){
+  var a=base*0.74,b=base*0.67*dir,t=(base+peak)*1.22*dir;
+  return "M "+(cx-a)+" "+(cy+b)+" Q "+cx+" "+(cy+t)+" "+(cx+a)+" "+(cy+b)+" Z";
+}
+function chamberD(cfg,crown){
+  return "M "+CY.BL+" "+cfg.roofSide+" L "+CY.CX+" "+cfg.roofApex+" L "+CY.BR+" "+cfg.roofSide+
+         " L "+CY.BR+" "+crown+" L "+CY.BL+" "+crown+" Z";
+}
+function camAngle(a,open,close){
+  var mid=norm(open+norm(close-open)/2),d=norm(a-mid)/2;
+  return d>180?d-360:d;
+}
+function liftOf(a,open,close,max){
+  if(!inWin(a,open,close))return 0;
+  return max*Math.sin(winFrac(a,open,close)*Math.PI);
+}
+
+function buildCyl(cfg){
+  cyl.textContent="";
+  var roofS=cfg.roofSide,roofA=cfg.roofApex,ST=CY.STEM,pr=cfg.train==="pushrod";
+
+  var defs=el("defs");
+  var rg=el("radialGradient",{id:"flashG"});
+  rg.appendChild(el("stop",{offset:"0%","stop-color":"#FFF6DC","stop-opacity":"1"}));
+  rg.appendChild(el("stop",{offset:"52%","stop-color":"#FF8F3E","stop-opacity":".9"}));
+  rg.appendChild(el("stop",{offset:"100%","stop-color":"#C63A12","stop-opacity":"0"}));
+  defs.appendChild(rg);
+  var am=el("marker",{id:"cm",viewBox:"0 0 10 10",refX:"9",refY:"5",markerWidth:"10",markerHeight:"10",
+    markerUnits:"userSpaceOnUse",orient:"auto-start-reverse"});
+  am.appendChild(el("path",{d:"M 0 0 L 10 5 L 0 10 z",fill:TXT}));
+  defs.appendChild(am);
+  cyl.appendChild(defs);
+
+  /* --- crankcase --- */
+  cyl.appendChild(el("path",{d:"M "+CY.CL+" "+CY.CT+" L "+CY.CR+" "+CY.CT+" L "+CY.CR+" 552 Q "+CY.CR+" "+CY.CB+" "+(CY.CR-70)+" "+CY.CB+
+    " L "+(CY.CL+70)+" "+CY.CB+" Q "+CY.CL+" "+CY.CB+" "+CY.CL+" 552 Z",fill:MET2,stroke:EDGE,"stroke-width":2}));
+
+  /* --- cooling --- */
+  if(cfg.cooling==="fins"){
+    for(var y=roofS+10;y<CY.CT-6;y+=15){
+      cyl.appendChild(el("line",{x1:378,y1:y,x2:402,y2:y,stroke:EDGE,"stroke-width":5,"stroke-linecap":"round"}));
+      cyl.appendChild(el("line",{x1:598,y1:y,x2:622,y2:y,stroke:EDGE,"stroke-width":5,"stroke-linecap":"round"}));
+    }
+    for(var y2=150;y2<roofS-4;y2+=15){
+      cyl.appendChild(el("line",{x1:330,y1:y2,x2:344,y2:y2,stroke:EDGE,"stroke-width":5,"stroke-linecap":"round"}));
+      cyl.appendChild(el("line",{x1:656,y1:y2,x2:670,y2:y2,stroke:EDGE,"stroke-width":5,"stroke-linecap":"round"}));
+    }
+  }else{
+    var cw=cvar("--air");
+    cyl.appendChild(el("rect",{x:380,y:roofS,width:22,height:CY.CT-roofS,fill:cw,opacity:.38}));
+    cyl.appendChild(el("rect",{x:598,y:roofS,width:22,height:CY.CT-roofS,fill:cw,opacity:.38}));
+    cyl.appendChild(el("rect",{x:344,y:150,width:20,height:roofS-150,rx:5,fill:cw,opacity:.38}));
+    cyl.appendChild(el("rect",{x:636,y:150,width:20,height:roofS-150,rx:5,fill:cw,opacity:.38}));
+  }
+
+  /* --- barrel + head casting --- */
+  cyl.appendChild(el("rect",{x:402,y:roofS,width:20,height:CY.CT-roofS,fill:MET,stroke:EDGE,"stroke-width":1.4}));
+  cyl.appendChild(el("rect",{x:578,y:roofS,width:20,height:CY.CT-roofS,fill:MET,stroke:EDGE,"stroke-width":1.4}));
+  cyl.appendChild(el("rect",{x:344,y:96,width:312,height:roofS-96,rx:10,fill:MET,stroke:EDGE,"stroke-width":1.4}));
+
+  /* --- valve seats/frames --- */
+  C.valves=[-1,1].map(function(side){
+    var sx=CY.SEAT[side<0?0:1];
+    return {sx:sx,sy:seatYof(cfg,sx),side:side,lat:side,deg:side*CY.TILT,
+            open:side<0?cfg.vt.io:cfg.vt.eo,close:side<0?cfg.vt.ic:cfg.vt.ec};
+  });
+
+  /* covers / cam boxes (behind the ports) */
+  C.valves.forEach(function(v){
+    var g=el("g",{transform:"rotate("+v.deg+" "+v.sx+" "+v.sy+")"});
+    if(pr)g.appendChild(el("rect",{x:(v.lat<0?v.sx-120:v.sx-34),y:v.sy-ST-34,width:154,height:ST-58,rx:12,
+      fill:MET,stroke:EDGE,"stroke-width":1.4}));
+    else g.appendChild(el("rect",{x:v.sx-38,y:v.sy-ST-50,width:76,height:ST-8,rx:12,
+      fill:MET,stroke:EDGE,"stroke-width":1.4}));
+    g.appendChild(el("rect",{x:v.sx-15,y:v.sy-96,width:30,height:56,fill:MET2,stroke:EDGE,"stroke-width":1}));
+    cyl.appendChild(g);
+  });
+
+  /* --- ports (in front of the covers) --- */
+  var ipD="M 266 124 L 400 124 Q 442 124 450 182 L 456 216";
+  var epD="M 734 124 L 600 124 Q 558 124 550 182 L 544 216";
+  [ipD,epD].forEach(function(d){
+    cyl.appendChild(el("path",{d:d,fill:"none",stroke:EDGE,"stroke-width":46}));
+    cyl.appendChild(el("path",{d:d,fill:"none",stroke:MET,"stroke-width":42}));
+    cyl.appendChild(el("path",{d:d,fill:"none",stroke:VOID,"stroke-width":34}));
+  });
+  C.ipFlow=el("path",{d:ipD,fill:"none",stroke:cvar("--air"),"stroke-width":24,"stroke-dasharray":"14 14",opacity:0,"stroke-linecap":"round"});
+  C.epFlow=el("path",{d:epD,fill:"none",stroke:cvar("--exh"),"stroke-width":24,"stroke-dasharray":"14 14",opacity:0,"stroke-linecap":"round"});
+  C.ipFlow.style.transition="opacity .25s, stroke .3s";C.epFlow.style.transition="opacity .25s";
+  cyl.appendChild(C.ipFlow);cyl.appendChild(C.epFlow);
+  cyl.appendChild(el("line",{x1:296,y1:124,x2:334,y2:124,stroke:cvar("--air"),"stroke-width":3.5,"marker-end":"url(#cm)"}));
+  cyl.appendChild(el("line",{x1:666,y1:124,x2:704,y2:124,stroke:cvar("--exh"),"stroke-width":3.5,"marker-end":"url(#cm)"}));
+
+  /* port injector (C172) */
+  if(pr){
+    cyl.appendChild(el("rect",{x:358,y:88,width:13,height:24,rx:2,fill:STEEL2,stroke:EDGE,"stroke-width":1}));
+    C.pspray=el("path",{d:"M 364.5 112 L 404 138 L 404 112 Z",fill:cvar("--fuel"),opacity:.85});
+    cyl.appendChild(C.pspray);
+  }else C.pspray=null;
+
+  /* --- combustion chamber --- */
+  C.chamber=el("path",{d:chamberD(cfg,CY.TDC),fill:cvar("--mix"),opacity:.5});
+  C.chamber.style.transition="fill .3s ease";
+  cyl.appendChild(C.chamber);
+  C.flash=el("ellipse",{cx:CY.CX,cy:roofA+16,rx:92,ry:cfg.bowl?34:26,fill:"url(#flashG)",opacity:0});
+  cyl.appendChild(C.flash);
+
+  /* --- valve mechanisms (front) --- */
+  C.valves.forEach(function(v){
+    var sx=v.sx,sy=v.sy,lat=v.lat;
+    var g=el("g",{transform:"rotate("+v.deg+" "+sx+" "+sy+")"});
+    v.spring=el("polyline",{points:springPts(sx,sy-62,sy-ST+16,6,15),fill:"none",
+      stroke:STEEL2,"stroke-width":5,"stroke-linejoin":"round"});
+    g.appendChild(v.spring);
+    v.move=el("g",{});
+    v.move.appendChild(el("rect",{x:sx-5,y:sy-ST,width:10,height:ST,fill:STEEL}));
+    v.move.appendChild(el("rect",{x:sx-20,y:sy-ST+9,width:40,height:10,rx:2,fill:STEEL2,stroke:EDGE,"stroke-width":1}));
+    v.move.appendChild(el("path",{d:"M "+(sx-26)+" "+sy+" L "+(sx+26)+" "+sy+" L "+(sx+15)+" "+(sy+12)+" L "+(sx-15)+" "+(sy+12)+" Z",
+      fill:STEEL,stroke:v.side<0?cvar("--air"):cvar("--exh"),"stroke-width":2.2}));
+    g.appendChild(v.move);
+    if(pr){
+      v.rocker=el("g",{});
+      v.rocker.appendChild(el("path",{d:"M "+(sx-9)+" "+(sy-ST-21)+" L "+(sx+lat*CY.ARM)+" "+(sy-ST-19)+
+        " L "+(sx+lat*CY.ARM)+" "+(sy-ST-5)+" L "+(sx-9)+" "+(sy-ST-3)+" Z",
+        fill:STEEL,stroke:MET2,"stroke-width":1.6}));
+      v.rocker.appendChild(el("circle",{cx:sx+lat*CY.PIV,cy:sy-ST-12,r:9,fill:MET2,stroke:STEEL2,"stroke-width":2}));
+      g.appendChild(v.rocker);
+    }else{
+      var cy0=sy-ST-24;
+      v.cam=el("g",{});
+      v.cam.appendChild(el("circle",{cx:sx,cy:cy0,r:24,fill:STEEL2,stroke:MET2,"stroke-width":1.6}));
+      v.cam.appendChild(el("path",{d:lobeD(sx,cy0,24,cfg.maxLift,1),fill:STEEL2,stroke:MET2,"stroke-width":1.6}));
+      v.cam.appendChild(el("circle",{cx:sx,cy:cy0,r:7,fill:MET2}));
+      g.appendChild(v.cam);
+    }
+    cyl.appendChild(g);
+  });
+
+  /* --- pushrods + crankcase camshaft --- */
+  if(pr){
+    C.valves.forEach(function(v){
+      var o=rotPt(v.sx+v.lat*(CY.PIV+CY.ARM-CY.PIV),v.sy-ST-12,v.sx,v.sy,v.deg);
+      o=rotPt(v.sx+v.lat*CY.ARM,v.sy-ST-12,v.sx,v.sy,v.deg);
+      v.px0=o[0];
+      cyl.appendChild(el("rect",{x:v.px0-14,y:o[1]+4,width:28,height:CY.CT-o[1]+4,rx:9,
+        fill:MET,stroke:EDGE,"stroke-width":1.4}));
+      v.prod=el("line",{x1:o[0],y1:o[1],x2:v.px0,y2:452,stroke:STEEL,"stroke-width":8,"stroke-linecap":"round"});
+      cyl.appendChild(v.prod);
+      v.tap=el("rect",{x:v.px0-14,y:452,width:28,height:20,rx:4,fill:STEEL2,stroke:EDGE,"stroke-width":1.2});
+      cyl.appendChild(v.tap);
+      v.ccam=el("g",{});
+      v.ccam.appendChild(el("circle",{cx:v.px0,cy:494,r:22,fill:STEEL2,stroke:MET2,"stroke-width":1.6}));
+      v.ccam.appendChild(el("path",{d:lobeD(v.px0,494,22,cfg.maxLift,-1),fill:STEEL2,stroke:MET2,"stroke-width":1.6}));
+      v.ccam.appendChild(el("circle",{cx:v.px0,cy:494,r:7,fill:MET2}));
+      cyl.appendChild(v.ccam);
+    });
+  }
+
+  /* --- piston --- */
+  C.piston=el("g",{});
+  C.piston.appendChild(el("rect",{x:424,y:0,width:152,height:CY.PH,rx:4,fill:STEEL,stroke:MET2,"stroke-width":1.6}));
+  [11,19,27].forEach(function(o){C.piston.appendChild(el("line",{x1:426,y1:o,x2:574,y2:o,stroke:MET2,"stroke-width":3}));});
+  if(cfg.bowl){
+    C.bowl=el("path",{d:"M 450 0 Q 500 56 550 0 Z",fill:cvar("--air"),opacity:.5,stroke:MET2,"stroke-width":1.4});
+    C.piston.appendChild(C.bowl);
+  }
+  C.piston.appendChild(el("circle",{cx:CY.CX,cy:40,r:16,fill:STEEL2,stroke:MET2,"stroke-width":1.4}));
+  C.piston.appendChild(el("circle",{cx:CY.CX,cy:40,r:8,fill:MET2}));
+  cyl.appendChild(C.piston);
+
+  /* --- rod + crank --- */
+  C.rod=el("path",{d:"",fill:STEEL,stroke:MET2,"stroke-width":1.6});
+  cyl.appendChild(C.rod);
+  C.cw=el("circle",{cx:CY.CX,cy:CY.CKY+38,r:54,fill:MET,stroke:EDGE,"stroke-width":1.6});
+  cyl.appendChild(C.cw);
+  C.web=el("line",{x1:CY.CX,y1:CY.CKY,x2:CY.CX,y2:CY.CKY-CY.R,stroke:MET,"stroke-width":46,"stroke-linecap":"round"});
+  cyl.appendChild(C.web);
+  cyl.appendChild(el("circle",{cx:CY.CX,cy:CY.CKY,r:30,fill:STEEL2,stroke:EDGE,"stroke-width":1.6}));
+  cyl.appendChild(el("circle",{cx:CY.CX,cy:CY.CKY,r:12,fill:MET2}));
+  C.bigEnd=el("circle",{cx:CY.CX,cy:CY.CKY-CY.R,r:30,fill:"none",stroke:STEEL,"stroke-width":11});
+  cyl.appendChild(C.bigEnd);
+  C.pinC=el("circle",{cx:CY.CX,cy:CY.CKY-CY.R,r:19,fill:STEEL2,stroke:MET2,"stroke-width":1.4});
+  cyl.appendChild(C.pinC);
+
+  /* --- plug / injector --- */
+  if(pr){
+    cyl.appendChild(el("rect",{x:CY.CX-9,y:40,width:18,height:26,rx:3,fill:STEEL2}));
+    cyl.appendChild(el("path",{d:"M "+(CY.CX-13)+" 66 L "+(CY.CX+13)+" 66 L "+(CY.CX+9)+" 132 L "+(CY.CX-9)+" 132 Z",
+      fill:"#D9DEDC",stroke:MET2,"stroke-width":1.2}));
+    cyl.appendChild(el("path",{d:"M "+(CY.CX-15)+" 132 L "+(CY.CX+15)+" 132 L "+(CY.CX+15)+" 152 L "+(CY.CX-15)+" 152 Z",
+      fill:MET2,stroke:EDGE,"stroke-width":1.2}));
+    cyl.appendChild(el("rect",{x:CY.CX-10,y:152,width:20,height:roofA-152,fill:STEEL2,stroke:MET2,"stroke-width":1}));
+    cyl.appendChild(el("rect",{x:CY.CX-3,y:roofA-4,width:6,height:14,fill:STEEL}));
+    cyl.appendChild(el("path",{d:"M "+(CY.CX+8)+" "+(roofA-2)+" L "+(CY.CX+8)+" "+(roofA+11)+" L "+(CY.CX+2)+" "+(roofA+11),
+      fill:"none",stroke:STEEL2,"stroke-width":4}));
+    C.spark=el("circle",{cx:CY.CX+3,cy:roofA+9,r:10,fill:"#FFEBB0",opacity:0});
+    cyl.appendChild(C.spark);
+    C.spray=null;
+  }else{
+    cyl.appendChild(el("rect",{x:CY.CX-12,y:38,width:24,height:34,rx:4,fill:STEEL2,stroke:MET2,"stroke-width":1.2}));
+    cyl.appendChild(el("rect",{x:CY.CX-9,y:72,width:18,height:roofA-72,rx:2,fill:STEEL2,stroke:MET2,"stroke-width":1.2}));
+    cyl.appendChild(el("rect",{x:CY.CX-16,y:126,width:32,height:18,rx:2,fill:MET2,stroke:EDGE,"stroke-width":1.2}));
+    C.spray=el("path",{d:"M "+CY.CX+" "+roofA+" L "+(CY.CX-48)+" "+(roofA+54)+" L "+(CY.CX-18)+" "+(roofA+58)+
+      " L "+CY.CX+" "+(roofA+24)+" L "+(CY.CX+18)+" "+(roofA+58)+" L "+(CY.CX+48)+" "+(roofA+54)+" Z",
+      fill:cvar("--fuel"),opacity:0});
+    cyl.appendChild(C.spray);
+    C.spark=null;
+  }
+
+  /* --- TDC / BDC --- */
+  [[CY.TDC,"TDC"],[CY.TDC+140,"BDC"]].forEach(function(m){
+    cyl.appendChild(el("line",{x1:626,y1:m[0],x2:652,y2:m[0],stroke:TXT,"stroke-width":1,"stroke-dasharray":"4 4"}));
+    cyl.appendChild(el("text",{x:656,y:m[0]+4,"font-size":12,fill:TXT,"font-family":"IBM Plex Mono, monospace"},m[1]));
+  });
+
+  /* --- labels --- */
+  function lab(y,txt,pts,right,color){
+    cyl.appendChild(el("text",{x:right?CY.RX:CY.LX,y:y,"text-anchor":right?"start":"end",
+      "font-size":15,fill:color||TXT},txt));
+    if(pts)cyl.appendChild(el("polyline",{points:pts,fill:"none",stroke:EDGE,"stroke-width":1.1,opacity:.9}));
+  }
+  lab(60, pr?"กระเดื่องวาล์ว":"เพลาลูกเบี้ยวเหนือฝาสูบ", pr?"238,55 350,72":"238,55 362,66");
+  lab(102,"สปริงวาล์ว","238,97 406,126");
+  lab(150,"ท่อไอดี — ไอดีเข้า","238,145 268,141",false,cvar("--air"));
+  if(pr)lab(212,"ก้านกระทุ้ง","238,207 280,207");
+  lab(268,"ลิ้นไอดี","238,263 430,242",false,cvar("--air"));
+  lab(310,"ห้องเผาไหม้","238,305 464,274");
+  lab(360,"เสื้อสูบ","238,355 402,355");
+  lab(444,"ก้านสูบ","238,439 486,444");
+  if(pr)lab(502,"เพลาลูกเบี้ยว","238,497 292,497");
+  lab(562,"เพลาข้อเหวี่ยง","238,557 456,522");
+
+  lab(60, pr?"หัวเทียน (สูบละ 2 หัว)":"หัวฉีดคอมมอนเรล","762,55 518,56",true,pr?cvar("--fire"):cvar("--fuel"));
+  lab(102,pr?"ฝาครอบกระเดื่อง":"เสื้อเพลาลูกเบี้ยว","762,97 650,116",true);
+  lab(150,"ท่อไอเสีย — ไอเสียออก","762,145 732,141",true,cvar("--exh"));
+  lab(268,"ลิ้นไอเสีย","762,263 570,242",true,cvar("--exh"));
+  lab(310,"ฝาสูบ","762,305 650,198",true);
+  lab(360,pr?"ครีบระบายความร้อน":"ช่องน้ำหล่อเย็น","762,355 616,355",true,pr?null:cvar("--air"));
+  lab(412,pr?"ลูกสูบ / แหวนลูกสูบ":"ลูกสูบ (มีแอ่งเผาไหม้)","762,407 574,384",true);
+  lab(562,"ห้องข้อเหวี่ยง","762,557 706,566",true);
+}
+
+/* ---------- timing wheel ---------- */
+var wheel=document.getElementById("wheel"),W={};
+function polar(cx,cy,r,d){var a=(d-90)*TAU;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}
+function ring(cx,cy,ro,ri,s,e){
+  var sweep=e-s; if(sweep<0)sweep+=360; var big=sweep>180?1:0;
+  var a=polar(cx,cy,ro,s),b=polar(cx,cy,ro,e),c=polar(cx,cy,ri,e),d=polar(cx,cy,ri,s);
+  return "M "+a[0]+" "+a[1]+" A "+ro+" "+ro+" 0 "+big+" 1 "+b[0]+" "+b[1]+
+         " L "+c[0]+" "+c[1]+" A "+ri+" "+ri+" 0 "+big+" 0 "+d[0]+" "+d[1]+" Z";
+}
+function buildWheel(cfg){
+  wheel.textContent="";
+  var cx=140,cy=140;
+  var strokes=[["ดูด",cvar("--mix"),0,180],["อัด","#8FA09E",180,360],["ระเบิด",cvar("--fire"),360,540],["คาย",cvar("--exh"),540,720]];
+  strokes.forEach(function(s){
+    wheel.appendChild(el("path",{d:ring(cx,cy,96,68,s[2]/2,s[3]/2),fill:s[1],opacity:.28,stroke:s[1],"stroke-width":1}));
+    var m=polar(cx,cy,82,(s[2]+s[3])/4);
+    wheel.appendChild(el("text",{x:m[0],y:m[1]+4,"text-anchor":"middle","font-size":11.5,fill:s[1],"font-family":"IBM Plex Sans Thai, sans-serif"},s[0]));
+  });
+  function band(open,close,ro,ri,color,label){
+    var s=norm(open)/2,e=norm(close)/2;
+    wheel.appendChild(el("path",{d:ring(cx,cy,ro,ri,s,e),fill:color,opacity:.85}));
+    var m=polar(cx,cy,(ro+ri)/2,s+norm(close-open)/4);
+    wheel.appendChild(el("text",{x:m[0],y:m[1]+3.5,"text-anchor":"middle","font-size":9,fill:"#0F1618","font-family":"IBM Plex Mono, monospace"},label));
+  }
+  band(cfg.vt.io,cfg.vt.ic,116,102,cvar("--air"),"IN");
+  band(cfg.vt.eo,cfg.vt.ec,116,102,cvar("--exh"),"EX");
+
+  /* quadrant scale */
+  [[0,"0°"],[90,"180°"],[180,"360°"],[270,"540°"]].forEach(function(q){
+    var t1=polar(cx,cy,116,q[0]),t2=polar(cx,cy,124,q[0]),tl=polar(cx,cy,134,q[0]);
+    wheel.appendChild(el("line",{x1:t1[0],y1:t1[1],x2:t2[0],y2:t2[1],stroke:"#6E7F7D","stroke-width":1}));
+    wheel.appendChild(el("text",{x:tl[0],y:tl[1]+3.5,"text-anchor":"middle","font-size":9,fill:"#8FA09E","font-family":"IBM Plex Mono, monospace"},q[1]));
+  });
+
+  /* ignition / injection tick */
+  var igc=cfg.key==="c172"?cvar("--fire"):cvar("--fuel");
+  var t=polar(cx,cy,96,cfg.fire.start/2),t2=polar(cx,cy,124,cfg.fire.start/2);
+  wheel.appendChild(el("line",{x1:t[0],y1:t[1],x2:t2[0],y2:t2[1],stroke:igc,"stroke-width":3,"stroke-linecap":"round"}));
+  wheel.appendChild(el("circle",{cx:24,cy:296,r:4,fill:igc}));
+  wheel.appendChild(el("text",{x:34,y:300,"font-size":10.5,fill:igc,"font-family":"IBM Plex Sans Thai, sans-serif"},
+    cfg.key==="c172"?"หัวเทียนจุดประกาย ≈20° ก่อน TDC":"เริ่มฉีดน้ำมัน ใกล้ TDC ปลายจังหวะอัด"));
+
+  W.needle=el("line",{x1:cx,y1:cy,x2:cx,y2:cy-124,stroke:"#E7EDEB","stroke-width":2.5,"stroke-linecap":"round"});
+  wheel.appendChild(W.needle);
+  wheel.appendChild(el("circle",{cx:cx,cy:cy,r:5,fill:"#E7EDEB"}));
+  W.deg=el("text",{x:cx,y:cy+46,"text-anchor":"middle","font-size":14,fill:"#8FA09E","font-family":"IBM Plex Mono, monospace"},"0°");
+  wheel.appendChild(W.deg);
+}
+
+/* ---------- cylinder bank / firing order ---------- */
+var bank=document.getElementById("bank"),B=[];
+function buildBank(cfg){
+  bank.textContent="";B=[];
+  var EDGE="#546366",TXT="#8FA09E";
+  function cell(n,x,y,w,h){
+    var g=el("g",{});
+    var r=el("rect",{x:x,y:y,width:w,height:h,rx:4,fill:"#2A3538",stroke:EDGE,"stroke-width":1.2});
+    g.appendChild(r);
+    g.appendChild(el("text",{x:x+w/2,y:y+h/2+5,"text-anchor":"middle","font-size":14,fill:"#B8C7C9","font-family":"IBM Plex Mono, monospace"},String(n)));
+    bank.appendChild(g);B[n]=r;
+  }
+  if(cfg.layout==="opposed"){
+    bank.appendChild(el("rect",{x:120,y:46,width:100,height:34,rx:6,fill:"#39474A",stroke:EDGE}));
+    cell(2,16,16,98,30);cell(4,16,84,98,30);
+    cell(1,226,16,98,30);cell(3,226,84,98,30);
+    bank.appendChild(el("text",{x:170,y:68,"text-anchor":"middle","font-size":10,fill:TXT},"เพลาข้อเหวี่ยง"));
+    bank.appendChild(el("text",{x:170,y:124,"text-anchor":"middle","font-size":11,fill:TXT},"4 สูบนอนยันกัน · ลำดับจุดระเบิด 1-3-2-4"));
+  }else{
+    bank.appendChild(el("rect",{x:16,y:80,width:308,height:16,rx:5,fill:"#39474A",stroke:EDGE}));
+    [1,2,3,4].forEach(function(n,i){cell(n,16+i*78,20,68,52);});
+    bank.appendChild(el("text",{x:170,y:124,"text-anchor":"middle","font-size":11,fill:TXT},"4 สูบเรียง · ลำดับจุดระเบิดแบบสูบเรียงทั่วไป 1-3-4-2"));
+  }
+}
+
+/* ---------- part glyphs (line art, 32x32, centred on 0,0) ---------- */
+var ICONS={
+inlet:[["p","M 14 -12 Q 2 -12 -2 -5 L -14 -5"],["p","M 14 12 Q 2 12 -2 5 L -14 5"],
+  ["l",-11,0,3,0],["p","M -1 -3 L 3 0 L -1 3"]],
+outlet:[["p","M -14 -12 Q -2 -12 2 -5 L 14 -5"],["p","M -14 12 Q -2 12 2 5 L 14 5"],
+  ["l",-3,0,11,0],["p","M 7 -3 L 11 0 L 7 3"]],
+airfilter:[["r",-13,-9,26,18,3],["p","M -8 -9 L -8 9 M -3 -9 L -3 9 M 2 -9 L 2 9 M 7 -9 L 7 9"],
+  ["l",13,0,16,0]],
+throttle:[["l",-14,-9,14,-9],["l",-14,9,14,9],["l",-9,6,9,-6],["cf",0,0,2.2]],
+servo:[["r",-13,-11,26,22,3],["p","M -8 -11 Q -2 0 -8 11"],["p","M 8 -11 Q 2 0 8 11"],["cf",0,0,2.2]],
+manifold:[["p","M -14 4 L 14 4"],["l",-9,4,-9,-9],["l",-3,4,-3,-9],["l",3,4,3,-9],["l",9,4,9,-9],
+  ["l",0,4,0,11]],
+tank:[["p","M -13 -8 L 13 -8 L 13 5 Q 13 10 8 10 L -8 10 Q -13 10 -13 5 Z"],
+  ["p","M -13 -1 Q -6 3 0 -1 Q 6 -5 13 -1"],["r",-3,-12,6,4,1]],
+selector:[["c",0,0,9],["l",0,-9,0,-14],["l",-9,0,-14,0],["l",9,0,14,0],["p","M -5 0 L 5 0"],
+  ["p","M 0 0 L 0 6"],["cf",0,0,2]],
+gearpump:[["c",-6,0,6.5],["c",6,0,6.5],["l",-6,-6.5,-6,-10],["l",-6,6.5,-6,10],
+  ["l",6,-6.5,6,-10],["l",6,6.5,6,10],["l",-12.5,0,-16,0],["l",12.5,0,16,0]],
+elecpump:[["c",0,0,9],["p","M -4 -4 L 1 0 L -4 4"],["l",-9,0,-15,0],["l",9,0,15,0],
+  ["r",-5,-14,10,5,1],["p","M -2 -9 L -2 -14 M 2 -9 L 2 -14"]],
+hpump:[["c",0,3,9],["p","M -6 0 L 6 0"],["r",-3,-13,6,7,1],["p","M 0 -6 L 0 0"],
+  ["l",-9,3,-15,3],["l",9,3,15,3]],
+fuelfilter:[["p","M -8 -11 L 8 -11 L 8 4 Q 8 8 4 8 L -4 8 Q -8 8 -8 4 Z"],["l",-8,-5,8,-5],
+  ["p","M -4 8 L -4 12 L 4 12 L 4 8"],["l",-8,-11,-13,-11],["l",8,-11,13,-11]],
+rail:[["p","M -14 -4 L 14 -4 L 14 2 L -14 2 Z"],["l",-9,2,-9,10],["l",-3,2,-3,10],
+  ["l",3,2,3,10],["l",9,2,9,10],["p","M -12 -8 L -12 -4"]],
+divider:[["c",0,-5,6],["l",-6,-2,-13,9],["l",6,-2,13,9],["l",-2,1,-5,12],["l",2,1,5,12],
+  ["l",0,-11,0,-15]],
+exhmanifold:[["p","M -12 -10 L -12 2"],["p","M -4 -10 L -4 2"],["p","M 4 -10 L 4 2"],
+  ["p","M 12 -10 L 12 2"],["r",-14,2,28,7,2],["l",14,5,16,5]],
+muffler:[["r",-9,-7,18,14,4],["l",-9,0,-16,0],["l",9,0,16,0],
+  ["p","M -5 -7 L -5 7 M 0 -7 L 0 7 M 5 -7 L 5 7"]],
+tailpipe:[["p","M -14 -4 L 4 -4 Q 8 -4 8 0 Q 8 4 4 4 L -14 4"],["c",12,-3,2.6],["c",13,4,1.8]],
+shroud:[["r",-14,-10,28,20,3],["r",-9,-4,18,8,2],["l",-14,-6,-9,-6],["l",9,6,14,6]],
+cabin:[["r",-13,-8,26,16,3],["p","M -8 -4 L -2 4 M -1 -4 L 5 4 M 6 -4 L 12 4"]],
+sump:[["p","M -14 -7 L 14 -7 L 10 8 Q 10 12 5 12 L -5 12 Q -10 12 -10 8 Z"],
+  ["p","M -11 -1 Q -5 2 0 -1 Q 5 -4 11 -1"],["l",-14,-7,-16,-10],["l",14,-7,16,-10]],
+screen:[["r",-12,-5,24,12,2],["p","M -12 -1 L 12 -1 M -12 3 L 12 3 M -6 -5 L -6 7 M 0 -5 L 0 7 M 6 -5 L 6 7"],
+  ["l",0,-5,0,-12],["p","M -3 -12 L 3 -12"]],
+relief:[["p","M -11 11 L -4 11 L -4 5 L 4 5 L 4 11 L 11 11"],["cf",0,2.5,3.6],
+  ["p","M -5 -2 L 5 -4 L -5 -6 L 5 -8 L -5 -10 L 5 -12"],["l",-8,-13,8,-13]],
+oilcooler:[["r",-13,-9,26,18,2],["p","M -9 -9 L -9 9 M -4 -9 L -4 9 M 1 -9 L 1 9 M 6 -9 L 6 9 M 11 -9 L 11 9"],
+  ["l",-13,0,-16,0],["l",13,0,16,0]],
+filter:[["p","M -8 -10 L 8 -10 L 8 8 Q 8 12 4 12 L -4 12 Q -8 12 -8 8 Z"],["l",-8,-5,8,-5],
+  ["l",-8,0,8,0],["r",-10,-13,20,4,1]],
+gauge:[["c",0,0,12],["l",0,0,6,-7],["cf",0,0,2.2],["l",-9,-6,-7,-5],["l",9,-6,7,-5],["l",0,-12,0,-10]],
+ecu:[["r",-12,-9,24,18,2],["p","M -6 -3 L 6 -3 M -6 2 L 6 2"],["l",-12,-5,-16,-5],
+  ["l",-12,1,-16,1],["l",12,-5,16,-5],["l",12,1,16,1]],
+engineIcon:[["l",-11,-14,-11,3],["l",11,-14,11,3],["r",-8,-12,16,8,1],["l",0,-4,6,4],
+  ["c",8,8,5],["cf",8,8,1.6]],
+bearing:[["l",-15,0,15,0],["c",-7,0,5],["c",7,0,5],
+  ["p","M -7 -5 L -7 -9 M -7 5 L -7 9 M 7 -5 L 7 -9 M 7 5 L 7 9"],["cf",-7,0,1.6],["cf",7,0,1.6]],
+compressor:[["c",0,0,10],["p","M 0 -10 Q 5 -5 2 0 M 8.7 -5 Q 3 -2 0 1 M 8.7 5 Q 2 3 -1 0 M 0 10 Q -5 5 -2 0 M -8.7 5 Q -3 2 0 -1 M -8.7 -5 Q -2 -3 1 0"],
+  ["cf",0,0,2.2],["p","M -13 -13 Q 14 -13 14 4"]],
+turbine:[["c",0,0,10],["l",0,-10,0,-2],["l",8.7,-5,1.7,-1],["l",8.7,5,1.7,1],["l",0,10,0,2],
+  ["l",-8.7,5,-1.7,1],["l",-8.7,-5,-1.7,-1],["cf",0,0,2.2],["p","M 13 13 Q -14 13 -14 -4"]],
+turbounit:[["c",-8,0,6.5],["c",8,0,6.5],["l",-8,0,8,0],["p","M -8 -6.5 L -8 6.5 M 8 -6.5 L 8 6.5"],
+  ["cf",-8,0,1.6],["cf",8,0,1.6]],
+intercooler:[["r",-13,-8,26,16,2],["p","M -8 -8 L -8 8 M -3 -8 L -3 8 M 2 -8 L 2 8 M 7 -8 L 7 8"],
+  ["l",-16,-4,-13,-4],["l",13,4,16,4],["p","M 10 1 L 13 4 L 10 7"]],
+wastegate:[["l",-14,-8,14,-8],["l",-14,8,14,8],["l",-6,8,6,-4],["cf",-6,8,2.2],
+  ["r",-5,-16,10,6,1],["l",0,-10,0,-6]],
+baffle:[["p","M -13 2 L 13 2"],["p","M -13 2 L -13 -6 L 13 -6 L 13 2"],
+  ["p","M -12 -6 Q -9 -11 -6 -6 Q -3 -11 0 -6 Q 3 -11 6 -6 Q 9 -11 12 -6"],
+  ["p","M -6 2 L -6 10 M 6 2 L 6 10"]],
+finnedcyl:[["r",-6,-12,12,24,2],
+  ["p","M -6 -8 L -13 -8 M -6 -4 L -13 -4 M -6 0 L -13 0 M -6 4 L -13 4 M -6 8 L -13 8"],
+  ["p","M 6 -8 L 13 -8 M 6 -4 L 13 -4 M 6 0 L 13 0 M 6 4 L 13 4 M 6 8 L 13 8"]],
+waterpump:[["c",0,0,10],
+  ["p","M 0 -10 Q 5 -5 2 0 M 8.7 -5 Q 3 -2 0 1 M 8.7 5 Q 2 3 -1 0 M 0 10 Q -5 5 -2 0 M -8.7 5 Q -3 2 0 -1"],
+  ["cf",0,0,2.2],["l",10,0,16,0],["l",0,-10,0,-14]],
+jacket:[["r",-5,-11,10,22,2],["r",-13,-11,6,22,2],["r",7,-11,6,22,2],
+  ["p","M -10 -6 Q -8 -3 -10 0 Q -12 3 -10 6"],["p","M 10 -6 Q 8 -3 10 0 Q 12 3 10 6"]],
+thermostat:[["c",0,-2,10],["r",-3,-6,6,8,1],["p","M -9 -6 L -3 -6 M 3 -6 L 9 -6"],
+  ["p","M -6 4 L 6 4"],["p","M -4 6 L 4 8 M -4 10 L 4 12"]],
+radiator:[["r",-13,-11,26,22,2],["l",-13,-6,13,-6],["l",-13,6,13,6],
+  ["p","M -9 -6 L -9 6 M -5 -6 L -5 6 M -1 -6 L -1 6 M 3 -6 L 3 6 M 7 -6 L 7 6 M 11 -6 L 11 6"]],
+bottle:[["p","M -8 -8 L 8 -8 L 8 8 Q 8 12 4 12 L -4 12 Q -8 12 -8 8 Z"],["r",-4,-12,8,4,1],
+  ["p","M -8 0 Q -4 3 0 0 Q 4 -3 8 0"],["l",8,-4,12,-4]],
+heatercore:[["r",-11,-7,22,14,2],["p","M -7 -7 L -7 7 M -3 -7 L -3 7 M 1 -7 L 1 7 M 5 -7 L 5 7"],
+  ["l",-15,-3,-11,-3],["l",11,3,15,3],["p","M 12 0 L 15 3 L 12 6"]],
+cylblock:[["r",-12,-11,24,22,2],["l",-12,-4,12,-4],["r",-7,-1,14,8,1],["l",0,-11,0,-4]]
+};
+ICONS.probe=[["p","M -14 -6 L 14 -6 M -14 6 L 14 6"],["l",0,-6,0,-15],["cf",0,-15,2.6],
+  ["p","M -4 -6 L 0 3 L 4 -6"]];
+ICONS.mixturelever=[["p","M -9 13 L 9 13"],["l",1,13,1,-5],["c",1,-9,4.5],
+  ["p","M -12 -3 L -7 -3 M -12 3 L -7 3 M -12 9 L -7 9"]];
+ICONS.climb=[["p","M -14 11 L 14 11"],["p","M -13 8 L 9 -9"],["p","M 1 -9 L 9 -9 L 9 -1"],
+  ["cf",-6,3.5,1.6],["cf",1,-1.5,1.6]];
+ICONS.airthin=[["r",-13,-10,26,20,3],["cf",-6,-4,1.8],["cf",6,3,1.8],["cf",0,0,1.8]];
+ICONS.airdense=[["r",-13,-10,26,20,3],["cf",-7,-4,1.8],["cf",0,-4,1.8],["cf",7,-4,1.8],
+  ["cf",-7,3,1.8],["cf",0,3,1.8],["cf",7,3,1.8]];
+ICONS.drop=[["p","M 0 -13 Q 9 0 9 5 Q 9 13 0 13 Q -9 13 -9 5 Q -9 0 0 -13 Z"],
+  ["p","M -4 6 Q -4 9 -1 10"]];
+ICONS.mix=[["p","M -14 -8 L -3 0"],["p","M -14 8 L -3 0"],["p","M -3 0 L 13 0"],
+  ["p","M 9 -4 L 14 0 L 9 4"],["cf",-3,0,2.6]];
+
+function iconG(name,cx,cy,c){
+  var g=el("g",{transform:"translate("+cx+","+cy+")",fill:"none",stroke:c,"stroke-width":1.5,
+    "stroke-linecap":"round","stroke-linejoin":"round"});
+  (ICONS[name]||[]).forEach(function(d){
+    if(d[0]==="p")g.appendChild(el("path",{d:d[1]}));
+    else if(d[0]==="c")g.appendChild(el("circle",{cx:d[1],cy:d[2],r:d[3]}));
+    else if(d[0]==="cf")g.appendChild(el("circle",{cx:d[1],cy:d[2],r:d[3],fill:c,stroke:"none"}));
+    else if(d[0]==="r")g.appendChild(el("rect",{x:d[1],y:d[2],width:d[3],height:d[4],rx:d[5]||2}));
+    else if(d[0]==="l")g.appendChild(el("line",{x1:d[1],y1:d[2],x2:d[3],y2:d[4]}));
+  });
+  return g;
+}
+
+/* ---------- flow schematic ---------- */
+var flow=document.getElementById("flow");
+function $(id){return document.getElementById(id);}
+var NW=136,NH=56,XS=[20,178,336,494,652];
+var X6=[16,146,276,406,536,666],W6=116;
+var topic="engine";
+
+function PAL(){return{A:cvar("--air"),F:cvar("--fuel"),M:cvar("--mix"),E:cvar("--exh"),
+  N:cvar("--ink-3"),O:cvar("--oil"),K:cvar("--cool"),R:cvar("--redline"),G:cvar("--arc")};}
+
+/* ===== 1. ENGINE — induction / fuel / exhaust ===== */
+function SPEC_ENGINE(key){
+  var P=PAL();
+  if(key==="c172")return{vb:"0 0 1120 530",
+    nodes:[
+      {x:XS[0],y:64,t:["ช่องรับอากาศ","ใต้ฝากระโปรง"],c:P.A},
+      {x:XS[1],y:64,t:["กรองอากาศ","+ Alternate air"],c:P.A},
+      {x:XS[2],y:64,t:["ลิ้นเร่ง","Throttle valve"],c:P.A},
+      {x:XS[3],y:64,w:NW,h:214,t:["Fuel / Air","Control Unit","อากาศไหลผ่าน แล้ววัด","น้ำมันตามปริมาณอากาศ"],c:P.M},
+      {x:XS[4],y:64,t:["ท่อร่วมไอดี","แยกไป 4 สูบ"],c:P.A},
+      {x:XS[0],y:222,t:["ถังน้ำมันปีก","ซ้าย + ขวา 100LL"],c:P.F},
+      {x:XS[1],y:222,t:["Fuel selector","+ กรอง / ดักน้ำ"],c:P.F},
+      {x:XS[2],y:222,t:["ปั๊มขับด้วยเครื่องยนต์","+ ปั๊มไฟฟ้าสำรอง"],c:P.F},
+      {x:XS[4],y:222,t:["Flow divider","\"แมงมุม\" แบ่ง 4 ทาง"],c:P.F},
+      {x:470,y:443,t:["ปลายท่อ","ออกใต้ลำตัว"],c:P.E},
+      {x:660,y:443,t:["มัฟเฟลอร์","+ ปลอกครอบ shroud"],c:P.E},
+      {x:868,y:443,t:["ท่อร่วมไอเสีย","จาก 4 สูบ"],c:P.E},
+      {x:660,y:352,h:46,t:["อากาศร้อนเข้าห้องโดยสาร"],c:P.R}],
+    cyl:{x:852,y:92,w:168,h:230,mix:{x:836,y:140,in:false}},
+    edges:[
+      {d:"M 156 92 L 178 92",c:P.A},{d:"M 314 92 L 336 92",c:P.A},{d:"M 472 92 L 494 92",c:P.A},
+      {d:"M 630 92 L 652 92",c:P.A},{d:"M 788 92 L 822 92 L 822 140 L 828 140",c:P.A},
+      {d:"M 156 250 L 178 250",c:P.F},{d:"M 314 250 L 336 250",c:P.F},{d:"M 472 250 L 494 250",c:P.F},
+      {d:"M 630 250 L 652 250",c:P.F},{d:"M 788 250 L 806 250 L 806 140 L 828 140",c:P.F},
+      {d:"M 936 322 L 936 443",c:P.E,lab:"ไอเสียออกจากลิ้นไอเสีย",lx:948,ly:390,anchor:"start"},
+      {d:"M 868 470 L 796 470",c:P.E},{d:"M 660 470 L 606 470",c:P.E},
+      {d:"M 728 443 L 728 398",c:P.R,lab:"ผ่านปลอกครอบ",lx:740,ly:428,anchor:"start"}],
+    lanes:[{y:48,x:20,t:"อากาศ",c:P.A},{y:206,x:20,t:"น้ำมัน",c:P.F},{y:427,x:1004,t:"ไอเสีย",c:P.E,anchor:"end"}]};
+  return{vb:"0 0 1120 530",
+    nodes:[
+      {x:XS[0],y:64,t:["ช่องรับอากาศ","ใต้ฝากระโปรง"],c:P.A},
+      {x:XS[1],y:64,t:["กรองอากาศ"],c:P.A},
+      {x:XS[2],y:64,t:["คอมเพรสเซอร์","ของเทอร์โบ"],c:P.A},
+      {x:XS[3],y:64,t:["อินเตอร์คูลเลอร์","ลดอุณหภูมิอากาศอัด"],c:P.A},
+      {x:XS[4],y:64,t:["ท่อร่วมไอดี","อากาศล้วน 4 สูบ"],c:P.A},
+      {x:XS[0],y:222,t:["ถังน้ำมัน","Jet A-1 / ดีเซล"],c:P.F},
+      {x:XS[1],y:222,t:["ปั๊มไฟฟ้า","แรงดันต่ำ"],c:P.F},
+      {x:XS[2],y:222,t:["กรอง + ดักน้ำ","Fuel filter"],c:P.F},
+      {x:XS[3],y:222,t:["ปั๊มแรงดันสูง","High-pressure pump"],c:P.F},
+      {x:XS[4],y:222,t:["คอมมอนเรล","แรงดัน ~1,800 บาร์"],c:P.F},
+      {x:470,y:443,t:["ปลายท่อ","ออกสู่บรรยากาศ"],c:P.E},
+      {x:660,y:443,t:["กังหันเทอร์โบ","Turbine"],c:P.E},
+      {x:868,y:443,t:["ท่อร่วมไอเสีย","จาก 4 สูบ"],c:P.E}],
+    cyl:{x:852,y:92,w:168,h:230,mix:{x:936,y:168,in:true}},
+    edges:[
+      {d:"M 156 92 L 178 92",c:P.A},{d:"M 314 92 L 336 92",c:P.A},{d:"M 472 92 L 494 92",c:P.A},
+      {d:"M 630 92 L 652 92",c:P.A},{d:"M 788 92 L 822 92 L 822 140 L 852 140",c:P.A,
+        lab:"อากาศล้วน ไม่มีน้ำมันปน",lx:838,ly:78,anchor:"middle"},
+      {d:"M 156 250 L 178 250",c:P.F},{d:"M 314 250 L 336 250",c:P.F},{d:"M 472 250 L 494 250",c:P.F},
+      {d:"M 630 250 L 652 250",c:P.F},
+      {d:"M 788 250 L 806 250 L 806 44 L 936 44 L 936 92",c:P.F,
+        lab:"น้ำมันแรงดันสูงขึ้นไปที่หัวฉีดบนฝาสูบ",lx:846,ly:36,anchor:"middle"},
+      {d:"M 936 322 L 936 443",c:P.E},
+      {d:"M 868 470 L 796 470",c:P.E},{d:"M 660 470 L 606 470",c:P.E},
+      {d:"M 770 278 L 770 340 L 40 340 L 40 278",c:P.F,dash:true,
+        lab:"น้ำมันส่วนเกินไหลกลับถัง",lx:400,ly:332,anchor:"middle"},
+      {d:"M 728 443 L 728 386 L 478 386 L 478 100 L 472 100",c:P.N,dash:true,
+        lab:"ไอเสียหมุนกังหัน แล้วเพลาเดียวกันไปหมุนคอมเพรสเซอร์",lx:606,ly:378,anchor:"middle"}],
+    lanes:[{y:48,x:20,t:"อากาศ",c:P.A},{y:206,x:20,t:"น้ำมัน",c:P.F},{y:427,x:1004,t:"ไอเสีย",c:P.E,anchor:"end"}]};
+}
+
+/* ===== 2. LUBRICATION ===== */
+function SPEC_LUBE(key){
+  var P=PAL(),c172=key==="c172";
+  var chain=[
+    [c172?["อ่างน้ำมันเครื่อง","wet sump · สูงสุด 8 qt"]:["อ่างน้ำมันเครื่อง","ปริมาณตามคู่มือ"],"sump"],
+    [["ตะแกรงดูด","suction screen"],"screen"],
+    [["ปั๊มน้ำมันเครื่อง","ขับด้วยเครื่องยนต์"],"gearpump"],
+    [["วาล์วระบายแรงดัน","relief valve"],"relief"],
+    [c172?["ออยล์คูลเลอร์","+ วาล์วเทอร์โมสตัท"]:["ออยล์คูลเลอร์","oil cooler"],"oilcooler"],
+    [["กรองน้ำมัน","full-flow + bypass"],"filter"]];
+  var nodes=chain.map(function(t,i){return {x:X6[i],y:110,w:W6,h:58,t:t[0],c:P.O,icon:t[1]};});
+  nodes.push(c172
+    ?{x:X6[5],y:276,w:W6,h:84,t:["เกจในห้องนักบิน","แรงดัน 50–90 psi","อุณหภูมิไม่เกินขีดแดง"],c:P.G,icon:"gauge"}
+    :{x:X6[5],y:276,w:W6,h:84,t:["ECU / FADEC","เฝ้าดูแรงดัน+อุณหภูมิ","แจ้งเตือนบน G1000"],c:P.G,icon:"ecu"});
+  var blocks=c172?[
+    {x:830,y:110,w:200,h:250,title:"เครื่องยนต์",sub:"ทางน้ำมันในห้องข้อเหวี่ยง",c:P.O,icon:"engineIcon",
+     items:["แบริ่งเพลาข้อเหวี่ยง","แบริ่งก้านสูบ","เพลาลูกเบี้ยว + ลิฟเตอร์","ผนังกระบอกสูบ + แหวนลูกสูบ","กระเดื่องวาล์ว (ขึ้นทางท่อก้านกระทุ้ง)"]}
+  ]:[
+    {x:830,y:110,w:200,h:196,title:"เครื่องยนต์",sub:"ทางน้ำมันในเสื้อสูบ",c:P.O,icon:"engineIcon",
+     items:["แบริ่งเพลาข้อเหวี่ยง","แบริ่งก้านสูบ","เพลาลูกเบี้ยว","หัวพ่นน้ำมันใต้ลูกสูบ","เกียร์ทดใบพัด"]},
+    {x:830,y:330,w:200,h:74,title:"แบริ่งเทอร์โบ",sub:"เพลาหมุนเร็วและร้อนจัด — ต้องมีน้ำมันตลอด",c:P.R,icon:"bearing",items:[]}
+  ];
+  var edges=[];
+  for(var i=0;i<5;i++)edges.push({d:"M "+(X6[i]+W6)+" 139 L "+X6[i+1]+" 139",c:P.O});
+  edges.push({d:"M 782 130 L 812 130 L 812 162 L 830 162",c:P.O});
+  edges.push({d:"M 464 168 L 464 236 L 104 236 L 104 168",c:P.O,dash:true,
+    lab:"แรงดันเกิน → ระบายกลับอ่าง",lx:290,ly:228,anchor:"middle"});
+  edges.push({d:"M 830 296 L 786 296",c:P.G,dash:true});
+  if(c172){
+    edges.push({d:"M 890 360 L 890 470 L 56 470 L 56 168",c:P.O,
+      lab:"น้ำมันไหลกลับลงอ่างด้วยแรงโน้มถ่วง แล้วเริ่มรอบใหม่",lx:470,ly:462,anchor:"middle"});
+  }else{
+    edges.push({d:"M 782 150 L 800 150 L 800 366 L 830 366",c:P.O,
+      lab:"แยกไปเลี้ยงเทอร์โบ",lx:794,ly:244,anchor:"end"});
+    edges.push({d:"M 890 306 L 890 470",c:P.O});
+    edges.push({d:"M 960 404 L 960 470 L 56 470 L 56 168",c:P.O,
+      lab:"น้ำมันไหลกลับลงอ่าง แล้วเริ่มรอบใหม่",lx:470,ly:462,anchor:"middle"});
+  }
+  return{vb:"0 0 1120 510",nodes:nodes,blocks:blocks,edges:edges,
+    lanes:[{y:44,x:16,t:"น้ำมันเครื่อง",c:P.O},{y:214,x:X6[5],t:"สิ่งที่นักบินเห็น",c:P.G}]};
+}
+
+/* ===== 3. COOLING ===== */
+function SPEC_COOL(key){
+  var P=PAL();
+  if(key==="c172")return{vb:"0 0 1120 500",
+    nodes:[
+      {x:16,y:140,w:170,h:58,t:["ช่องรับอากาศหน้าเครื่อง","ram air 2 ช่อง"],c:P.A,icon:"inlet"},
+      {x:216,y:140,w:170,h:58,t:["แผ่นกั้น baffle + ซีลยาง","บังคับอากาศให้ไหลลง"],c:P.A,icon:"baffle"},
+      {x:706,y:140,w:150,h:58,t:["ออยล์คูลเลอร์"],c:P.O,icon:"oilcooler"},
+      {x:886,y:140,w:170,h:58,t:["ช่องระบายใต้ท้องเครื่อง","อากาศร้อนออกไป"],c:P.A,icon:"outlet"},
+      {x:16,y:430,w:170,h:58,t:["อากาศแยกอีกทางหนึ่ง"],c:P.A,icon:"inlet"},
+      {x:216,y:430,w:170,h:58,t:["ปลอกครอบท่อไอเสีย","exhaust shroud"],c:P.E,icon:"shroud"},
+      {x:416,y:430,w:260,h:58,t:["ห้องโดยสาร — cabin heat","ท่อไอเสียในปลอกร้าว = CO เข้าห้องนักบิน"],c:P.R,icon:"cabin"}],
+    blocks:[
+      {x:416,y:140,w:260,h:190,title:"ฝาสูบ + กระบอกสูบ 4 สูบ",sub:"ครีบระบายความร้อน",c:P.A,icon:"finnedcyl",
+       items:["อากาศไหลจากบนลงล่าง","ผ่านฝาสูบซึ่งร้อนที่สุดก่อน","แล้วจึงผ่านครีบกระบอกสูบ"]},
+      {x:706,y:250,w:350,h:200,title:"สิ่งที่นักบินใช้คุมอุณหภูมิ",sub:"เครื่องนี้ไม่มีเทอร์โมสตัทช่วย",c:P.G,icon:"gauge",
+       items:["ความเร็วอากาศ — ไต่แบบ cruise climb","กำลังเครื่องยนต์","ส่วนผสม — Lean เกินไปทำให้ CHT สูง","เฝ้าดู CHT / EGT / อุณหภูมิน้ำมัน","ลดกำลังเร็วเกินไป = shock cooling"]}],
+    edges:[
+      {d:"M 186 169 L 216 169",c:P.A},{d:"M 386 169 L 416 169",c:P.A},
+      {d:"M 676 169 L 706 169",c:P.A},{d:"M 856 169 L 886 169",c:P.A},
+      {d:"M 650 194 L 650 314",c:P.A,w:6,top:true},
+      {d:"M 706 340 L 680 340",c:P.G,dash:true},
+      {d:"M 101 198 L 101 430",c:P.A,dash:true,lab:"อากาศอีกส่วนหนึ่ง",lx:113,ly:330,anchor:"start"},
+      {d:"M 186 459 L 216 459",c:P.A},{d:"M 386 459 L 416 459",c:P.E}],
+    lanes:[{y:70,x:16,t:"อากาศระบายความร้อน",c:P.A},{y:372,x:416,t:"ความร้อนเข้าห้องโดยสาร",c:P.E}]};
+  return{vb:"0 0 1120 500",
+    nodes:[
+      {x:716,y:52,w:150,h:58,t:["อากาศจากช่องรับอากาศ","ไหลผ่านหม้อน้ำแล้วออกท้าย"],c:P.A,icon:"inlet"},
+      {x:16,y:140,w:170,h:58,t:["ปั๊มน้ำหล่อเย็น","ขับด้วยเครื่องยนต์"],c:P.K,icon:"waterpump"},
+      {x:526,y:140,w:150,h:58,t:["เทอร์โมสตัท","วาล์วอัตโนมัติ"],c:P.E,icon:"thermostat"},
+      {x:716,y:140,w:150,h:58,t:["หม้อน้ำ (radiator)","ในแนซเซล"],c:P.E,icon:"radiator"},
+      {x:906,y:140,w:150,h:58,t:["ถังพักน้ำหล่อเย็น","เช็กระดับก่อนบิน"],c:P.K,icon:"bottle"},
+      {x:226,y:430,w:150,h:58,t:["ตัวแลกเปลี่ยนความร้อน","heater core"],c:P.E,icon:"heatercore"},
+      {x:406,y:430,w:230,h:58,t:["ห้องโดยสาร — cabin heat","ความร้อนมาจากน้ำ ไม่ใช่ไอเสีย"],c:P.G,icon:"cabin"}],
+    blocks:[
+      {x:226,y:140,w:260,h:170,title:"ช่องน้ำในเสื้อสูบ + ฝาสูบ",sub:"water jacket",c:P.K,icon:"jacket",
+       items:["น้ำล้อมรอบกระบอกสูบทุกสูบ","และรอบห้องเผาไหม้","ดูดความร้อนออกมาโดยตรง"]}],
+    edges:[
+      {d:"M 186 169 L 226 169",c:P.K},{d:"M 486 169 L 526 169",c:P.E},{d:"M 676 169 L 716 169",c:P.E},
+      {d:"M 866 169 L 906 169",c:P.K,dash:true},
+      {d:"M 791 110 L 791 136",c:P.A},
+      {d:"M 791 198 L 791 380 L 60 380 L 60 198",c:P.K,
+       lab:"น้ำที่เย็นแล้วกลับเข้าปั๊ม — เป็นวงจรปิด",lx:420,ly:372,anchor:"middle"},
+      {d:"M 601 198 L 601 338 L 120 338 L 120 198",c:P.K,dash:true,
+       lab:"น้ำยังเย็น → เทอร์โมสตัทปิด บายพาสวนกลับ ให้เครื่องอุ่นเร็ว",lx:360,ly:330,anchor:"middle"},
+      {d:"M 270 310 L 270 430",c:P.E},{d:"M 376 459 L 406 459",c:P.E}],
+    lanes:[{y:70,x:16,t:"น้ำหล่อเย็น",c:P.K},{y:372,x:646,t:"ความร้อนเข้าห้องโดยสาร",c:P.E}]};
+}
+
+/* ===== 4. TURBOCHARGER ===== */
+function SPEC_TURBO(key){
+  var P=PAL();
+  var chart={x:690,y:492,w:396,h:154,title:"กำลังที่ใช้ได้ เทียบกับความสูง (เชิงหลักการ)",
+    xlab:"ความสูงเพิ่มขึ้น →",ylab:"กำลัง"};
+  if(key==="da42"){
+    chart.series=[
+      {c:P.N,dash:true,pts:[[0,1],[0.25,0.86],[0.5,0.72],[0.75,0.58],[1,0.45]],lab:"ไม่มีเทอร์โบ",lx:0.5,ly:0.4},
+      {c:P.A,pts:[[0,1],[0.45,1],[0.56,0.96],[0.78,0.82],[1,0.66]],lab:"มีเทอร์โบ",lx:0.06,ly:0.86}];
+    chart.mark={x:0.45,t:"critical altitude"};
+    return{vb:"0 0 1120 660",
+      nodes:[
+        {x:16,y:150,w:140,h:58,t:["ช่องรับอากาศ"],c:P.A,icon:"inlet"},
+        {x:186,y:150,w:140,h:58,t:["กรองอากาศ"],c:P.A,icon:"airfilter"},
+        {x:356,y:150,w:150,h:58,t:["คอมเพรสเซอร์","อัดอากาศให้แน่นขึ้น"],c:P.A,icon:"compressor"},
+        {x:536,y:150,w:150,h:58,t:["อินเตอร์คูลเลอร์","ลดอุณหภูมิอากาศอัด"],c:P.A,icon:"intercooler"},
+        {x:716,y:150,w:140,h:58,t:["ท่อร่วมไอดี"],c:P.A,icon:"manifold"},
+        {x:716,y:430,w:140,h:58,t:["ท่อร่วมไอเสีย"],c:P.E,icon:"exhmanifold"},
+        {x:536,y:430,w:150,h:58,t:["เวสต์เกต","wastegate"],c:P.E,icon:"wastegate"},
+        {x:356,y:430,w:150,h:58,t:["กังหัน (turbine)","ไอเสียหมุนตัวนี้"],c:P.E,icon:"turbine"},
+        {x:166,y:430,w:140,h:58,t:["ปลายท่อไอเสีย"],c:P.E,icon:"tailpipe"},
+        {x:536,y:550,w:150,h:58,t:["ECU / FADEC","คุมแรงดันบูสต์"],c:P.G,icon:"ecu"},
+        {x:16,y:550,w:200,h:58,t:["น้ำมันเครื่องเลี้ยงแบริ่งเทอร์โบ","หล่อลื่นและระบายความร้อน"],c:P.O,icon:"bearing"}],
+      blocks:[{x:886,y:150,w:200,h:160,title:"กระบอกสูบ 4 สูบ",sub:"",c:P.M,icon:"cylblock",
+        items:["ได้มวลอากาศมากขึ้น","จึงฉีดน้ำมันได้มากขึ้น","= กำลังมากขึ้นจากเครื่องขนาดเท่าเดิม"]}],
+      chart:chart,
+      edges:[
+        {d:"M 156 179 L 186 179",c:P.A},{d:"M 326 179 L 356 179",c:P.A},
+        {d:"M 506 179 L 536 179",c:P.A,lab:"อัดแล้วอากาศร้อนขึ้น",lx:521,ly:136,anchor:"middle"},
+        {d:"M 686 179 L 716 179",c:P.A},{d:"M 856 179 L 886 179",c:P.A},
+        {d:"M 986 310 L 986 459 L 860 459",c:P.E},
+        {d:"M 716 459 L 690 459",c:P.E},{d:"M 536 459 L 510 459",c:P.E},{d:"M 356 459 L 310 459",c:P.E},
+        {d:"M 431 424 L 431 214",c:P.N,w:8,solid:true,lab:"เพลาเดียวกัน หมุนได้เร็วมาก",lx:447,ly:326,anchor:"start"},
+        {d:"M 611 430 L 611 396 L 236 396 L 236 430",c:P.E,dash:true,
+         lab:"ไอเสียส่วนเกินข้ามกังหันไปเลย",lx:420,ly:388,anchor:"middle"},
+        {d:"M 611 550 L 611 494",c:P.G,dash:true},
+        {d:"M 216 579 L 380 579 L 380 494",c:P.O}],
+      lanes:[{y:110,x:16,t:"อากาศ",c:P.A},{y:404,x:860,t:"ไอเสีย",c:P.E,anchor:"end"}]};
+  }
+  chart.series=[{c:P.N,pts:[[0,1],[0.25,0.86],[0.5,0.72],[0.75,0.58],[1,0.45]],
+    lab:"C172S — ไม่มีเทอร์โบ",lx:0.42,ly:0.42}];
+  return{vb:"0 0 1120 660",
+    nodes:[
+      {x:16,y:150,w:140,h:58,t:["ช่องรับอากาศ"],c:P.A,icon:"inlet"},
+      {x:186,y:150,w:140,h:58,t:["กรองอากาศ"],c:P.A,icon:"airfilter"},
+      {x:356,y:150,w:150,h:58,t:["ไม่มีคอมเพรสเซอร์","เข้าด้วยความดันบรรยากาศ"],c:P.N,ghost:true},
+      {x:536,y:150,w:150,h:58,t:["ลิ้นเร่ง Throttle"],c:P.A,icon:"throttle"},
+      {x:716,y:150,w:140,h:58,t:["ท่อร่วมไอดี"],c:P.A,icon:"manifold"},
+      {x:716,y:430,w:140,h:58,t:["ท่อร่วมไอเสีย"],c:P.E,icon:"exhmanifold"},
+      {x:536,y:430,w:150,h:58,t:["มัฟเฟลอร์"],c:P.E,icon:"muffler"},
+      {x:356,y:430,w:150,h:58,t:["ไม่มีกังหัน","พลังงานไอเสียถูกทิ้งหมด"],c:P.N,ghost:true},
+      {x:166,y:430,w:140,h:58,t:["ปลายท่อไอเสีย"],c:P.E,icon:"tailpipe"}],
+    blocks:[{x:886,y:150,w:200,h:160,title:"กระบอกสูบ 4 สูบ",sub:"",c:P.M,icon:"cylblock",
+      items:["มวลอากาศต่อรอบลดลงตามความสูง","ต้อง Lean ส่วนผสมตามไปด้วย","กำลังลดลงเรื่อย ๆ"]}],
+    chart:chart,
+    edges:[
+      {d:"M 156 179 L 186 179",c:P.A},{d:"M 326 179 L 356 179",c:P.A},
+      {d:"M 506 179 L 536 179",c:P.A},{d:"M 686 179 L 716 179",c:P.A},{d:"M 856 179 L 886 179",c:P.A},
+      {d:"M 986 310 L 986 459 L 860 459",c:P.E},
+      {d:"M 716 459 L 690 459",c:P.E},{d:"M 536 459 L 510 459",c:P.E},{d:"M 356 459 L 310 459",c:P.E},
+      {d:"M 431 424 L 431 214",c:P.N,w:2,dash:true,
+       lab:"DA42 มีเพลาเชื่อมสองจุดนี้ — C172S ไม่มี",lx:445,ly:326,anchor:"start"}],
+    lanes:[{y:110,x:16,t:"อากาศ",c:P.A},{y:404,x:860,t:"ไอเสีย",c:P.E,anchor:"end"}]};
+}
+
+/* ===== 5. EGT ===== */
+function SPEC_EGT(key){
+  var P=PAL();
+  if(key==="c172"){
+    var xs=[22,204,386,568,750,932],CW=166;
+    var chain=[
+      [["บินสูงขึ้น"],"climb"],
+      [["อากาศเบาบางลง"],"airthin"],
+      [["มวลอากาศต่อรอบลดลง"],"cylblock"],
+      [["น้ำมันยังจ่ายเท่าเดิม"],"drop"],
+      [["ส่วนผสม Rich ขึ้นเอง"],"mix"],
+      [["EGT ตก → ต้อง Lean"],"mixturelever"]];
+    var nodes=chain.map(function(t,i){
+      return {x:xs[i],y:470,w:CW,h:64,t:t[0],c:i<4?P.A:(i===4?P.F:P.G),icon:t[1]};});
+    var edges=[];
+    for(var i=0;i<5;i++)edges.push({d:"M "+(xs[i]+CW)+" 502 L "+xs[i+1]+" 502",c:i<4?P.A:P.F});
+    return{vb:"0 0 1120 570",nodes:nodes,edges:edges,
+      blocks:[
+        {x:726,y:56,w:364,h:190,title:"อ่านกราฟนี้ยังไง",sub:"",c:P.G,icon:"gauge",
+         items:["ตัวเลข EGT ดิบ ๆ ไม่มีความหมายในตัวเอง","สิ่งที่อ่านคือ ห่างจาก Peak เท่าไหร่ และอยู่ฝั่งไหน","Lean ลงแล้ว EGT ขึ้น = ยังอยู่ฝั่ง Rich","Lean ต่อแล้ว EGT เริ่มตก = ผ่าน Peak ไปแล้ว","กำลังสูงสุดอยู่ฝั่ง Rich ของ Peak","CHT ต่างหากที่ทำเครื่องพัง ไม่ใช่ EGT"]},
+        {x:726,y:266,w:364,h:130,title:"ที่ความสูงต่างกัน",sub:"",c:P.A,icon:"climb",
+         items:["รูปกราฟเหมือนเดิมทุกระดับความสูง","แต่ตำแหน่งที่คัน Mixture ชี้ไปเปลี่ยน","Peak ใหม่จึงต้องหาใหม่ทุกครั้งที่เปลี่ยนระดับ"]}],
+      chart:{x:16,y:56,w:680,h:340,
+        title:"EGT · กำลัง · CHT เทียบกับส่วนผสม (เชิงหลักการ)",
+        ylab:"อุณหภูมิ / กำลัง",xlab:"",xleft:"◀ Lean (น้ำมันน้อย)",xright:"Rich (น้ำมันมาก) ▶",
+        zones:[{x0:0,x1:0.22,c:P.N,t:"Lean เกินไป"},
+               {x0:0.82,x1:1,c:P.N,t:"Rich เกินไป"}],
+        vmarks:[{x:0.5,c:P.R,t:["Peak EGT","(peak)"]},
+                {x:0.66,c:P.M,t:["กำลังสูงสุด","ฝั่ง Rich ของ Peak"]}],
+        series:[
+          {c:P.R,w:2.6,lab:"EGT",lx:0.13,ly:0.84,
+           pts:[[0.04,0.26],[0.15,0.48],[0.28,0.74],[0.4,0.92],[0.5,1],[0.6,0.94],[0.72,0.82],[0.86,0.66],[0.98,0.5]]},
+          {c:P.M,w:2.4,lab:"กำลัง",lx:0.8,ly:0.9,
+           pts:[[0.04,0.34],[0.15,0.5],[0.28,0.66],[0.4,0.78],[0.52,0.85],[0.66,0.88],[0.8,0.85],[0.98,0.78]]},
+          {c:P.E,w:2.4,dash:true,lab:"CHT",lx:0.86,ly:0.5,
+           pts:[[0.04,0.2],[0.15,0.32],[0.28,0.48],[0.4,0.62],[0.52,0.72],[0.62,0.74],[0.76,0.66],[0.98,0.5]]}]},
+      lanes:[{y:416,x:22,t:"เมื่อไต่สูงขึ้นโดยไม่แตะคัน Mixture",c:P.A}]};
+  }
+  var xs2=[70,320,570,820],CW2=230;
+  var chain2=[
+    [["บินสูงขึ้น"],"climb",P.A,false],
+    [["เทอร์โบชดเชยความหนาแน่นอากาศ"],"compressor",P.A,false],
+    [["ECU วัดแล้วสั่งปริมาณน้ำมันเอง"],"ecu",P.G,false],
+    [["ไม่มีคัน Mixture ไม่มีขั้นตอน Lean"],"mixturelever",P.N,true]];
+  var nodes2=chain2.map(function(t,i){
+    return {x:xs2[i],y:470,w:CW2,h:64,t:t[0],c:t[2],icon:t[1],ghost:t[3]};});
+  var edges2=[];
+  for(var j=0;j<3;j++)edges2.push({d:"M "+(xs2[j]+CW2)+" 502 L "+xs2[j+1]+" 502",c:j<2?P.A:P.G});
+  return{vb:"0 0 1120 570",nodes:nodes2,edges:edges2,
+    blocks:[
+      {x:726,y:56,w:364,h:190,title:"ดีเซลอยู่ฝั่ง Lean เสมอ",sub:"",c:P.G,icon:"ecu",
+       items:["อากาศเข้าเต็มที่ตลอด ไม่มีลิ้นเร่งคุมกำลัง","กำลังคุมที่ปริมาณน้ำมันที่ฉีดล้วน ๆ","เดินเบา = น้ำมันน้อยมาก อากาศเหลือเยอะ","กำลังเต็ม = น้ำมันมากขึ้น แต่ยังเหลืออากาศ","จึงไม่มีจุด peak EGT ให้นักบินตามหา"]},
+      {x:726,y:266,w:364,h:130,title:"แล้วนักบินดูอะไรแทน",sub:"",c:P.A,icon:"gauge",
+       items:["เปอร์เซ็นต์ภาระเครื่องยนต์และอัตราสิ้นเปลือง","อุณหภูมิน้ำหล่อเย็นและน้ำมันเครื่อง","ข้อความเตือนจาก ECU บน G1000"]}],
+    chart:{x:16,y:56,w:680,h:340,
+      title:"อัตราส่วนอากาศ:น้ำมัน และ EGT เทียบกับกำลัง (เชิงหลักการ)",
+      ylab:"อากาศ : น้ำมัน",xlab:"",xleft:"◀ เดินเบา",xright:"กำลังเต็ม ▶",
+      hmarks:[{y:0.16,c:P.R,t:"อัตราส่วนพอดีทางเคมี — ดีเซลอยู่เหนือเส้นนี้เสมอ (มีอากาศเหลือ)"}],
+      zones:[{x0:0,x1:1,c:P.K,t:""}],
+      series:[
+        {c:P.A,w:2.8,lab:"อากาศ : น้ำมัน",lx:0.42,ly:0.62,
+         pts:[[0.03,0.98],[0.15,0.82],[0.3,0.62],[0.45,0.48],[0.6,0.4],[0.8,0.32],[1,0.27]]},
+        {c:P.R,w:2.6,dash:true,lab:"EGT",lx:0.72,ly:0.72,
+         pts:[[0.03,0.1],[0.15,0.2],[0.3,0.34],[0.45,0.47],[0.6,0.6],[0.8,0.78],[1,0.94]]}]},
+    lanes:[{y:416,x:70,t:"เมื่อไต่สูงขึ้น",c:P.A}]};
+}
+
+function SPEC(t,key){
+  return t==="lube"?SPEC_LUBE(key):t==="cool"?SPEC_COOL(key):t==="turbo"?SPEC_TURBO(key)
+    :t==="egt"?SPEC_EGT(key):SPEC_ENGINE(key);
+}
+
+var FL={},mkCache={},mkN=0,mkDefs=null;
+function mkFor(c){
+  if(mkCache[c])return mkCache[c];
+  var id="ar"+(mkN++);
+  var m=el("marker",{id:id,viewBox:"0 0 10 10",refX:"9",refY:"5",markerWidth:"9",markerHeight:"9",
+    markerUnits:"userSpaceOnUse",orient:"auto-start-reverse"});
+  m.appendChild(el("path",{d:"M 0 0 L 10 5 L 0 10 z",fill:c}));
+  mkDefs.appendChild(m);
+  return (mkCache[c]="url(#"+id+")");
+}
+
+function buildFlow(cfg){
+  flow.textContent="";FL.dashes=[];mkCache={};mkN=0;
+  var spec=SPEC(topic,cfg.key),bg=cvar("--surface"),ink=cvar("--ink"),ink2=cvar("--ink-2");
+  flow.setAttribute("viewBox",spec.vb);
+  mkDefs=el("defs");flow.appendChild(mkDefs);
+
+  (spec.lanes||[]).forEach(function(l){
+    flow.appendChild(el("text",{x:l.x,y:l.y,fill:l.c,"font-size":12,"font-weight":600,
+      "text-anchor":l.anchor||"start","font-family":"Chakra Petch, sans-serif","letter-spacing":".08em"},l.t));
+  });
+
+  function drawEdge(e){
+    var p=el("path",{d:e.d,fill:"none",stroke:e.c,"stroke-width":e.w||5,"stroke-linecap":"round",
+      "stroke-linejoin":"round","marker-end":mkFor(e.c)});
+    if(e.dash){p.setAttribute("stroke-dasharray","9 7");p.setAttribute("opacity",".85");}
+    else if(e.solid){p.setAttribute("opacity",".85");}
+    else{p.setAttribute("stroke-dasharray","14 10");FL.dashes.push(p);}
+    flow.appendChild(p);
+    if(e.lab)flow.appendChild(el("text",{x:e.lx,y:e.ly,fill:e.c,"font-size":11,
+      "text-anchor":e.anchor||"middle"},e.lab));
+  }
+  spec.edges.filter(function(e){return !e.top;}).forEach(function(e){
+    flow.appendChild(el("path",{d:e.d,fill:"none",stroke:bg,"stroke-width":(e.w||5)+6,
+      "stroke-linecap":"round","stroke-linejoin":"round"}));
+  });
+  spec.edges.filter(function(e){return !e.top;}).forEach(drawEdge);
+
+  (spec.nodes||[]).forEach(function(n){
+    var w=n.w||NW,h=n.h||NH;
+    if(n.icon)flow.appendChild(iconG(n.icon,n.x+w/2,n.y-25,n.c));
+    var rc=el("rect",{x:n.x,y:n.y,width:w,height:h,rx:4,fill:bg,stroke:n.c,"stroke-width":1.5});
+    if(n.ghost){rc.setAttribute("stroke-dasharray","7 6");rc.setAttribute("opacity",".9");}
+    flow.appendChild(rc);
+    if(!n.ghost)flow.appendChild(el("rect",{x:n.x,y:n.y,width:4,height:h,fill:n.c}));
+    var start=n.y+h/2-((n.t.length-1)*15)/2+5;
+    n.t.forEach(function(t,i){
+      flow.appendChild(el("text",{x:n.x+w/2+2,y:start+i*15,"text-anchor":"middle",
+        "font-size":i===0?12.5:11,fill:n.ghost?ink2:(i===0?ink:ink2),"font-weight":i===0?600:400},t));
+    });
+  });
+
+  (spec.blocks||[]).forEach(function(b){
+    flow.appendChild(el("rect",{x:b.x,y:b.y,width:b.w,height:b.h,rx:6,fill:cvar("--surface-2"),
+      stroke:b.c,"stroke-width":1.6}));
+    if(b.icon)flow.appendChild(iconG(b.icon,b.x+b.w-28,b.y+30,b.c));
+    flow.appendChild(el("text",{x:b.x+b.w/2-14,y:b.y+26,"text-anchor":"middle","font-size":13,
+      "font-weight":600,fill:ink,"font-family":"Chakra Petch, sans-serif"},b.title));
+    if(b.sub)flow.appendChild(el("text",{x:b.x+b.w/2-14,y:b.y+44,"text-anchor":"middle","font-size":11,fill:ink2},b.sub));
+    (b.items||[]).forEach(function(it,i){
+      var y=b.y+70+i*21;
+      flow.appendChild(el("circle",{cx:b.x+18,cy:y-4,r:3,fill:b.c}));
+      flow.appendChild(el("text",{x:b.x+30,y:y,"font-size":11.5,fill:ink2},it));
+    });
+  });
+
+  if(spec.chart){
+    var ch=spec.chart,line=cvar("--line");
+    flow.appendChild(el("rect",{x:ch.x,y:ch.y,width:ch.w,height:ch.h,rx:6,fill:bg,stroke:line,"stroke-width":1.2}));
+    var padL=ch.w>500?58:42,padT=ch.w>500?46:30,padR=ch.w>500?26:20,padB=ch.w>500?54:28;
+    var px=ch.x+padL,py=ch.y+padT,pw=ch.w-padL-padR,ph=ch.h-padT-padB;
+    var X=function(u){return px+u*pw;},Y=function(v){return py+ph-v*ph;};
+    flow.appendChild(el("text",{x:ch.x+14,y:ch.y+22,"font-size":ch.w>500?12:11,fill:ink2},ch.title));
+    (ch.zones||[]).forEach(function(z){
+      flow.appendChild(el("rect",{x:X(z.x0),y:py,width:(z.x1-z.x0)*pw,height:ph,fill:z.c,opacity:.09}));
+      if(z.t)flow.appendChild(el("text",{x:X((z.x0+z.x1)/2),y:py+ph-8,"text-anchor":"middle",
+        "font-size":10,fill:ink2,opacity:.9},z.t));
+    });
+    (ch.hmarks||[]).forEach(function(h){
+      flow.appendChild(el("line",{x1:px,y1:Y(h.y),x2:px+pw,y2:Y(h.y),stroke:h.c,"stroke-width":1.4,
+        "stroke-dasharray":"7 5",opacity:.85}));
+      flow.appendChild(el("text",{x:px+6,y:Y(h.y)-7,"font-size":10,fill:h.c},h.t));
+    });
+    (ch.vmarks||[]).forEach(function(v){
+      flow.appendChild(el("line",{x1:X(v.x),y1:py,x2:X(v.x),y2:py+ph,stroke:v.c,"stroke-width":1.4,
+        "stroke-dasharray":"5 4",opacity:.85}));
+      (v.t||[]).forEach(function(t,i){
+        flow.appendChild(el("text",{x:X(v.x),y:py-18+i*13,"text-anchor":"middle","font-size":10.5,
+          fill:v.c,"font-weight":i===0?600:400},t));
+      });
+    });
+    flow.appendChild(el("path",{d:"M "+px+" "+py+" L "+px+" "+(py+ph)+" L "+(px+pw)+" "+(py+ph),
+      fill:"none",stroke:line,"stroke-width":1.3}));
+    if(ch.ylab)flow.appendChild(el("text",{x:ch.x+22,y:py+ph/2,"text-anchor":"middle","font-size":10.5,fill:ink2,
+      transform:"rotate(-90 "+(ch.x+22)+" "+(py+ph/2)+")"},ch.ylab));
+    if(ch.xleft)flow.appendChild(el("text",{x:px,y:py+ph+22,"font-size":10.5,fill:ink2},ch.xleft));
+    if(ch.xright)flow.appendChild(el("text",{x:px+pw,y:py+ph+22,"text-anchor":"end","font-size":10.5,fill:ink2},ch.xright));
+    if(ch.xlab)flow.appendChild(el("text",{x:px+pw,y:py+ph+16,"text-anchor":"end","font-size":9.5,fill:ink2},ch.xlab));
+    if(ch.mark){
+      var mx=X(ch.mark.x);
+      flow.appendChild(el("line",{x1:mx,y1:py,x2:mx,y2:py+ph,stroke:ink2,"stroke-width":1,
+        "stroke-dasharray":"3 3",opacity:.7}));
+      flow.appendChild(el("text",{x:mx+4,y:py+10,"font-size":9,fill:ink2,
+        "font-family":"IBM Plex Mono, monospace"},ch.mark.t));
+    }
+    ch.series.forEach(function(se){
+      var d=se.pts.map(function(q,i){return (i?"L ":"M ")+X(q[0]).toFixed(1)+" "+Y(q[1]).toFixed(1);}).join(" ");
+      var pl=el("path",{d:d,fill:"none",stroke:se.c,"stroke-width":se.w||2.4,
+        "stroke-linecap":"round","stroke-linejoin":"round"});
+      if(se.dash)pl.setAttribute("stroke-dasharray","6 5");
+      flow.appendChild(pl);
+      flow.appendChild(el("text",{x:X(se.lx),y:Y(se.ly),"font-size":ch.w>500?11.5:10,
+        fill:se.c,"font-weight":600,"text-anchor":"middle"},se.lab));
+    });
+  }
+
+  spec.edges.filter(function(e){return e.top;}).forEach(drawEdge);
+
+  if(spec.cyl){
+    var c=spec.cyl;
+    flow.appendChild(el("rect",{x:c.x,y:c.y,width:c.w,height:c.h,rx:6,fill:cvar("--surface-2"),
+      stroke:ink2,"stroke-width":1.5}));
+    flow.appendChild(el("text",{x:c.x+c.w/2,y:c.y+26,"text-anchor":"middle","font-size":13,
+      "font-weight":600,fill:ink,"font-family":"Chakra Petch, sans-serif"},"กระบอกสูบ + ฝาสูบ"));
+    flow.appendChild(el("text",{x:c.x+c.w/2,y:c.y+44,"text-anchor":"middle","font-size":11,fill:ink2},"× 4 สูบ"));
+    flow.appendChild(el("rect",{x:c.x+34,y:c.y+150,width:100,height:38,rx:4,fill:cvar("--sunk"),stroke:ink2,"stroke-width":1}));
+    flow.appendChild(el("text",{x:c.x+c.w/2,y:c.y+174,"text-anchor":"middle","font-size":10.5,fill:ink2},"ลูกสูบ"));
+    var m=c.mix;
+    var leg=m.in?el("path",{d:"M "+m.x+" "+(c.y+4)+" L "+m.x+" "+(m.y-14),fill:"none",stroke:cvar("--fuel"),
+          "stroke-width":6,"stroke-linecap":"round","marker-end":mkFor(cvar("--fuel")),"stroke-dasharray":"14 10"})
+        :el("path",{d:"M "+(m.x+12)+" "+m.y+" L "+(m.x+74)+" "+m.y,fill:"none",stroke:cvar("--mix"),
+          "stroke-width":7,"stroke-linecap":"round","marker-end":mkFor(cvar("--mix")),"stroke-dasharray":"14 10"});
+    flow.appendChild(leg);FL.dashes.push(leg);
+    flow.appendChild(el("circle",{cx:m.x,cy:m.y,r:11,fill:cvar("--mix")}));
+    flow.appendChild(el("circle",{cx:m.x,cy:m.y,r:17,fill:"none",stroke:cvar("--mix"),"stroke-width":1.5,opacity:.55}));
+    var lx=m.in?m.x:m.x-46,ly=m.y+40,la=m.in?"middle":"end";
+    if(!m.in)flow.appendChild(el("path",{d:"M "+(m.x-42)+" "+(m.y+32)+" L "+(m.x-9)+" "+(m.y+10),
+      fill:"none",stroke:cvar("--mix"),"stroke-width":1.2,opacity:.7}));
+    flow.appendChild(el("text",{x:lx,y:ly,"text-anchor":la,"font-size":12,"font-weight":600,fill:cvar("--mix")},"จุดที่น้ำมันเจออากาศ"));
+    flow.appendChild(el("text",{x:lx,y:ly+16,"text-anchor":la,"font-size":11,fill:cvar("--mix")},
+      m.in?"ในห้องเผาไหม้ ปลายจังหวะอัด":"ที่พอร์ตไอดี หน้าลิ้นไอดี"));
+  }
+}
+
+/* ---------- copy blocks ---------- */
+var COPY={
+engine:{
+c172:{
+ lede:"เครื่องยนต์ตัวนี้เป็นแบบ continuous-flow fuel injection น้ำมันถูกพ่นออกมาตลอดเวลาที่พอร์ตไอดีของทุกสูบ ไม่ได้พ่นเป็นจังหวะ และไม่มีคาร์บูเรเตอร์ ดังนั้นจึงไม่มี carb heat มีแต่ alternate air ไว้บายพาสกรองอากาศเวลากรองตัน",
+ cap:"ทางเดินอากาศ (ฟ้า) กับทางเดินน้ำมัน (อำพัน) วิ่งขนานกันจนมาบรรจบที่ Fuel/Air Control Unit ซึ่งวัดปริมาณน้ำมันให้สัมพันธ์กับปริมาณอากาศ แต่ยังไม่ผสมกันตรงนั้น การผสมจริงเกิดที่พอร์ตไอดีหน้าลิ้นไอดีของแต่ละสูบ",
+ qa:[
+  {c:"--air",q:"อากาศเข้าทางไหน",list:["ช่องรับอากาศใต้ฝากระโปรงหน้า (ram air)","กรองอากาศ — ถ้าตัน จะมี alternate air door เปิดดูดอากาศอุ่นจากในฝากระโปรงแทน","ลิ้นเร่ง (throttle) คุมปริมาณอากาศ = คุมกำลัง","ผ่าน Fuel/Air Control Unit ซึ่งวัดการไหลของอากาศ","ท่อร่วมไอดี แยกไปแต่ละสูบ แล้วเข้าลิ้นไอดี"]},
+  {c:"--fuel",q:"น้ำมันเข้าทางไหน",list:["ถังปีกซ้าย/ขวา ไหลลงมาด้วยแรงโน้มถ่วง","Fuel selector แล้วผ่านกรอง/ตัวดักน้ำ","ปั๊มขับด้วยเครื่องยนต์ (มีปั๊มไฟฟ้าสำรองสำหรับสตาร์ทและกรณีปั๊มหลักเสีย)","เข้า Fuel/Air Control Unit — คัน Mixture คุมปริมาณน้ำมันที่นี่","Flow divider บนหัวเครื่อง แบ่งออกเป็น 4 ท่อเท่า ๆ กัน","หัวฉีดที่พอร์ตไอดีของแต่ละสูบ พ่นออกตลอดเวลา"]},
+  {c:"--mix",q:"ผสมกันยังไง",a:"หัวฉีดพ่นน้ำมันเป็นละอองเข้าไปในพอร์ตไอดี ตรงตำแหน่งหน้าลิ้นไอดีพอดี อากาศที่วิ่งผ่านพัดละอองน้ำมันให้กลายเป็นไอ แล้วไหลเข้ากระบอกสูบพร้อมกันเป็นไอดีที่ผสมเสร็จแล้ว อัตราส่วนน้ำมันต่ออากาศคุมด้วยคัน Mixture — บินสูงขึ้นอากาศเบาบางลง ต้อง Lean เพื่อไม่ให้ส่วนผสมหนาเกินไป"},
+  {c:"--exh",q:"ไอเสียไปไหน",list:["ออกจากลิ้นไอเสียเข้าท่อไอเสียของแต่ละสูบ","รวมกันที่ท่อร่วมไอเสียใต้เครื่องยนต์","เข้ามัฟเฟลอร์ที่มีปลอกครอบ (shroud) — อากาศที่ไหลผ่านปลอกนี้คือ cabin heat","ออกทางปลายท่อใต้ลำตัวเครื่องบิน"]}]},
+da42:{
+ lede:"เครื่องยนต์ดีเซลไม่ได้คุมกำลังด้วยลิ้นเร่ง แต่คุมด้วยปริมาณน้ำมันที่ฉีดเข้าไป อากาศจึงถูกดูดเข้าเต็มที่ตลอดเวลา และมีเทอร์โบอัดเพิ่มให้อีก ทั้งหมดสั่งงานโดย FADEC ผ่านคันบังคับเดียวในห้องนักบิน",
+ cap:"อากาศ (ฟ้า) กับน้ำมัน (อำพัน) ไม่เจอกันเลยตลอดทาง — อากาศเข้าทางลิ้นไอดี ส่วนน้ำมันแรงดันสูงขึ้นไปรอที่หัวฉีดบนฝาสูบ แล้วจึงพบกันครั้งแรกในห้องเผาไหม้ตอนปลายจังหวะอัด ด้านไอเสียมีกังหันเทอร์โบคั่นอยู่ก่อนออกท่อ ทำให้พลังงานส่วนหนึ่งวนกลับไปอัดอากาศขาเข้า",
+ qa:[
+  {c:"--air",q:"อากาศเข้าทางไหน",list:["ช่องรับอากาศที่ฝากระโปรง ผ่านกรองอากาศ","คอมเพรสเซอร์ของเทอร์โบอัดอากาศให้ความดันสูงขึ้น","อินเตอร์คูลเลอร์ลดอุณหภูมิอากาศที่ร้อนจากการอัด ทำให้อากาศหนาแน่นขึ้นอีก","ท่อร่วมไอดี → ลิ้นไอดี เข้ากระบอกสูบเป็นอากาศล้วน ๆ ไม่มีน้ำมันปน","ไม่มีลิ้นเร่งคุมกำลัง กำลังคุมที่ปริมาณน้ำมัน"]},
+  {c:"--fuel",q:"น้ำมันเข้าทางไหน",list:["ถังน้ำมัน Jet A-1 หรือดีเซล","ปั๊มไฟฟ้าแรงดันต่ำดูดออกจากถัง","กรองน้ำมัน + ตัวดักน้ำ (สำคัญมากกับดีเซล)","ปั๊มแรงดันสูงอัดขึ้นไปถึงระดับพันบาร์","ท่อคอมมอนเรลที่แรงดันคงที่ ~1,800 บาร์ รอไว้ตลอดเวลา","หัวฉีดไฟฟ้า 4 หัวบนฝาสูบ ฉีดตรงเข้าห้องเผาไหม้ (น้ำมันส่วนที่ไม่ได้ใช้ไหลกลับถัง)"]},
+  {c:"--mix",q:"ผสมกันยังไง",a:"ผสมกันในกระบอกสูบ ไม่ใช่ในท่อไอดี — ปลายจังหวะอัด อากาศถูกบีบจนร้อนหลายร้อยองศา หัวฉีดพ่นน้ำมันเป็นละอองละเอียดมากเข้าไปในอากาศร้อนนั้น ละอองระเหยแล้วติดไฟเองทันทีโดยไม่ต้องมีประกายไฟ ระยะเวลาและจำนวนครั้งที่ฉีดถูกคุมด้วย FADEC จึงไม่มีคัน Mixture ให้นักบินปรับ"},
+  {c:"--exh",q:"ไอเสียไปไหน",list:["ออกจากลิ้นไอเสียเข้าท่อร่วมไอเสีย","พุ่งเข้าใส่กังหัน (turbine) ของเทอร์โบ ทำให้กังหันหมุน","เพลาเดียวกันไปหมุนคอมเพรสเซอร์ด้านไอดี = เอาพลังงานที่จะทิ้งไปกลับมาใช้","ผ่าน wastegate คุมแรงดันบูสต์ แล้วออกปลายท่อ"]}]}
+},
+
+lube:{
+c172:{
+ lede:"ระบบหล่อลื่นของ Lycoming เป็นแบบ wet sump คือเก็บน้ำมันไว้ในอ่างใต้ห้องข้อเหวี่ยงของเครื่องยนต์เอง ไม่มีถังแยก ปั๊มดูดขึ้นไปเลี้ยงทุกจุด แล้วน้ำมันไหลกลับลงอ่างด้วยแรงโน้มถ่วง วนแบบนี้ตลอดเวลาที่เครื่องเดิน",
+ cap:"เส้นทางเป็นวงจรปิด อ่าง → ปั๊ม → คูลเลอร์ → กรอง → ทางน้ำมันในห้องข้อเหวี่ยง → ทุกจุดที่มีโลหะเสียดสีกัน → ไหลกลับลงอ่าง วาล์วระบายแรงดันคอยระบายน้ำมันส่วนเกินกลับ ไม่ให้แรงดันสูงเกินไปตอนน้ำมันยังเย็นและหนืด",
+ qa:[
+  {c:"--oil",q:"น้ำมันเครื่องทำอะไรบ้าง",list:["หล่อลื่น — ลดการเสียดสีระหว่างโลหะกับโลหะ","ระบายความร้อน — พาความร้อนออกจากลูกสูบและแบริ่ง คิดเป็นสัดส่วนไม่น้อยของความร้อนทั้งหมด","ทำความสะอาด — พาเศษโลหะและเขม่าไปติดที่ไส้กรอง","ซีล — อุดช่องว่างระหว่างแหวนลูกสูบกับผนังกระบอกสูบ ทำให้กำลังอัดไม่รั่ว","ป้องกันสนิม — เคลือบผิวโลหะไว้","ทำงานแบบไฮดรอลิก — ดันลิฟเตอร์ให้ปรับระยะวาล์วเอง"]},
+  {c:"--oil",q:"เดินทางยังไง",list:["อ่างน้ำมันใต้ห้องข้อเหวี่ยง","ผ่านตะแกรงดูด กันเศษใหญ่","ปั๊มเฟืองขับด้วยเครื่องยนต์","วาล์วระบายแรงดัน — เกินเมื่อไหร่ระบายกลับอ่าง","ออยล์คูลเลอร์ (ถ้าน้ำมันยังเย็น วาล์วเทอร์โมสตัทจะบายพาสไม่ให้ผ่าน)","กรองน้ำมันแบบ full-flow (มีทางบายพาสถ้าไส้กรองตัน)","ทางน้ำมันในห้องข้อเหวี่ยง ไปเลี้ยงแบริ่ง เพลาลูกเบี้ยว ลิฟเตอร์ และขึ้นทางท่อก้านกระทุ้งไปหล่อลื่นกระเดื่องวาล์ว","ไหลกลับลงอ่าง เริ่มรอบใหม่"]},
+  {c:"--arc",q:"ต้องเฝ้าดูอะไร",a:"แรงดันน้ำมันและอุณหภูมิน้ำมันคือสัญญาณชีพของเครื่องยนต์ หลังสตาร์ทต้องเห็นแรงดันขึ้นภายในราว 30 วินาที (อากาศหนาวให้เวลานานกว่านั้นได้) ถ้าไม่ขึ้น ให้ดับเครื่องทันที ระหว่างบินแรงดันควรอยู่ในย่านเขียว แรงดันตกพร้อมอุณหภูมิขึ้น มักแปลว่าน้ำมันกำลังจะหมดหรือรั่ว ให้เตรียมลงสนามใกล้ที่สุด"},
+  {c:"--redline",q:"ที่มักพลาดกัน",list:["ไม่ได้เช็กระดับน้ำมันก่อนบิน หรือเช็กแล้วไม่ขันฝาให้แน่น น้ำมันพ่นออกจนหมดกลางอากาศ","เติมน้ำมันเกิน — ส่วนเกินจะถูกดันออกทาง breather เลอะท้องเครื่องเปล่า ๆ","ใช้น้ำมันผิดชนิดหรือผิดเบอร์ตามอุณหภูมิอากาศ","เร่งเครื่องแรงตอนน้ำมันยังเย็น น้ำมันยังหนืดและยังไปไม่ถึงทุกจุด","บินท่าที่ทำให้แรงดันเป็นลบ ปั๊มจะดูดอากาศแทนน้ำมัน"]}]},
+da42:{
+ lede:"หลักการเหมือนกับ C172 คือปั๊มดูดน้ำมันจากอ่างไปเลี้ยงทุกจุดแล้ววนกลับ แต่ AE300 มีสองอย่างที่ Lycoming ไม่มีและต้องพึ่งน้ำมันเครื่องหนักมาก คือแบริ่งเทอร์โบที่หมุนเร็วและร้อนจัด กับชุดเกียร์ทดใบพัด",
+ cap:"สังเกตแขนงที่แยกไปเลี้ยงแบริ่งเทอร์โบ นี่คือจุดที่ทำให้ขั้นตอนดับเครื่องของเครื่องบินลำนี้ต่างจาก C172 — ต้องเดินเบาให้เทอร์โบเย็นลงก่อนตามที่คู่มือกำหนด ไม่ใช่ดับทันทีหลังลดกำลัง",
+ qa:[
+  {c:"--oil",q:"ต่างจาก C172 ตรงไหน",list:["ต้องเลี้ยงแบริ่งเทอร์โบ ซึ่งหมุนเร็วมากและรับความร้อนจากไอเสียโดยตรง","ต้องเลี้ยงชุดเกียร์ทดที่ลดรอบเครื่องลงไปหมุนใบพัด","ดีเซลสร้างเขม่าและกรดมากกว่า น้ำมันจึงเสื่อมเร็วกว่าและมีรอบเปลี่ยนถี่กว่า","ใช้น้ำมันตามรายการที่ Austro อนุมัติ ซึ่งเป็นน้ำมันดีเซลสมัยใหม่ ไม่ใช่น้ำมันการบินแบบ ashless dispersant อย่าง C172 — ห้ามใช้สลับกัน","แรงดันและอุณหภูมิถูกเฝ้าดูโดย ECU แล้วส่งขึ้นจอ G1000 พร้อมข้อความเตือน"]},
+  {c:"--oil",q:"เดินทางยังไง",list:["อ่างน้ำมันเครื่อง ผ่านตะแกรงดูด","ปั๊มขับด้วยเครื่องยนต์","วาล์วระบายแรงดัน","ตัวระบายความร้อนน้ำมัน","กรองน้ำมันแบบ full-flow มีทางบายพาส","แยกสองทาง — ทางหนึ่งเข้าทางน้ำมันในเสื้อสูบไปเลี้ยงแบริ่ง เพลาลูกเบี้ยว หัวพ่นน้ำมันใต้ลูกสูบ และชุดเกียร์ อีกทางไปเลี้ยงแบริ่งเทอร์โบ","ทั้งสองทางไหลกลับลงอ่าง"]},
+  {c:"--arc",q:"ใครเป็นคนเฝ้าดู",a:"FADEC/ECU เฝ้าดูให้ตลอดเวลาและเตือนเองเมื่อค่าออกนอกเกณฑ์ นักบินไม่ต้องตีความเข็มเหมือน C172 แต่ก็ไม่ได้แปลว่าไม่ต้องดู — ข้อความเตือนที่ขึ้นบน G1000 ต้องรู้ว่าอันไหนสั่งให้ลดกำลัง อันไหนสั่งให้ลงสนามทันที ให้ยึดตาม AFM"},
+  {c:"--redline",q:"ที่ต้องระวัง",list:["ดับเครื่องทันทีหลังใช้กำลังสูง — น้ำมันจะค้างอยู่ในแบริ่งเทอร์โบที่ยังร้อนจัดแล้วไหม้เป็นคราบ (coking) ทำให้แบริ่งพังในระยะยาว ต้องเดินเบาให้เย็นก่อนตามคู่มือ","เติมน้ำมันผิดสเปก เพราะดูเหมือนน้ำมันรถทั่วไป","ไม่เช็กระดับตามวิธีที่คู่มือกำหนด (เวลารอหลังดับเครื่องมีผลกับค่าที่อ่านได้)","มองข้ามข้อความเตือนบนจอเพราะคิดว่าระบบจัดการเองได้"]}]}
+},
+
+cool:{
+c172:{
+ lede:"C172S ระบายความร้อนด้วยอากาศล้วน ๆ ไม่มีน้ำ ไม่มีหม้อน้ำ ไม่มีเทอร์โมสตัท สิ่งที่ทำให้มันเย็นคือแรงลมที่ไหลผ่านครีบระบายความร้อน กับแผ่นกั้น (baffle) ที่บังคับไม่ให้ลมไหลผ่านไปเฉย ๆ — แปลว่าอุณหภูมิเครื่องขึ้นกับวิธีบินของนักบินโดยตรง",
+ cap:"อากาศเข้าช่องหน้าเครื่อง แผ่นกั้นและซีลยางบังคับให้ไหลลงผ่านฝาสูบก่อน (จุดที่ร้อนที่สุด) แล้วจึงผ่านครีบกระบอกสูบและออยล์คูลเลอร์ ก่อนออกใต้ท้องเครื่อง ส่วนแถวล่างคืออากาศอีกทางหนึ่งที่วิ่งผ่านปลอกครอบท่อไอเสียแล้วเข้าห้องโดยสารเป็น cabin heat",
+ qa:[
+  {c:"--air",q:"ระบายความร้อนด้วยอะไร",list:["อากาศที่วิ่งผ่านครีบระบายความร้อนของฝาสูบและกระบอกสูบ","ออยล์คูลเลอร์ช่วยดึงความร้อนออกทางน้ำมันเครื่องอีกทางหนึ่ง","น้ำมันเครื่องเองก็เป็นตัวระบายความร้อนสำคัญ — ระบบหล่อลื่นกับระบายความร้อนจึงเกี่ยวกัน","ไอเสียพาความร้อนออกไปด้วยส่วนหนึ่ง","ส่วนผสมที่หนาขึ้นเล็กน้อยช่วยลดอุณหภูมิห้องเผาไหม้"]},
+  {c:"--air",q:"แผ่นกั้น (baffle) สำคัญยังไง",a:"ถ้าไม่มีแผ่นกั้นและซีลยาง อากาศจะไหลผ่านฝากระโปรงไปเฉย ๆ โดยไม่ยอมมุดลงไปตามครีบ แผ่นกั้นสร้างความดันสูงไว้ด้านบนและความดันต่ำไว้ด้านล่าง อากาศจึงถูกบังคับให้ไหลลงผ่านครีบ ซีลยางที่แข็งกรอบ ฉีก หรือหลุด ทำให้ CHT สูงขึ้นทันทีโดยไม่มีอะไรผิดปกติที่อื่นเลย จึงต้องตรวจทุกครั้งตอนเดินรอบเครื่อง"},
+  {c:"--arc",q:"นักบินคุมอุณหภูมิยังไง",list:["ความเร็วอากาศ — ไต่แบบ cruise climb ที่ความเร็วสูงขึ้น ลมผ่านครีบมากขึ้น","กำลังเครื่องยนต์ — ลดกำลังลงบ้างเมื่ออุณหภูมิสูง","ส่วนผสม — Lean เกินไปทำให้เผาไหม้ร้อนขึ้นและ CHT สูง","ลดเวลาเดินเครื่องบนพื้นให้สั้น เพราะไม่มีลมช่วยระบาย","เฝ้าดู CHT, EGT และอุณหภูมิน้ำมันตลอด"]},
+  {c:"--redline",q:"สองอย่างที่ต้องระวัง",list:["ร้อนเกิน — ไต่ชันด้วยความเร็วต่ำ กำลังเต็ม ในวันอากาศร้อน คือชุดเงื่อนไขที่ทำให้ CHT พุ่งเร็วที่สุด","Shock cooling — ลดกำลังกะทันหันตอนลดระดับ ทำให้ฝาสูบเย็นเร็วเกินไปจนเกิดความเค้น ควรลดกำลังทีละน้อยและวางแผนการลดระดับล่วงหน้า","ครีบหักหรือมีสิ่งอุดตันช่องอากาศ (รังนก เศษใบไม้) ทำให้ระบายความร้อนไม่ได้"]}]},
+da42:{
+ lede:"AE300 ระบายความร้อนด้วยของเหลวเหมือนเครื่องยนต์รถยนต์ คือมีน้ำหล่อเย็นวนอยู่ในช่องรอบกระบอกสูบ แล้วเอาความร้อนไปทิ้งที่หม้อน้ำ ข้อดีคือเทอร์โมสตัทคุมอุณหภูมิให้คงที่โดยอัตโนมัติ ไม่ขึ้นกับว่านักบินบินยังไง",
+ cap:"เป็นวงจรปิด ปั๊ม → ช่องน้ำในเสื้อสูบและฝาสูบ → เทอร์โมสตัท ถ้าน้ำยังเย็น เทอร์โมสตัทจะปิดทางไปหม้อน้ำแล้วให้วนกลับ เพื่อให้เครื่องอุ่นเร็ว พอร้อนถึงเกณฑ์จึงเปิดให้ผ่านหม้อน้ำ อีกแขนงหนึ่งพาน้ำร้อนไปตัวแลกเปลี่ยนความร้อนเพื่อทำ cabin heat",
+ qa:[
+  {c:"--cool",q:"ระบายความร้อนด้วยอะไร",list:["น้ำหล่อเย็น (น้ำผสมไกลคอล) วนอยู่ในช่องรอบกระบอกสูบและห้องเผาไหม้","ปั๊มน้ำขับด้วยเครื่องยนต์เป็นตัวทำให้ไหล","หม้อน้ำในแนซเซลเป็นที่ทิ้งความร้อนให้อากาศ","ยังมีออยล์คูลเลอร์และอินเตอร์คูลเลอร์ที่ใช้อากาศอีกต่างหาก","ถังพักน้ำรับการขยายตัวเมื่อร้อน และเป็นจุดที่ใช้เช็กระดับ"]},
+  {c:"--exh",q:"เทอร์โมสตัททำอะไร",a:"มันคือวาล์วที่เปิด-ปิดตามอุณหภูมิ ตอนสตาร์ทเครื่องเย็น มันจะปิดทางไปหม้อน้ำ น้ำจึงวนอยู่ในเครื่องอย่างเดียว ทำให้เครื่องถึงอุณหภูมิทำงานเร็ว ซึ่งสำคัญกับดีเซลมาก พอน้ำร้อนถึงเกณฑ์ วาล์วจะเปิดให้น้ำผ่านหม้อน้ำ ผลคืออุณหภูมิเครื่องยนต์แทบคงที่ตลอดเที่ยวบิน ไม่ว่าจะไต่ ล่องเรือ หรือลดระดับ"},
+  {c:"--arc",q:"cabin heat มาจากไหน",a:"มาจากน้ำหล่อเย็นร้อนที่ถูกส่งผ่านตัวแลกเปลี่ยนความร้อน แล้วเป่าลมผ่านเข้าห้องโดยสาร ไม่ได้มาจากปลอกครอบท่อไอเสียแบบ C172 นั่นแปลว่าไม่มีเส้นทางให้คาร์บอนมอนอกไซด์จากไอเสียเล็ดลอดเข้าห้องนักบินผ่านระบบทำความร้อน ซึ่งเป็นข้อได้เปรียบด้านความปลอดภัยที่ชัดเจนข้อหนึ่ง"},
+  {c:"--redline",q:"ต้องเช็กอะไรก่อนบิน",list:["ระดับน้ำหล่อเย็นในถังพัก — เป็นรายการเดินรอบเครื่องที่ C172 ไม่มี","ร่องรอยการรั่วซึมใต้เครื่องและรอบท่อ","ช่องรับอากาศของหม้อน้ำไม่มีสิ่งอุดตัน","สภาพน้ำหล่อเย็น ต้องเปลี่ยนตามรอบ เพราะสารกันสนิมเสื่อมตามอายุ","ถ้าอุณหภูมิน้ำขึ้นสูงผิดปกติระหว่างบิน ให้ทำตาม AFM — มักหมายถึงน้ำรั่ว ปั๊มหรือเทอร์โมสตัทมีปัญหา"]}]}
+},
+
+turbo:{
+c172:{
+ lede:"C172S ไม่มีเทอร์โบ เป็นเครื่องแบบ normally aspirated คือดูดอากาศเข้าเองด้วยความดันบรรยากาศล้วน ๆ ผลคือยิ่งบินสูง อากาศยิ่งเบาบาง มวลอากาศที่เข้ากระบอกสูบต่อรอบยิ่งน้อย กำลังก็ลดลงเรื่อย ๆ และพลังงานที่ยังเหลืออยู่ในไอเสียถูกปล่อยทิ้งไปทั้งหมด",
+ cap:"ผังนี้คือทางเดินเดียวกับ DA42 แต่ถอดออกสองชิ้น กล่องเส้นประคือตำแหน่งที่ DA42 มีคอมเพรสเซอร์กับกังหันอยู่ ลองสลับไปดูหัวข้อเดียวกันของ DA42 จะเห็นชัดว่าเทอร์โบเพิ่มอะไรเข้ามาบ้าง",
+ qa:[
+  {c:"--air",q:"normally aspirated แปลว่าอะไร",a:"แปลว่าไม่มีอะไรมาช่วยอัดอากาศเข้าเครื่องเลย ลูกสูบที่เลื่อนลงสร้างความดันต่ำในกระบอกสูบ แล้วความดันบรรยากาศเป็นตัวดันอากาศเข้าไปเอง ดังนั้นความดันไอดีสูงสุดที่เป็นไปได้ก็คือความดันบรรยากาศ ณ ความสูงนั้น หักด้วยแรงเสียดทานในท่อไอดีและที่ลิ้นเร่ง"},
+  {c:"--air",q:"กำลังหายไปไหนเมื่อบินสูง",list:["ความหนาแน่นอากาศลดลงตามความสูง มวลออกซิเจนต่อรอบจึงน้อยลง","เมื่ออากาศน้อยลง ต้องลดน้ำมันตามด้วยการ Lean ไม่งั้นส่วนผสมหนาเกิน","น้ำมันน้อยลง + อากาศน้อยลง = พลังงานต่อการจุดระเบิดน้อยลง","แม้เปิดลิ้นเร่งสุด ก็ได้กำลังไม่เท่าเดิม","ผลจริงที่เจอ — ระยะวิ่งขึ้นยาวขึ้น อัตราไต่ลดลง เพดานบินจำกัด"]},
+  {c:"--mix",q:"แล้ว alternate air เกี่ยวไหม",a:"ไม่เกี่ยวกับการเพิ่มกำลัง มันเป็นเพียงทางอากาศสำรองเผื่อกรองอากาศตันหรือมีน้ำแข็งเกาะ อากาศที่เข้ามาทางนั้นเป็นอากาศอุ่นจากในฝากระโปรงซึ่งเบาบางกว่า จึงทำให้กำลังลดลงด้วยซ้ำ อย่าสับสนกับเทอร์โบซึ่งเพิ่มความดันไอดีจริง ๆ"},
+  {c:"--arc",q:"นักบินต้องทำอะไรแทน",list:["คำนวณสมรรถนะจาก density altitude ทุกครั้ง ไม่ใช่จากความสูงสนามอย่างเดียว","วันอากาศร้อน สนามสูง น้ำหนักมาก คือชุดเงื่อนไขที่อันตรายที่สุด","Lean ส่วนผสมตามระดับความสูงเพื่อให้เครื่องเดินเรียบและประหยัด","วางแผนอัตราไต่และเพดานบินตามตารางใน POH ไม่ใช่ตามความรู้สึก"]}]},
+da42:{
+ lede:"เทอร์โบชาร์จเจอร์คือเครื่องอัดอากาศที่ขับด้วยไอเสีย ไม่ได้ดึงกำลังจากเพลาข้อเหวี่ยงแบบซูเปอร์ชาร์จเจอร์ มันเอาพลังงานที่เดิมจะถูกทิ้งไปทางท่อไอเสียกลับมาอัดอากาศขาเข้า ทำให้ใส่มวลอากาศเข้ากระบอกสูบได้มากขึ้น จึงฉีดน้ำมันได้มากขึ้นและได้กำลังมากขึ้นจากเครื่องขนาดเท่าเดิม",
+ cap:"หัวใจอยู่ที่เส้นแนวตั้งกลางภาพ — กังหันฝั่งไอเสียกับคอมเพรสเซอร์ฝั่งไอดีอยู่บนเพลาเดียวกัน ไอเสียร้อนพุ่งใส่กังหัน กังหันลากคอมเพรสเซอร์ให้หมุนตาม ถ้าบูสต์สูงเกินที่ต้องการ ECU สั่งเปิดเวสต์เกตให้ไอเสียบางส่วนข้ามกังหันไป กราฟมุมขวาล่างคือผลลัพธ์ที่นักบินสัมผัสได้จริง",
+ qa:[
+  {c:"--air",q:"ทำงานยังไง",list:["ไอเสียที่ยังร้อนและมีความดันสูงพุ่งเข้าใส่ใบกังหัน","กังหันหมุน และลากคอมเพรสเซอร์ที่อยู่บนเพลาเดียวกันให้หมุนตาม","คอมเพรสเซอร์อัดอากาศขาเข้าให้ความดันสูงกว่าบรรยากาศ","อากาศที่ถูกอัดจะร้อนขึ้น จึงต้องผ่านอินเตอร์คูลเลอร์ก่อน","อากาศเย็นและหนาแน่นเข้ากระบอกสูบ ฉีดน้ำมันได้มากขึ้น = กำลังมากขึ้น"]},
+  {c:"--air",q:"ทำไมต้องมีอินเตอร์คูลเลอร์",a:"การอัดอากาศทำให้อากาศร้อนขึ้นเสมอ และอากาศร้อนก็เบาบางลง ซึ่งย้อนแย้งกับสิ่งที่เทอร์โบพยายามทำ อินเตอร์คูลเลอร์จึงเอาความร้อนออกจากอากาศที่อัดแล้วก่อนส่งเข้าเครื่อง ผลคือได้มวลอากาศต่อปริมาตรมากขึ้นอีก และยังช่วยลดภาระความร้อนของเครื่องยนต์ด้วย"},
+  {c:"--exh",q:"เวสต์เกตทำอะไร",a:"กังหันจะหมุนเร็วขึ้นเรื่อย ๆ ตามปริมาณไอเสีย ถ้าปล่อยไว้ ความดันบูสต์จะสูงเกินที่เครื่องรับไหว เวสต์เกตคือวาล์วที่เปิดให้ไอเสียบางส่วนข้ามกังหันไปออกท่อโดยตรง ทำให้กังหันหมุนช้าลงและบูสต์ไม่เกินพิกัด บน AE300 ตัวสั่งเปิด-ปิดคือ ECU ซึ่งคุมให้เองตลอดเวลา นักบินไม่ต้องเฝ้าเข็มบูสต์แบบเครื่องเทอร์โบรุ่นเก่า"},
+  {c:"--redline",q:"ผลต่อการบิน และสิ่งที่ต้องระวัง",list:["รักษากำลังได้จนถึง critical altitude แล้วจึงเริ่มลดลง — ไต่ได้ดีกว่าและบินสูงได้กว่า","แบริ่งเทอร์โบพึ่งน้ำมันเครื่องทั้งการหล่อลื่นและระบายความร้อน น้ำมันขาดเมื่อไหร่เสียหายทันที","ห้ามดับเครื่องทันทีหลังใช้กำลังสูง ต้องเดินเบาให้เทอร์โบเย็นตามที่คู่มือกำหนด ไม่งั้นน้ำมันไหม้เป็นคราบในแบริ่ง","ชิ้นส่วนฝั่งไอเสียร้อนจัดตลอดเวลา รอยรั่วของท่อไอเสียจึงเป็นเรื่องใหญ่กว่าเครื่องไร้เทอร์โบ","เพิ่มความซับซ้อนและน้ำหนัก แลกกับสมรรถนะที่ความสูง"]}]}
+},
+
+egt:{
+c172:{
+ lede:"EGT คืออุณหภูมิของแก๊สไอเสียที่เพิ่งออกจากกระบอกสูบ วัดด้วยเทอร์โมคัปเปิลที่ท่อไอเสียห่างจากฝาสูบไม่กี่นิ้ว ตัวเลขดิบของมันแทบไม่มีความหมายในตัวเอง เพราะขึ้นกับตำแหน่งที่ติดหัววัด สิ่งที่มีความหมายคือมันเปลี่ยนไปทางไหนเมื่อเราขยับคัน Mixture — EGT คือเครื่องมือที่บอกว่าตอนนี้ส่วนผสมอยู่ตรงไหนของกราฟ",
+ cap:"แกนนอนคือปริมาณน้ำมันเทียบกับอากาศ ซ้าย Lean ขวา Rich EGT ขึ้นสูงสุดตรงจุดที่น้ำมันกับอากาศพอดีกันทางเคมี เลยไปทางไหนก็ตาม EGT จะตกลงทั้งคู่ นี่คือเหตุผลที่ EGT ตกไม่ได้แปลว่าดีเสมอไป ต้องรู้ก่อนว่าเราอยู่ฝั่งไหนของ Peak และสังเกตว่ากำลังสูงสุดกับ CHT สูงสุดอยู่คนละจุดกับ EGT สูงสุด แถวล่างคือสิ่งที่เกิดขึ้นเองเมื่อไต่สูงขึ้นโดยไม่แตะคัน Mixture",
+ qa:[
+  {c:"--redline",q:"EGT บอกอะไรเรา",list:["บอกว่าส่วนผสมอยู่ห่างจากจุดพอดีทางเคมีแค่ไหน","Lean ลงแล้ว EGT ขึ้น แปลว่ายังอยู่ฝั่ง Rich ของ Peak","Lean ต่อแล้ว EGT เริ่มตก แปลว่าผ่าน Peak ไปแล้ว","ใช้เทียบกับตัวมันเองเท่านั้น ไม่ควรเอาตัวเลขไปเทียบกับเครื่องลำอื่น","ถ้าสูบใดสูบหนึ่ง EGT ผิดจากเพื่อนมาก มักบอกปัญหาหัวฉีด หัวเทียน หรือวาล์วของสูบนั้น"]},
+  {c:"--mix",q:"ทำไม EGT ตกได้ทั้งสองทาง",a:"เพราะ EGT สะท้อนความสมบูรณ์ของการเผาไหม้ ไม่ใช่ปริมาณน้ำมัน ถ้าน้ำมันมากเกินพอดี น้ำมันส่วนเกินจะดูดความร้อนไปกับตัวเองโดยไม่ได้เผา อุณหภูมิจึงตก ถ้าน้ำมันน้อยเกินพอดี ก็มีเชื้อเพลิงให้เผาน้อย ความร้อนรวมก็ตกเช่นกัน ตรงกลางคือจุดที่ทุกโมเลกุลเจอคู่ของมันพอดี ความร้อนจึงสูงที่สุด — EGT ที่ 1,300 องศาจึงอาจหมายถึง Rich มากหรือ Lean มากก็ได้ ถ้าไม่รู้ว่าเดินทางมาจากทางไหน",},
+  {c:"--air",q:"ความสูงเข้ามาเกี่ยวยังไง",list:["ยิ่งสูง อากาศยิ่งเบาบาง มวลอากาศที่เข้ากระบอกสูบต่อรอบยิ่งน้อยลง","แต่ระบบจ่ายน้ำมันวัดตามการไหลและแรงดัน ไม่ได้วัดมวลอากาศ ถ้าไม่แตะคัน Mixture น้ำมันจึงจ่ายเท่าเดิม","ผลคือส่วนผสม Rich ขึ้นเองโดยที่นักบินไม่ได้ทำอะไรเลย","บนกราฟคือจุดทำงานเลื่อนไปทางขวาเรื่อย ๆ ทั้งที่คัน Mixture อยู่ที่เดิม","EGT จึงตก กำลังตกมากกว่าที่ความหนาแน่นอากาศทำให้ตกอยู่แล้ว เปลืองน้ำมัน และเขม่าจับหัวเทียน","แก้ด้วยการ Lean คือดึงคัน Mixture ออกเพื่อลดน้ำมันให้สมดุลกับอากาศที่น้อยลง = ลากจุดทำงานกลับมาที่ Peak"]},
+  {c:"--arc",q:"Lean ยังไงในทางปฏิบัติ",list:["ตอนไต่เหนือระดับที่ POH กำหนด ให้ Lean เพื่อให้ได้รอบสูงสุด/เดินเรียบ ไม่ใช่ปล่อย Full Rich ตลอด","ตอนบินระดับ ตั้งกำลังตามตารางก่อน แล้วค่อย Lean ช้า ๆ จนถึง Peak EGT","จาก Peak ให้เติมกลับมาตามที่ POH สั่งสำหรับโหมดที่ต้องการ — เติมกลับมากคือเน้นกำลัง เติมน้อยคือเน้นประหยัด","ทุกครั้งที่เปลี่ยนระดับความสูงหรือเปลี่ยนกำลัง Peak จะย้าย ต้องหาใหม่","ก่อนลดระดับและเข้าสนาม ให้เติมส่วนผสมกลับตามขั้นตอน ไม่งั้นเครื่องอาจสำลักตอนต้องการกำลังกะทันหัน","อย่าลืมว่า CHT คือตัวที่ทำให้เครื่องเสียหาย ไม่ใช่ EGT — ถ้า CHT สูง ให้แก้ก่อนแม้ EGT จะดูปกติ"]}]},
+da42:{
+ lede:"เครื่องดีเซลไม่มีคัน Mixture เพราะมันไม่ได้คุมกำลังด้วยส่วนผสม แต่คุมด้วยปริมาณน้ำมันที่ฉีดล้วน ๆ อากาศเข้าเต็มที่ตลอดเวลา อัตราส่วนอากาศต่อน้ำมันจึงเปลี่ยนไปตามกำลังที่ใช้ และอยู่ฝั่ง Lean เสมอ ไม่เคย Rich เกินพอดี",
+ cap:"เส้นทึบคืออัตราส่วนอากาศต่อน้ำมัน เดินเบาจะ Lean มากเพราะฉีดน้ำมันนิดเดียวแต่อากาศเข้าเต็ม พอเพิ่มกำลังก็เข้มขึ้นแต่ไม่เคยลงมาแตะเส้นอัตราส่วนพอดีทางเคมี ส่วนเส้นประคือ EGT ซึ่งขึ้นตามปริมาณน้ำมันที่ฉีด แปลว่าใน AE300 การอ่าน EGT เป็นเรื่องของภาระเครื่องยนต์ ไม่ใช่เรื่องการปรับส่วนผสมของนักบิน",
+ qa:[
+  {c:"--air",q:"ทำไมดีเซลไม่ต้อง Lean",list:["ดีเซลไม่มีลิ้นเร่งคุมกำลัง อากาศจึงเข้าเต็มที่ทุกรอบไม่ว่าจะใช้กำลังเท่าไหร่","กำลังมากน้อยขึ้นกับปริมาณน้ำมันที่ฉีดเข้าไปอย่างเดียว","ผลคือมีอากาศเหลือเสมอ ไม่มีสภาวะ Rich เกินพอดีให้ต้องแก้","การเผาไหม้เป็นแบบละอองน้ำมันติดไฟทันทีที่เจออากาศร้อน ไม่ต้องรอให้ผสมกันทั่วก่อนแบบเครื่องหัวเทียน","จึงไม่มีจุด Peak EGT ให้ตามหา และไม่มีคัน Mixture ในห้องนักบิน"]},
+  {c:"--air",q:"อัตราส่วนอากาศต่อน้ำมันอยู่ประมาณไหน",a:"ตอนเดินเบาจะ Lean มากเพราะฉีดน้ำมันน้อยมากแต่อากาศเข้าเต็มกระบอกสูบ พอเพิ่มกำลัง น้ำมันมากขึ้น อัตราส่วนก็เข้มขึ้นเรื่อย ๆ แต่ยังเหลืออากาศส่วนเกินอยู่เสมอ นี่คือเหตุผลที่ไอเสียดีเซลมีออกซิเจนเหลือ และเป็นเหตุผลที่มันเผาไหม้ได้ทั่วถึงโดยไม่ต้องคุมส่วนผสมให้พอดีเป๊ะ ตัวเลขจริงให้ดูจากเอกสารของผู้ผลิตเครื่องยนต์",},
+  {c:"--arc",q:"ความสูงเข้ามาเกี่ยวยังไง",list:["เทอร์โบอัดอากาศชดเชยความหนาแน่นที่หายไป มวลอากาศต่อรอบจึงไม่ตกเร็วเหมือนเครื่องไร้เทอร์โบ","ECU วัดความดันและอุณหภูมิอากาศไอดีอยู่ตลอด แล้วคำนวณปริมาณน้ำมันที่เหมาะสมให้เอง","นักบินจึงไม่มีขั้นตอน Lean ไม่ว่าจะไต่ ล่องเรือ หรือลดระดับ","เหนือ critical altitude กำลังจะเริ่มลดลงตามหลักการเดียวกับเครื่องทั่วไป แต่ ECU ยังคุมส่วนผสมให้เหมาะสมอยู่","สิ่งที่นักบินทำคือเลื่อนคันกำลังเดียว ที่เหลือระบบจัดการ"]},
+  {c:"--redline",q:"แล้วต้องระวังอะไร",list:["อย่าเข้าใจผิดว่าไม่มีอะไรต้องดู — ข้อความเตือนจาก ECU คือสิ่งที่แทนการอ่านเข็มของเครื่องหัวเทียน","อุณหภูมิที่ต้องเฝ้าคือน้ำหล่อเย็นและน้ำมันเครื่อง ไม่ใช่การไล่ตาม EGT","ฝั่งไอเสียร้อนจัดเพราะมีเทอร์โบอยู่ในทาง รอยรั่วของท่อไอเสียเป็นเรื่องใหญ่","คุณภาพเชื้อเพลิงและตัวดักน้ำสำคัญมาก น้ำในน้ำมันทำให้ระบบคอมมอนเรลเสียหายได้","ยึดขั้นตอนใน AFM เสมอ อย่าเอาความเคยชินจากเครื่องหัวเทียนมาใช้"]}]}
+}};
+
+var CMPS={
+engine:{
+ eyebrow:"เทียบกันตรง ๆ",
+ title:"จุดที่ทำให้สองเครื่องนี้ไม่เหมือนกัน",
+ lede:"ทั้งคู่คือลูกสูบ 4 จังหวะ 4 สูบเหมือนกัน ความต่างเกือบทั้งหมดสืบย้อนกลับไปได้ที่ข้อเดียว คือจะจุดไฟด้วยประกายไฟ หรือจะให้มันติดเองด้วยความร้อนจากการอัด",
+ note:"<b>ระวังตรงนี้</b> — ไอเสียของ C172S วิ่งผ่านมัฟเฟลอร์ที่มีปลอกครอบ (shroud) แล้วเป่าอากาศร้อนเข้าห้องโดยสารเป็น cabin heat ถ้าท่อไอเสียในปลอกร้าว คาร์บอนมอนอกไซด์จะเข้าห้องนักบินโดยตรง จึงต้องตรวจปลอกและท่อทุกครั้ง และเฝ้าดูแผ่นตรวจ CO ส่วน DA42 ใช้ความร้อนจากน้ำหล่อเย็นทำ cabin heat จึงไม่มีเส้นทางนี้",
+ rows:[
+["ชนิดการจุดระเบิด","ประกายไฟจากหัวเทียน 2 หัวต่อสูบ ป้อนไฟจากแมกนีโต 2 ชุดที่ทำงานได้เองโดยไม่ง้อไฟจากแบตเตอรี่","อัดอากาศจนร้อนแล้วน้ำมันติดไฟเอง ไม่มีหัวเทียน ไม่มีแมกนีโต มี glow plug ช่วยเฉพาะตอนสตาร์ทเครื่องเย็น"],
+["เชื้อเพลิง","AVGAS 100LL (ย้อมสีฟ้า)","Jet A-1 หรือดีเซล"],
+["จุดที่น้ำมันเจออากาศ","ที่พอร์ตไอดี หน้าลิ้นไอดี — ผสมเสร็จก่อนเข้ากระบอกสูบ","ในห้องเผาไหม้ ปลายจังหวะอัด — ผสมในกระบอกสูบ"],
+["ระบบจ่ายน้ำมัน","หัวฉีดที่พอร์ต แบบไหลต่อเนื่อง (Bendix RSA servo + flow divider) ไม่มีคาร์บูเรเตอร์","คอมมอนเรลฉีดตรง แรงดัน ~1,800 บาร์ หัวฉีดไฟฟ้าสั่งด้วย FADEC"],
+["อัตราส่วนกำลังอัด","8.5 : 1","≈ 18 : 1"],
+["การป้อนอากาศ","ดูดเอง (normally aspirated) กำลังลดลงตามความสูง","เทอร์โบชาร์จ + อินเตอร์คูลเลอร์ รักษากำลังได้สูงขึ้น"],
+["วิธีคุมกำลัง","ลิ้นเร่งคุมปริมาณอากาศ แล้วปรับส่วนผสมด้วยคัน Mixture","คุมที่ปริมาณน้ำมันที่ฉีด อากาศเข้าเต็มที่ตลอด"],
+["กลไกเปิดวาล์ว","เพลาลูกเบี้ยวในห้องข้อเหวี่ยง → ก้านกระทุ้ง → กระเดื่องวาล์ว","เพลาลูกเบี้ยวเหนือฝาสูบ กดก้านวาล์วโดยตรง"],
+["การขับใบพัด","ขับตรง 2,700 RPM สูงสุด","ผ่านเกียร์ทดประมาณ 1.69 : 1 ใบพัดหมุน 2,300 RPM"],
+["คันบังคับในห้องนักบิน","Throttle + Mixture (+ Prop ในรุ่นใบพัดปรับพิทช์) และมีอัลเทอร์เนตแอร์ให้ดูแล","คันเดียวต่อเครื่อง (Power lever) FADEC จัดการที่เหลือทั้งหมด"],
+["สิ่งที่ตรวจก่อนบิน","Mag check ซ้าย-ขวา, ตรวจ alternate air, Lean Mixture ตามระดับความสูง","ECU test A / B แทน mag check ไม่มีการ Lean ไม่มีการ prime"],
+["ไอเสียไปไหน","ท่อร่วม → มัฟเฟลอร์ที่มีปลอกครอบ (ใช้ทำ cabin heat) → ปลายท่อใต้ลำตัว","ท่อร่วม → กังหันเทอร์โบ → wastegate → ปลายท่อ"],
+["กำลัง","180 แรงม้า ที่ 2,700 RPM","168 แรงม้า ที่ใบพัด 2,300 RPM ต่อเครื่อง"]]},
+
+lube:{
+ eyebrow:"เทียบกันตรง ๆ",
+ title:"ระบบหล่อลื่น — เทียบกัน",
+ lede:"หลักการเดียวกันทั้งคู่ คือปั๊มดูดน้ำมันจากอ่างไปเลี้ยงทุกจุดที่มีโลหะเสียดสีกัน แล้ววนกลับ ความต่างอยู่ที่ AE300 มีของที่ต้องเลี้ยงเพิ่มสองอย่างซึ่งเปลี่ยนวิธีใช้งานไปด้วย",
+ note:"<b>ระวังตรงนี้</b> — สำหรับ DA42 การดับเครื่องทันทีหลังใช้กำลังสูงจะทำให้น้ำมันค้างในแบริ่งเทอร์โบที่ยังร้อนจัดแล้วไหม้เป็นคราบ ต้องเดินเบาให้เย็นตามเวลาที่คู่มือกำหนดก่อนดับ ส่วน C172S เรื่องที่พลาดกันบ่อยที่สุดคือฝาช่องเติมน้ำมันไม่ได้ขันแน่นหลังเช็กระดับ ซึ่งทำให้น้ำมันพ่นออกจนหมดได้ระหว่างบิน",
+ rows:[
+["รูปแบบระบบ","Wet sump — เก็บน้ำมันในอ่างใต้ห้องข้อเหวี่ยง ไม่มีถังแยก","ปั๊มดูดจากอ่างเช่นกัน แต่ต้องเลี้ยงเทอร์โบและเกียร์ทดเพิ่ม (ยืนยันรายละเอียดในคู่มือเครื่องยนต์)"],
+["ชนิดน้ำมัน","น้ำมันการบินแบบ ashless dispersant เช่นเบอร์มัลติเกรดสำหรับเครื่องบินเล็ก","น้ำมันตามรายการที่ Austro อนุมัติ ซึ่งเป็นน้ำมันดีเซลสมัยใหม่ — ห้ามใช้สลับกับน้ำมันการบิน"],
+["ปริมาณ","สูงสุด 8 qt ปกติเติมไว้ราว 6–7 qt สำหรับบินทางไกล (ยึดตาม POH)","ตามที่คู่มือเครื่องยนต์กำหนด และมีวิธีเช็กระดับเฉพาะของมันเอง"],
+["จุดที่ต้องเลี้ยง","แบริ่งข้อเหวี่ยงและก้านสูบ เพลาลูกเบี้ยว ลิฟเตอร์ กระเดื่องวาล์ว ผนังกระบอกสูบ","ทุกจุดเดียวกัน บวกแบริ่งเทอร์โบ ชุดเกียร์ทดใบพัด และหัวพ่นน้ำมันใต้ลูกสูบ"],
+["ทางน้ำมันขึ้นไปฝาสูบ","ขึ้นไปตามท่อก้านกระทุ้ง แล้วไหลกลับลงอ่างทางเดียวกัน","ขึ้นไปตามทางน้ำมันในเสื้อสูบถึงเพลาลูกเบี้ยวเหนือฝาสูบ"],
+["การกรอง","กรอง full-flow แบบเกลียวหมุน มีทางบายพาสถ้าไส้ตัน","กรอง full-flow มีทางบายพาสเช่นกัน รอบเปลี่ยนถี่กว่าเพราะดีเซลสร้างเขม่ามาก"],
+["การระบายความร้อนน้ำมัน","ออยล์คูลเลอร์ระบายด้วยอากาศ มีวาล์วเทอร์โมสตัทบายพาสตอนน้ำมันเย็น","มีตัวระบายความร้อนน้ำมันเช่นกัน และทำงานร่วมกับระบบน้ำหล่อเย็นของเครื่อง"],
+["ใครเฝ้าดู","นักบินอ่านเกจแรงดันและอุณหภูมิเอง แล้วตัดสินใจเอง","ECU/FADEC เฝ้าดูตลอดเวลา แล้วขึ้นข้อความเตือนบน G1000"],
+["สัญญาณอันตราย","แรงดันไม่ขึ้นภายในราว 30 วินาทีหลังสตาร์ท / แรงดันตกพร้อมอุณหภูมิขึ้น","ข้อความเตือนจาก ECU เรื่องแรงดันหรืออุณหภูมิน้ำมัน ให้ทำตาม AFM"],
+["ผลต่อขั้นตอนดับเครื่อง","ลดกำลัง เดินเบาสั้น ๆ แล้วดับด้วย Mixture","ต้องเผื่อเวลาเดินเบาให้เทอร์โบเย็นก่อนดับ"]]},
+
+cool:{
+ eyebrow:"เทียบกันตรง ๆ",
+ title:"ระบบระบายความร้อน — เทียบกัน",
+ lede:"เครื่องยนต์ลูกสูบเปลี่ยนพลังงานในน้ำมันเป็นกำลังได้ราวหนึ่งในสาม ที่เหลือกลายเป็นความร้อนที่ต้องทิ้งให้ทัน ทั้งสองลำทิ้งความร้อนคนละวิธี และนั่นเปลี่ยนสิ่งที่นักบินต้องทำไปด้วย",
+ note:"<b>ระวังตรงนี้</b> — C172S ไม่มีอะไรคุมอุณหภูมิให้อัตโนมัติเลย ซีลยางของแผ่นกั้นที่แข็งกรอบหรือหลุดเพียงเส้นเดียวทำให้ CHT สูงขึ้นได้ทันทีโดยไม่มีอะไรผิดปกติที่อื่น จึงเป็นรายการเดินรอบเครื่องที่ห้ามข้าม ส่วน DA42 รายการที่เพิ่มเข้ามาคือระดับน้ำหล่อเย็นและรอยรั่ว",
+ rows:[
+["ตัวกลางระบายความร้อน","อากาศ ผ่านครีบระบายความร้อนที่ฝาสูบและกระบอกสูบ","ของเหลว (น้ำผสมไกลคอล) วนในช่องรอบกระบอกสูบและห้องเผาไหม้"],
+["สิ่งที่ทำให้ไหล","แรงลมจากการบิน + ใบพัด ไม่มีปั๊ม","ปั๊มน้ำขับด้วยเครื่องยนต์ ไหลได้แม้จอดอยู่กับที่"],
+["สิ่งที่บังคับทิศทาง","แผ่นกั้น (baffle) และซีลยาง","ท่อทางน้ำและวาล์วเทอร์โมสตัท"],
+["ที่ทิ้งความร้อน","อากาศที่ไหลออกช่องระบายใต้ท้องเครื่อง","หม้อน้ำในแนซเซล ระบายให้อากาศอีกที"],
+["ควบคุมอุณหภูมิยังไง","นักบินคุมเอง ด้วยความเร็ว กำลัง และส่วนผสม","เทอร์โมสตัทคุมอัตโนมัติ อุณหภูมิแทบคงที่ตลอดเที่ยวบิน"],
+["อุณหภูมิที่เฝ้าดู","CHT, EGT และอุณหภูมิน้ำมัน","อุณหภูมิน้ำหล่อเย็นและอุณหภูมิน้ำมัน แสดงบน G1000"],
+["Shock cooling","เป็นประเด็นจริง ลดกำลังกะทันหันตอนลดระดับทำให้ฝาสูบเย็นเร็วเกินไป","แทบไม่เป็นประเด็น เพราะของเหลวและเทอร์โมสตัทกันการเปลี่ยนอุณหภูมิฉับพลันไว้"],
+["ตอนอยู่บนพื้น","ระบายความร้อนได้แย่ที่สุด ต้องจำกัดเวลาเดินเครื่องและหันหัวรับลม","ปั๊มยังทำงาน ระบายความร้อนได้ตามปกติ"],
+["cabin heat มาจากไหน","อากาศที่ไหลผ่านปลอกครอบท่อไอเสีย — มีความเสี่ยง CO ถ้าท่อร้าว","น้ำหล่อเย็นร้อนผ่านตัวแลกเปลี่ยนความร้อน — ไม่มีเส้นทาง CO"],
+["น้ำหนักและความซับซ้อน","เบาและเรียบง่าย ชิ้นส่วนน้อย ไม่มีของเหลวให้รั่ว","หนักกว่าและซับซ้อนกว่า มีปั๊ม หม้อน้ำ ท่อ และจุดที่รั่วได้"],
+["สิ่งที่ต้องตรวจก่อนบิน","แผ่นกั้นและซีลยาง ครีบไม่หัก ช่องอากาศไม่มีสิ่งอุดตัน","ระดับน้ำหล่อเย็นในถังพัก รอยรั่ว และช่องรับอากาศของหม้อน้ำ"]]},
+
+turbo:{
+ eyebrow:"เทียบกันตรง ๆ",
+ title:"ไม่มีเทอร์โบ กับ มีเทอร์โบ",
+ lede:"นี่คือหัวข้อเดียวที่เครื่องบินสองลำนี้ไม่ได้ทำสิ่งเดียวกันคนละวิธี แต่ลำหนึ่งมีระบบนี้ อีกลำไม่มีเลย ตารางนี้จึงอ่านเป็น \u0022อะไรเปลี่ยนไปบ้างเมื่อเพิ่มเทอร์โบเข้ามา\u0022",
+ note:"<b>ระวังตรงนี้</b> — เทอร์โบทำให้ฝั่งไอเสียร้อนจัดและหมุนเร็วมาก แบริ่งของมันพึ่งน้ำมันเครื่องทั้งการหล่อลื่นและการระบายความร้อน การดับเครื่องทันทีหลังใช้กำลังสูงจะทิ้งน้ำมันไว้ในแบริ่งที่ยังร้อนจนไหม้เป็นคราบ ต้องเดินเบาให้เย็นตามเวลาที่คู่มือกำหนดเสมอ",
+ rows:[
+["มีระบบนี้ไหม","ไม่มี — normally aspirated ดูดอากาศเข้าเองด้วยความดันบรรยากาศ","มี — เทอร์โบชาร์จเจอร์ตัวเดียวต่อเครื่อง"],
+["พลังงานที่ใช้อัดอากาศ","ไม่มีการอัด พลังงานในไอเสียถูกทิ้งไปทั้งหมด","เอาพลังงานจากไอเสียที่จะทิ้งอยู่แล้วกลับมาใช้ ไม่ดึงกำลังจากเพลาข้อเหวี่ยง"],
+["กำลังเมื่อบินสูง","ลดลงเรื่อย ๆ ตามความหนาแน่นอากาศ","รักษาไว้ได้จนถึง critical altitude แล้วจึงเริ่มลดลง"],
+["อินเตอร์คูลเลอร์","ไม่มี ไม่จำเป็น","มี เพราะอากาศที่ถูกอัดจะร้อนขึ้นและเบาบางลง ต้องทำให้เย็นก่อนเข้าเครื่อง"],
+["การคุมความดันไอดี","ลิ้นเร่งอย่างเดียว สูงสุดได้เท่าความดันบรรยากาศ","เวสต์เกตปล่อยไอเสียข้ามกังหัน ควบคุมโดย ECU ให้บูสต์อยู่ในพิกัด"],
+["ชิ้นส่วนที่เพิ่มเข้ามา","—","คอมเพรสเซอร์ กังหัน เพลาและแบริ่ง เวสต์เกต อินเตอร์คูลเลอร์ ท่อทางน้ำมันเลี้ยงแบริ่ง"],
+["ผลต่อระบบหล่อลื่น","ไม่มีผล","น้ำมันเครื่องต้องเลี้ยงแบริ่งเทอร์โบตลอดเวลา ทั้งหล่อลื่นและระบายความร้อน"],
+["ผลต่อขั้นตอนดับเครื่อง","ลดกำลัง เดินเบาสั้น ๆ แล้วดับด้วย Mixture","ต้องเผื่อเวลาเดินเบาให้เทอร์โบเย็นก่อนดับ ตามที่คู่มือกำหนด"],
+["ความร้อนที่ต้องจัดการ","ไอเสียร้อน แต่ออกท่อไปเลย","ฝั่งไอเสียร้อนจัดต่อเนื่อง ท่อและซีลรอบเทอร์โบเป็นจุดตรวจที่สำคัญ"],
+["สิ่งที่นักบินต้องเฝ้า","CHT, EGT และการ Lean ตามความสูง","ECU คุมบูสต์ให้เอง นักบินดูข้อความเตือนบน G1000 เป็นหลัก"],
+["ได้อะไร เสียอะไร","เบา เรียบง่าย ค่าซ่อมบำรุงต่ำ แต่สมรรถนะตกตามความสูง","สมรรถนะที่ความสูงดีกว่าชัดเจน แลกกับน้ำหนัก ความซับซ้อน และวินัยในการใช้งาน"]]},
+
+egt:{
+ eyebrow:"เทียบกันตรง ๆ",
+ title:"EGT กับส่วนผสม — สองแบบที่คิดคนละทาง",
+ lede:"C172S ให้ EGT เป็นเครื่องมือให้นักบินหาส่วนผสมที่ถูกต้องเอง ส่วน DA42 ตัดงานนั้นออกไปทั้งหมดเพราะเครื่องดีเซลไม่ได้คุมกำลังด้วยส่วนผสม ตารางนี้เทียบให้เห็นว่าอะไรเป็นหน้าที่ของใคร",
+ note:"<b>ระวังตรงนี้</b> — สำหรับ C172S จำไว้ว่า EGT เป็นแค่ตัวชี้ตำแหน่ง แต่ CHT ต่างหากที่เป็นตัวบอกความเสียหาย เครื่องพังเพราะฝาสูบร้อนเกิน ไม่ได้พังเพราะเลข EGT สูง และที่กำลังสูงให้ทำตามที่ POH สั่งเรื่องการ Lean เสมอ อย่า Lean ตามความรู้สึก",
+ rows:[
+["ใครคุมส่วนผสม","นักบิน ผ่านคัน Mixture โดยใช้ EGT เป็นตัวชี้ตำแหน่ง","ECU/FADEC คุมให้ทั้งหมด ไม่มีคัน Mixture"],
+["ช่วงอัตราส่วนอากาศต่อน้ำมัน","ทำงานคร่อมจุดพอดีทางเคมี ทั้งฝั่ง Rich และฝั่ง Lean","อยู่ฝั่ง Lean เสมอ มีอากาศเหลือทุกสภาวะ"],
+["EGT สูงสุดเกิดตอนไหน","ที่ส่วนผสมพอดีทางเคมี Rich กว่าหรือ Lean กว่านั้น EGT ตกทั้งคู่","ไม่มีจุด Peak EGT ขึ้นตามปริมาณน้ำมันที่ฉีดเรื่อย ๆ"],
+["กำลังสูงสุดอยู่ตรงไหน","ฝั่ง Rich ของ Peak EGT ไม่ใช่ที่ Peak","ที่ปริมาณน้ำมันสูงสุดที่ ECU ยอมให้ฉีด"],
+["เมื่อไต่สูงขึ้นเกิดอะไร","อากาศน้อยลงแต่น้ำมันเท่าเดิม ส่วนผสม Rich ขึ้นเอง","เทอร์โบชดเชยความหนาแน่น และ ECU ปรับน้ำมันตามอากาศจริง"],
+["นักบินต้องทำอะไร","Lean ตามขั้นตอนใน POH ทุกครั้งที่เปลี่ยนระดับหรือเปลี่ยนกำลัง","ไม่ต้องทำอะไร เลื่อนคันกำลังอย่างเดียว"],
+["ตอนลดระดับและเข้าสนาม","ต้องเติมส่วนผสมกลับตามขั้นตอน ไม่งั้นเครื่องอาจสำลักตอนต้องเร่ง","ไม่มีขั้นตอนนี้"],
+["ถ้าทำผิดจะเป็นยังไง","Rich เกินไป = เปลืองน้ำมัน เขม่าจับหัวเทียน กำลังตก / Lean เกินไปตอนกำลังสูง = CHT พุ่ง เสี่ยงเสียหาย","ความเสี่ยงย้ายไปอยู่ที่คุณภาพเชื้อเพลิงและการดูแลระบบแทน"],
+["ใช้ EGT วินิจฉัยได้ไหม","ได้ ถ้ามีทีละสูบ EGT ที่ผิดจากเพื่อนมากบอกปัญหาหัวฉีด หัวเทียน หรือวาล์วของสูบนั้น","การวินิจฉัยเป็นหน้าที่ของ ECU และเครื่องมือของช่าง"],
+["อุณหภูมิที่ต้องเฝ้าจริง ๆ","CHT เป็นตัวบอกความเสียหาย EGT เป็นแค่ตัวชี้ตำแหน่ง","อุณหภูมิน้ำหล่อเย็นและน้ำมันเครื่อง"]]}
+};
+
+var LEGENDS={
+engine:function(k){return[["--air","อากาศ"],["--fuel","น้ำมันเชื้อเพลิง"],["--mix","ไอดีที่ผสมแล้ว"],
+  ["--exh","ไอเสีย"],["--ink-3","พลังงาน/ความร้อนที่ถูกนำไปใช้ต่อ"]];},
+lube:function(k){return[["--oil","น้ำมันเครื่อง"],["--arc","สิ่งที่แสดงในห้องนักบิน"],
+  ["--redline",k==="da42"?"จุดที่ร้อนที่สุดในระบบ":"—"]].filter(function(x){return x[1]!=="—";});},
+egt:function(k){return k==="c172"
+  ?[["--redline","EGT"],["--mix","กำลัง"],["--exh","CHT"],["--air","ผลของความสูง"],["--fuel","ส่วนผสมที่เปลี่ยนไปเอง"]]
+  :[["--air","อัตราส่วนอากาศ : น้ำมัน"],["--redline","EGT"],["--arc","สิ่งที่ ECU จัดการให้"],["--ink-3","สิ่งที่เครื่องนี้ไม่มี"]];},
+turbo:function(k){return k==="c172"
+  ?[["--air","อากาศ"],["--exh","ไอเสีย"],["--ink-3","ชิ้นส่วนที่เครื่องนี้ไม่มี"]]
+  :[["--air","อากาศ"],["--exh","ไอเสีย"],["--ink-3","เพลาที่เชื่อมกังหันกับคอมเพรสเซอร์"],["--oil","น้ำมันเลี้ยงแบริ่ง"],["--arc","ตัวคุมบูสต์"]];},
+cool:function(k){return k==="c172"
+  ?[["--air","อากาศระบายความร้อน"],["--oil","น้ำมันเครื่องช่วยระบายความร้อน"],["--exh","ทางที่ความร้อนไปห้องโดยสาร"],["--redline","จุดเสี่ยง CO"],["--arc","สิ่งที่นักบินคุมได้"]]
+  :[["--cool","น้ำหล่อเย็นที่เย็นแล้ว"],["--exh","น้ำหล่อเย็นที่ร้อน"],["--air","อากาศ"],["--arc","ทางที่ปลอดภัยกว่า"]];}
+};
+
+var TOPIC_HEAD={
+ engine:{eb:"ทางเดินของไหล",h:"เส้นทางอากาศ น้ำมัน และไอเสีย",qa:"ตอบสี่คำถาม"},
+ lube:{eb:"ทางเดินน้ำมันเครื่อง",h:"ระบบหล่อลื่น",qa:"ตอบสี่คำถาม"},
+ cool:{eb:"ทางเดินความร้อน",h:"ระบบระบายความร้อน",qa:"ตอบสี่คำถาม"},
+ turbo:{eb:"เทอร์โบชาร์จเจอร์",h:"ระบบเทอร์โบ",qa:"ตอบสี่คำถาม"},
+ egt:{eb:"อุณหภูมิไอเสียกับส่วนผสม",h:"EGT กับส่วนผสม",qa:"ตอบสี่คำถาม"}
+};
+
+function renderCopy(cfg){
+  var c=COPY[topic][cfg.key],h=TOPIC_HEAD[topic],nm=cfg.key==="c172"?"C172S":"DA42";
+  $("flowEyebrow").textContent=h.eb;
+  $("flowTitle").textContent=h.h+" — "+nm;
+  $("flowLede").textContent=c.lede;
+  $("flowCap").textContent=c.cap;
+  $("qaEyebrow").textContent=h.qa;
+  $("qaTitle").textContent="สรุปเป็นข้อ ๆ — "+nm;
+  var qa=$("qa");qa.textContent="";
+  c.qa.forEach(function(item){
+    var d=document.createElement("div");d.className="card";d.style.setProperty("--c","var("+item.c+")");
+    var q=document.createElement("div");q.className="q";q.textContent=item.q;d.appendChild(q);
+    if(item.a){var pp=document.createElement("p");pp.className="a";pp.textContent=item.a;d.appendChild(pp);}
+    if(item.list){var ol=document.createElement("ol");
+      item.list.forEach(function(li){var l=document.createElement("li");l.textContent=li;ol.appendChild(l);});
+      d.appendChild(ol);}
+    qa.appendChild(d);
+  });
+  var lg=$("legend");lg.textContent="";
+  LEGENDS[topic](cfg.key).forEach(function(p){
+    var sp=document.createElement("span");
+    var i=document.createElement("i");i.style.background="var("+p[0]+")";
+    sp.appendChild(i);sp.appendChild(document.createTextNode(p[1]));lg.appendChild(sp);
+  });
+  var T=CMPS[topic];
+  $("cmpEyebrow").textContent=T.eyebrow;$("cmpTitle").textContent=T.title;
+  $("cmpLede").textContent=T.lede;$("topicNote").innerHTML=T.note;
+  var tb=$("cmp");tb.textContent="";
+  T.rows.forEach(function(row){
+    var tr=document.createElement("tr");
+    var th=document.createElement("th");th.scope="row";th.textContent=row[0];tr.appendChild(th);
+    var a=document.createElement("td");a.className="c172";a.textContent=row[1];tr.appendChild(a);
+    var b=document.createElement("td");b.className="da42";b.textContent=row[2];tr.appendChild(b);
+    tb.appendChild(tr);
+  });
+}
+
+/* ---------- EGT interactive model ---------- */
+var SIM={alt:0,thr:75,mix:100};
+function sigmaOf(h){var t=1-6.87535e-6*h;return t<0?0:Math.pow(t,4.2561);}
+
+function modelC172(alt,thr,mix){
+  var sg=sigmaOf(alt),t=thr/100,m=mix/100;
+  var afr=11.5*Math.sqrt(sg)/m, phi=14.7/afr, dp=phi-1;
+  var dpf=Math.max(0,1.132*sg-0.132);
+  var g=Math.exp(-1.9*Math.pow(phi-1.15,2));
+  var pwr=t*dpf*g*100;
+  var egtPeak=1230+250*(t*dpf);
+  var dT=-(dp>0?3200:4600)*dp*dp;
+  return {sg:sg,afr:afr,phi:phi,pwr:pwr,egt:egtPeak+dT,egtPeak:egtPeak,dT:dT,
+    cht:240+160*(pwr/100)+55*Math.exp(-9*Math.pow(phi-1.08,2)),
+    ff:17*t*Math.sqrt(sg)*m, mPeak:11.5*Math.sqrt(sg)/14.7};
+}
+function modelDA42(alt,thr){
+  var sg=sigmaOf(alt),t=thr/100,crit=sigmaOf(10000);
+  var dens=sg>=crit?1:Math.max(0.45,sg/crit);
+  var pwr=t*dens*100,pf=pwr/100;
+  return {sg:sg,pwr:pwr,afr:19+58*Math.pow(Math.max(0,1-pf),1.5),
+    egt:320+420*pf,ff:2+32*pf,cool:88+7*pf,dens:dens};
+}
+
+/* ---------- gauge ---------- */
+var GG={};
+function buildGauge(cfg){
+  var g=document.getElementById("egtGauge");g.textContent="";GG={};
+  var isC=cfg.key==="c172";
+  GG.min=isC?900:200;GG.max=isC?1650:900;GG.red=isC?1560:820;
+  var cx=150,cy=142,R=104,A0=-120,A1=120;
+  GG.cx=cx;GG.cy=cy;GG.A0=A0;GG.A1=A1;
+  function ang(v){var f=(v-GG.min)/(GG.max-GG.min);f=Math.max(0,Math.min(1,f));return A0+(A1-A0)*f;}
+  GG.ang=ang;
+  function pol(r,a){var t=(a-90)*TAU;return [cx+r*Math.cos(t),cy+r*Math.sin(t)];}
+  GG.pol=pol;
+  function arcp(r,a0,a1){
+    var p=pol(r,a0),q=pol(r,a1),big=Math.abs(a1-a0)>180?1:0,sw=a1>a0?1:0;
+    return "M "+p[0].toFixed(1)+" "+p[1].toFixed(1)+" A "+r+" "+r+" 0 "+big+" "+sw+" "+q[0].toFixed(1)+" "+q[1].toFixed(1);
+  }
+  g.appendChild(el("path",{d:arcp(R,A0,A1),fill:"none",stroke:"#31403F","stroke-width":16,"stroke-linecap":"round"}));
+  g.appendChild(el("path",{d:arcp(R,ang(GG.red),A1),fill:"none",stroke:"#C4342A","stroke-width":16,"stroke-linecap":"round"}));
+  var step=isC?100:100;
+  for(var v=GG.min;v<=GG.max;v+=step){
+    var a=ang(v),p1=pol(R-11,a),p2=pol(R-20,a),p3=pol(R-33,a);
+    g.appendChild(el("line",{x1:p1[0],y1:p1[1],x2:p2[0],y2:p2[1],stroke:"#8FA09E","stroke-width":1.6}));
+    if((v-GG.min)%(step*2)===0)
+      g.appendChild(el("text",{x:p3[0],y:p3[1]+4,"text-anchor":"middle","font-size":11,fill:"#8FA09E",
+        "font-family":"IBM Plex Mono, monospace"},String(v)));
+  }
+  GG.bug=el("path",{d:"M 0 0 L -7 -12 L 7 -12 Z",fill:"#43BE92",opacity:isC?1:0});
+  g.appendChild(GG.bug);
+  GG.needle=el("path",{d:"M 0 0",fill:"none",stroke:"#E7EDEB","stroke-width":3.4,"stroke-linecap":"round"});
+  g.appendChild(GG.needle);
+  g.appendChild(el("circle",{cx:cx,cy:cy,r:8,fill:"#E7EDEB"}));
+  g.appendChild(el("circle",{cx:cx,cy:cy,r:3.4,fill:"#141B1D"}));
+  GG.val=el("text",{x:cx,y:cy+72,"text-anchor":"middle","font-size":30,fill:"#E7EDEB",
+    "font-family":"IBM Plex Mono, monospace","font-weight":500},"0");
+  g.appendChild(GG.val);
+  g.appendChild(el("text",{x:cx,y:cy+92,"text-anchor":"middle","font-size":11,fill:"#8FA09E",
+    "font-family":"IBM Plex Mono, monospace"},isC?"EGT  °F":"EGT  °C"));
+  GG.delta=el("text",{x:cx,y:cy+120,"text-anchor":"middle","font-size":12.5,fill:"#43BE92","font-weight":600},"");
+  g.appendChild(GG.delta);
+}
+
+/* ---------- live mixture curve ---------- */
+var CV={};
+function buildCurve(cfg){
+  var c=document.getElementById("egtCurve");c.textContent="";CV={};
+  var isC=cfg.key==="c172";
+  var px=54,py=34,pw=440,ph=176;
+  CV.px=px;CV.py=py;CV.pw=pw;CV.ph=ph;CV.isC=isC;
+  c.appendChild(el("path",{d:"M "+px+" "+py+" L "+px+" "+(py+ph)+" L "+(px+pw)+" "+(py+ph),
+    fill:"none",stroke:"#31403F","stroke-width":1.3}));
+  c.appendChild(el("text",{x:px,y:py-14,"font-size":11.5,fill:"#8FA09E"},
+    isC?"EGT ที่ตำแหน่งคัน Mixture ต่าง ๆ — ที่ความสูงและกำลังปัจจุบัน":"EGT ตามกำลังที่ใช้ — ECU คุมส่วนผสมให้เอง"));
+  c.appendChild(el("text",{x:px,y:py+ph+22,"font-size":10.5,fill:"#8FA09E"},isC?"◀ Lean":"◀ กำลังต่ำ"));
+  c.appendChild(el("text",{x:px+pw,y:py+ph+22,"text-anchor":"end","font-size":10.5,fill:"#8FA09E"},
+    isC?"Full Rich ▶":"กำลังเต็ม ▶"));
+  CV.peakLine=el("line",{x1:0,y1:py,x2:0,y2:py+ph,stroke:"#C4342A","stroke-width":1.3,
+    "stroke-dasharray":"5 4",opacity:isC?.9:0});
+  c.appendChild(CV.peakLine);
+  CV.peakTxt=el("text",{x:0,y:py-2,"text-anchor":"middle","font-size":10.5,fill:"#E9695C",opacity:isC?1:0},"Peak EGT");
+  c.appendChild(CV.peakTxt);
+  CV.pw2=el("path",{d:"",fill:"none",stroke:"#43BE92","stroke-width":2,"stroke-dasharray":"6 5",opacity:.9});
+  c.appendChild(CV.pw2);
+  CV.line=el("path",{d:"",fill:"none",stroke:"#FF8154","stroke-width":2.8,"stroke-linejoin":"round"});
+  c.appendChild(CV.line);
+  CV.dot=el("circle",{cx:0,cy:0,r:7,fill:"#FF8154",stroke:"#141B1D","stroke-width":2.4});
+  c.appendChild(CV.dot);
+  c.appendChild(el("text",{x:px+pw,y:py+12,"text-anchor":"end","font-size":10.5,fill:"#43BE92"},
+    isC?"เส้นประเขียว = กำลัง":"เส้นประเขียว = อากาศ : น้ำมัน"));
+}
+
+/* ---------- readouts ---------- */
+function ro(id,v){var n=document.getElementById(id);if(n)n.textContent=v;}
+function simUpdate(){
+  var isC=cur.key==="c172",m;
+  var lo=isC?35:0,hi=100;
+  if(isC){
+    m=modelC172(SIM.alt,SIM.thr,SIM.mix);
+    var f=(m.egt-GG.min)/(GG.max-GG.min);
+    var a=GG.ang(m.egt),p1=GG.pol(-24,a),p2=GG.pol(96,a);
+    GG.needle.setAttribute("d","M "+p1[0].toFixed(1)+" "+p1[1].toFixed(1)+" L "+p2[0].toFixed(1)+" "+p2[1].toFixed(1));
+    var ba=GG.ang(m.egtPeak),bp=GG.pol(116,ba);
+    GG.bug.setAttribute("transform","translate("+bp[0].toFixed(1)+","+bp[1].toFixed(1)+") rotate("+ba+")");
+    GG.val.textContent=Math.round(m.egt);
+    var d=Math.round(m.dT);
+    GG.delta.textContent=Math.abs(d)<8?"อยู่ที่ Peak EGT":(m.phi>1?"Rich of Peak "+Math.abs(d)+"°F":"Lean of Peak "+Math.abs(d)+"°F");
+    GG.delta.setAttribute("fill",Math.abs(d)<8?"#E9695C":(m.phi>1?"#EDB149":"#79BEE8"));
+    ro("roPwr",m.pwr.toFixed(0)+" %");
+    ro("roCht",m.cht.toFixed(0)+" °F");
+    ro("roFf",m.ff.toFixed(1)+" GPH");
+    ro("roAfr",m.afr.toFixed(1)+" : 1");
+    ro("roSig",(m.sg*100).toFixed(0)+" %");
+    ro("roPeak",Math.round(m.mPeak*100)+" %");
+    var st=[];
+    if(m.afr>19)st.push(["เดินไม่เรียบ — Lean เกินไป","#E9695C"]);
+    if(m.cht>450)st.push(["CHT สูง","#E9695C"]);
+    if(m.afr<12.2)st.push(["Rich มาก — เปลืองน้ำมัน","#EDB149"]);
+    var sb=document.getElementById("simFlags");
+    if(sb){sb.textContent="";st.forEach(function(x){
+      var e=document.createElement("span");e.className="chip on";e.style.background=x[1];e.textContent=x[0];sb.appendChild(e);});}
+    /* curve */
+    var pts=[],ppts=[],i,mm,mo,egMin=1e9,egMax=-1e9;
+    for(i=0;i<=60;i++){mm=35+(100-35)*i/60;mo=modelC172(SIM.alt,SIM.thr,mm);
+      pts.push([i/60,mo.egt]);ppts.push([i/60,mo.pwr]);
+      if(mo.egt<egMin)egMin=mo.egt;if(mo.egt>egMax)egMax=mo.egt;}
+    var lo2=egMin-40,hi2=egMax+40;
+    var X=function(u){return CV.px+u*CV.pw;},Y=function(v){return CV.py+CV.ph-(v-lo2)/(hi2-lo2)*CV.ph;};
+    CV.line.setAttribute("d",pts.map(function(q,i){return (i?"L ":"M ")+X(q[0]).toFixed(1)+" "+Y(q[1]).toFixed(1);}).join(" "));
+    var pmax=Math.max.apply(null,ppts.map(function(q){return q[1];}));
+    CV.pw2.setAttribute("d",ppts.map(function(q,i){
+      return (i?"L ":"M ")+X(q[0]).toFixed(1)+" "+(CV.py+CV.ph-(q[1]/Math.max(1,pmax))*CV.ph*0.86).toFixed(1);}).join(" "));
+    var u=(SIM.mix-35)/65;
+    CV.dot.setAttribute("cx",X(u).toFixed(1));CV.dot.setAttribute("cy",Y(m.egt).toFixed(1));
+    var up=Math.max(0,Math.min(1,(m.mPeak*100-35)/65));
+    CV.peakLine.setAttribute("x1",X(up).toFixed(1));CV.peakLine.setAttribute("x2",X(up).toFixed(1));
+    CV.peakTxt.setAttribute("x",X(up).toFixed(1));
+  }else{
+    m=modelDA42(SIM.alt,SIM.thr);
+    var a2=GG.ang(m.egt),q1=GG.pol(-24,a2),q2=GG.pol(96,a2);
+    GG.needle.setAttribute("d","M "+q1[0].toFixed(1)+" "+q1[1].toFixed(1)+" L "+q2[0].toFixed(1)+" "+q2[1].toFixed(1));
+    GG.val.textContent=Math.round(m.egt);
+    GG.delta.textContent="ECU คุมส่วนผสมให้ — ไม่มี Peak ให้ตามหา";
+    GG.delta.setAttribute("fill","#8FA09E");
+    ro("roPwr",m.pwr.toFixed(0)+" %");
+    ro("roCht",m.cool.toFixed(0)+" °C");
+    ro("roFf",m.ff.toFixed(1)+" L/h");
+    ro("roAfr",m.afr.toFixed(0)+" : 1");
+    ro("roSig",(m.sg*100).toFixed(0)+" %");
+    ro("roPeak",m.dens>=1?"ยังชดเชยได้เต็มที่":"เหนือ critical alt");
+    var sb2=document.getElementById("simFlags");
+    if(sb2){sb2.textContent="";
+      var e2=document.createElement("span");e2.className="chip on";e2.style.background="#43BE92";
+      e2.textContent="ไม่มีขั้นตอน Lean";sb2.appendChild(e2);}
+    var pts2=[],apts=[],j,tt,mo2,lo3=250,hi3=800;
+    for(j=0;j<=60;j++){tt=j/60*100;mo2=modelDA42(SIM.alt,tt);
+      pts2.push([j/60,mo2.egt]);apts.push([j/60,mo2.afr]);}
+    var X2=function(u){return CV.px+u*CV.pw;},Y2=function(v){return CV.py+CV.ph-(v-lo3)/(hi3-lo3)*CV.ph;};
+    CV.line.setAttribute("d",pts2.map(function(q,i){return (i?"L ":"M ")+X2(q[0]).toFixed(1)+" "+Y2(q[1]).toFixed(1);}).join(" "));
+    CV.pw2.setAttribute("d",apts.map(function(q,i){
+      return (i?"L ":"M ")+X2(q[0]).toFixed(1)+" "+(CV.py+CV.ph-Math.min(1,q[1]/80)*CV.ph).toFixed(1);}).join(" "));
+    var u2=SIM.thr/100;
+    CV.dot.setAttribute("cx",X2(u2).toFixed(1));CV.dot.setAttribute("cy",Y2(m.egt).toFixed(1));
+  }
+  ro("valAlt",SIM.alt.toLocaleString()+" ft");
+  ro("valThr",SIM.thr+" %");
+  ro("valMix",isC?SIM.mix+" %":"—");
+}
+function simSetup(cfg){
+  var isC=cfg.key==="c172";
+  buildGauge(cfg);buildCurve(cfg);
+  var mixWrap=document.getElementById("mixWrap");
+  document.getElementById("sMix").disabled=!isC;
+  ["btnRich","btnPeak","btnEcon"].forEach(function(id){
+    var b=document.getElementById(id);b.disabled=!isC;b.style.opacity=isC?1:.4;
+    b.style.cursor=isC?"pointer":"default";});
+  mixWrap.style.opacity=isC?1:.45;
+  document.getElementById("mixNote").textContent=isC?"100 % = Full Rich":"DA42 ไม่มีคัน Mixture — FADEC คุมให้";
+  document.getElementById("roPeakLabel").textContent=isC?"ตำแหน่งคันที่จะได้ Peak":"เทอร์โบชดเชยความหนาแน่น";
+  document.getElementById("roChtLabel").textContent=isC?"CHT":"อุณหภูมิน้ำหล่อเย็น";
+  simUpdate();
+}
+
+/* ---------- animation ---------- */
+var cur=ENG.c172, ang=0, playing=true, speed=70, last=null, dash=0;
+var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if(reduce)playing=false;
+
+
+function chargeColor(a,cfg){
+  if(a<180)return cfg.charge.intake==="mix"?cvar("--mix"):cvar("--air");
+  if(a<360)return cfg.charge.comp==="mix"?cvar("--mix"):cvar("--air");
+  if(a<cfg.burn.end)return cvar("--fire");
+  return cvar("--exh");
+}
+function drawCutaway(a,cfg){
+  var t=a*TAU;
+  var crown=CY.CKY-(CY.R*Math.cos(t)+Math.sqrt(CY.ROD*CY.ROD-CY.R*CY.R*Math.sin(t)*Math.sin(t)))-40;
+  C.piston.setAttribute("transform","translate(0,"+crown.toFixed(2)+")");
+  C.chamber.setAttribute("d",chamberD(cfg,crown));
+
+  var wx=CY.CX,wy=crown+40,px=CY.CX+CY.R*Math.sin(t),py=CY.CKY-CY.R*Math.cos(t);
+  var dx=px-wx,dy=py-wy,len=Math.sqrt(dx*dx+dy*dy),nx=-dy/len,ny=dx/len;
+  C.rod.setAttribute("d","M "+(wx+nx*10).toFixed(1)+" "+(wy+ny*10).toFixed(1)+
+    " L "+(px+nx*18).toFixed(1)+" "+(py+ny*18).toFixed(1)+
+    " L "+(px-nx*18).toFixed(1)+" "+(py-ny*18).toFixed(1)+
+    " L "+(wx-nx*10).toFixed(1)+" "+(wy-ny*10).toFixed(1)+" Z");
+  C.web.setAttribute("x2",px.toFixed(1));C.web.setAttribute("y2",py.toFixed(1));
+  C.cw.setAttribute("cx",(CY.CX-(px-CY.CX)*0.5).toFixed(1));
+  C.cw.setAttribute("cy",(CY.CKY-(py-CY.CKY)*0.5).toFixed(1));
+  C.bigEnd.setAttribute("cx",px.toFixed(1));C.bigEnd.setAttribute("cy",py.toFixed(1));
+  C.pinC.setAttribute("cx",px.toFixed(1));C.pinC.setAttribute("cy",py.toFixed(1));
+
+  var lifts=[0,0];
+  C.valves.forEach(function(v,i){
+    var lift=liftOf(a,v.open,v.close,cfg.maxLift);lifts[i]=lift;
+    v.move.setAttribute("transform","translate(0,"+lift.toFixed(2)+")");
+    v.spring.setAttribute("points",springPts(v.sx,v.sy-62,v.sy-CY.STEM+16+lift,6,14));
+    if(cfg.train==="pushrod"){
+      var phi=-v.lat*Math.asin(Math.min(1,lift/CY.PIV))/TAU;
+      var pvx=v.sx+v.lat*CY.PIV,pvy=v.sy-CY.STEM-12;
+      v.rocker.setAttribute("transform","rotate("+phi.toFixed(2)+" "+pvx+" "+pvy+")");
+      var lx=pvx+v.lat*(CY.ARM-CY.PIV)*Math.cos(phi*TAU),ly=pvy+v.lat*(CY.ARM-CY.PIV)*Math.sin(phi*TAU);
+      var o=rotPt(lx,ly,v.sx,v.sy,v.deg);
+      v.prod.setAttribute("x1",o[0].toFixed(1));v.prod.setAttribute("y1",o[1].toFixed(1));
+      v.prod.setAttribute("y2",(452-lift).toFixed(1));
+      v.tap.setAttribute("y",(452-lift).toFixed(1));
+      v.ccam.setAttribute("transform","rotate("+camAngle(a,v.open,v.close).toFixed(1)+" "+v.px0+" 494)");
+    }else{
+      v.cam.setAttribute("transform","rotate("+camAngle(a,v.open,v.close).toFixed(1)+" "+v.sx+" "+(v.sy-CY.STEM-24)+")");
+    }
+  });
+
+  var col=chargeColor(a,cfg),op=(a>=180&&a<360)?0.66:0.48;
+  C.chamber.setAttribute("fill",col);C.chamber.setAttribute("opacity",op);
+  if(C.bowl){C.bowl.setAttribute("fill",col);C.bowl.setAttribute("opacity",op);}
+
+  var burning=a>=cfg.burn.start&&a<=cfg.burn.end,fl=0;
+  if(burning)fl=Math.sin((a-cfg.burn.start)/(cfg.burn.end-cfg.burn.start)*Math.PI);
+  C.flash.setAttribute("opacity",(fl*0.95).toFixed(3));
+  if(cfg.bowl)C.flash.setAttribute("cy",(crown+18).toFixed(1));
+
+  var firing=inWin(a,cfg.fire.start,cfg.fire.end);
+  if(C.spark)C.spark.setAttribute("opacity",firing?(0.45+0.55*Math.random()).toFixed(2):0);
+  if(C.spray)C.spray.setAttribute("opacity",firing?0.92:0);
+  if(C.pspray)C.pspray.setAttribute("opacity",(0.5+0.4*(lifts[0]/cfg.maxLift)).toFixed(2));
+
+  dash-=3.2;
+  C.ipFlow.setAttribute("opacity",lifts[0]>0.5?Math.min(.8,lifts[0]/cfg.maxLift+0.12):0);
+  C.ipFlow.setAttribute("stroke",cfg.train==="pushrod"?cvar("--mix"):cvar("--air"));
+  C.ipFlow.setAttribute("stroke-dashoffset",dash);
+  C.epFlow.setAttribute("opacity",lifts[1]>0.5?Math.min(.8,lifts[1]/cfg.maxLift+0.12):0);
+  C.epFlow.setAttribute("stroke-dashoffset",-dash);
+  return lifts;
+}
+
+function draw(){
+  var cfg=cur,a=ang;
+  var lifts=drawCutaway(a,cfg);
+  FL.dashes.forEach(function(p){p.setAttribute("stroke-dashoffset",dash);});
+
+  W.needle.setAttribute("transform","rotate("+(a/2)+" 140 140)");
+  W.deg.textContent=Math.round(a)+"°";
+
+  var idx=Math.floor(a/180)%4;
+  for(var n=1;n<=4;n++){if(B[n])B[n].setAttribute("fill","#2A3538");}
+  var fc=cfg.order[Math.floor(norm(a+360)/180)%4];
+  if(B[fc])B[fc].setAttribute("fill","#5A3020");
+
+  var ph=cfg.phases[idx];
+  if($("phaseTh").textContent!==ph.th){
+    $("phaseTh").textContent=ph.th;
+    $("phaseNo").textContent="STROKE "+(idx+1)+" / 4 · "+ph.en;
+    $("phaseText").textContent=ph.t;
+  }
+  $("angOut").textContent=Math.round(a);
+  var burning=a>=cfg.burn.start&&a<=cfg.burn.end;
+  chip($("chIn"),lifts[0]>0.5);chip($("chEx"),lifts[1]>0.5);
+  chip($("chFu"),cfg.train==="pushrod"?true:inWin(a,cfg.fire.start,cfg.fire.end));
+  chip($("chFi"),burning);
+}
+
+function chip(node,on){node.classList.toggle("on",!!on);}
+
+function frame(ts){
+  if(last===null)last=ts;
+  var dt=Math.min(64,ts-last);last=ts;
+  if(playing)ang=norm(ang+speed*dt/1000);
+  draw();
+  requestAnimationFrame(frame);
+}
+
+function setEngine(key){
+  cur=ENG[key];
+  document.querySelectorAll(".plate").forEach(function(b){
+    b.setAttribute("aria-selected",String(b.dataset.eng===key));
+  });
+  $("rigTitle").textContent=cur.title;
+  $("rigSub").textContent=cur.sub;
+  buildCyl(cur);buildWheel(cur);buildBank(cur);buildFlow(cur);renderCopy(cur);
+  if(topic==="egt")simSetup(cur);
+  $("phaseTh").textContent="";
+  draw();
+}
+function setTopic(t){
+  topic=t;
+  document.querySelectorAll(".topic").forEach(function(b){
+    b.setAttribute("aria-selected",String(b.dataset.topic===t));
+  });
+  document.querySelector(".panel").style.display=(t==="engine")?"":"none";
+  $("egtPanel").style.display=(t==="egt")?"":"none";
+  buildFlow(cur);renderCopy(cur);
+  if(t==="egt")simSetup(cur);
+}
+["sAlt","sThr","sMix"].forEach(function(id){
+  $(id).addEventListener("input",function(){
+    if(id==="sAlt")SIM.alt=+this.value;
+    else if(id==="sThr")SIM.thr=+this.value;
+    else SIM.mix=+this.value;
+    simUpdate();
+  });
+});
+function setMix(v){v=Math.max(35,Math.min(100,Math.round(v)));SIM.mix=v;$("sMix").value=v;simUpdate();}
+$("btnRich").addEventListener("click",function(){setMix(100);});
+$("btnPeak").addEventListener("click",function(){
+  setMix(modelC172(SIM.alt,SIM.thr,100).mPeak*100);});
+$("btnEcon").addEventListener("click",function(){
+  var sg=sigmaOf(SIM.alt),dp=Math.sqrt(50/4600),afr=14.7/(1-dp);
+  setMix(11.5*Math.sqrt(sg)/afr*100);});
+document.querySelectorAll(".topic").forEach(function(b){
+  b.addEventListener("click",function(){setTopic(b.dataset.topic);});
+});
+
+document.querySelectorAll(".plate").forEach(function(b){
+  b.addEventListener("click",function(){setEngine(b.dataset.eng);});
+});
+$("playBtn").addEventListener("click",function(){
+  playing=!playing;this.textContent=playing?"หยุดชั่วคราว":"เล่นต่อ";
+});
+$("stepBtn").addEventListener("click",function(){
+  playing=false;$("playBtn").textContent="เล่นต่อ";
+  ang=norm((Math.floor(ang/180)+1)*180);draw();
+});
+$("speed").addEventListener("input",function(){speed=+this.value;});
+if(reduce)$("playBtn").textContent="เล่นต่อ";
+
+setEngine("c172");
+requestAnimationFrame(frame);
+
+/* rebuild colours if the viewer flips theme */
+var mq=window.matchMedia("(prefers-color-scheme: dark)");
+if(mq.addEventListener)mq.addEventListener("change",function(){setEngine(cur.key);});
+</script>
+
+
+</body></html>
